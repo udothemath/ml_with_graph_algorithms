@@ -15,3 +15,4 @@
 - Visualize a graph online: [GraphVis](https://networkrepository.com/graphvis.php?d=./data/gsm50/labeled/citeseer.edges)
 
 add test from aicloud
+add another test
