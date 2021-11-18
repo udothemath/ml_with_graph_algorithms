@@ -1,10 +1,27 @@
 # %%
 import os
+import pandas as pd
 
 PATH = "/Users/pro/Documents/ml_with_graph_algorithms/q1"
+PATH_DATA = f"{PATH}/data"
 
 os.chdir(PATH)
 print(os.getcwd())
+
+def using_pyg(if_download=True):
+    if if_download:
+        from torch_geometric.data import download_url, extract_zip
+        url = 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip'
+        extract_zip(download_url(url, f"{PATH_DATA}"), f"{PATH_DATA}")
+
+
+    movie_path = f'{PATH_DATA}/ml-latest-small/movies.csv'
+    rating_path = f'{PATH_DATA}/ml-latest-small/ratings.csv'
+    print("Download completed")
+
+    print(pd.read_csv(movie_path).head())
+    print(pd.read_csv(rating_path).head())
+
 
 def using_igraph(if_plot=False):
     from igraph import Graph, plot
@@ -77,10 +94,9 @@ def using_igraph(if_plot=False):
         # Plot the graph
         plot(g, out_fig_name, **visual_style)
     print("exit from using_igraph")
-# %%
 
 if __name__ == "__main__":
     print("hello")
-    using_igraph()
-
-
+    # using_igraph()
+    using_pyg(if_download=False)
+# %%
