@@ -13,34 +13,20 @@ PATH_DATA = f"{PATH}/data"
 os.chdir(PATH)
 print(f"Current directory: {os.getcwd()}")
 
-movie_path = f'{PATH_DATA}/ml-latest-small/movies.csv'
-rating_path = f'{PATH_DATA}/ml-latest-small/ratings.csv'
+proj_name = 'ml-latest-small' 
+url = 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip'
 
-dict_data = {
-    'citeseer': 'https://nrvis.com/download/data/labeled/citeseer.zip',
-    'ml-latest-small': 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip'}
+movie_path = f'{PATH_DATA}/{proj_name}/movies.csv'
+rating_path = f'{PATH_DATA}/{proj_name}/ratings.csv'
 
-def download_dataset(dict_dataset, dict_key, path_data):
-    print(dict_dataset[dict_key])
-    url = dict_dataset[dict_key]
-    path_data_sub = f"{PATH_DATA}/{dict_key}/"
+def download_dataset(proj_name, url, path_data):
+    print(f"{proj_name}: {url}")
+    path_data_sub = f"{PATH_DATA}/{proj_name}/"
     print(path_data_sub)
     
     Path(f"{path_data_sub}").mkdir(parents=True, exist_ok=True)
     extract_zip(download_url(url, path_data_sub), path_data_sub)
     # print("Exit from downloading files")
-
-download_dataset(dict_dataset=dict_data, dict_key='ml-latest-small', path_data=PATH_DATA)
-print("done")
-
-# extract_zip(download_url(url, f"{PATH_DATA}"), f"{PATH_DATA}")
-# print("Exit from downloading files")
-
-# %%
-print("done")
-# %%
-
-
 
 # %%
 
@@ -102,95 +88,16 @@ def load_edge_csv(path, src_index_col, src_mapping, dst_index_col, dst_mapping,
 
     return edge_index, edge_attr
 
-def using_pyg(path_data=PATH_DATA):
-    from torch_geometric.data import download_url, extract_zip
-    url = 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip'
-    extract_zip(download_url(url, f"{path_data}"), f"{path_data}")
-    print("Exit from downloading files")
-
-def using_igraph(if_plot=False):
-    from igraph import Graph, plot
-
-    n_vertices = 3264
-
-    # Create graph
-    g = Graph()
-
-    # Add vertices
-    g.add_vertices(n_vertices)
-
-    edges = []
-    weights = []
-
-    with open(f"{PATH}/data/citeseer/citeseer_mini.edges", "r") as edges_file:
-        line = edges_file.readline()
-        while line != "":
-            
-            strings = line.rstrip().split(",")
-            
-            # Add edge to edge list
-            edges.append(((int(strings[0])-1), (int(strings[1])-1)))
-            
-            # Add weight to weight list
-            weights.append(float(strings[2]))
-               
-            line = edges_file.readline()
-            # print(line)
-    # Add edges to the graph
-    g.add_edges(edges)
-
-    # Add weights to edges in the graph
-    g.es['weight'] = weights
-
-    print(g.vs())
-    print(g.es())
-    # print(g.es().__doc__)
-    for e in g.es():
-        print(e.tuple)
-
-    if if_plot:
-        out_fig_name = "graph.eps"
-
-        visual_style = {}
-
-        # Define colors used for outdegree visualization
-        colours = ['#fecc5c', '#a31a1c']
-
-        # Set bbox and margin
-        visual_style["bbox"] = (3000,3000)
-        visual_style["margin"] = 17
-
-        # Set vertex colours
-        visual_style["vertex_color"] = 'grey'
-
-        # Set vertex size
-        visual_style["vertex_size"] = 20
-
-        # Set vertex lable size
-        visual_style["vertex_label_size"] = 8
-
-        # Don't curve the edges
-        visual_style["edge_curved"] = False
-
-        # Set the layout
-        my_layout = g.layout_fruchterman_reingold()
-        visual_style["layout"] = my_layout
-
-        # Plot the graph
-        plot(g, out_fig_name, **visual_style)
-    print("exit from using_igraph")
-
-# if __name__ == "__main__":
-#     print("hello")
-    # using_igraph()
-#     using_pyg(if_download=False)
-
 def check_indicator(input_string):
     print (f"{'-'*10} {input_string} {'-'*10}")
 
 def check_first_few_items(the_dict, n):
     _dict = {k: the_dict[k] for k in list(the_dict)[:n]}
     print(_dict)
+
+# if __name__ == "__main__":
+#   pass
+download_dataset(proj_name, url, path_data=PATH_DATA)
 
 # %%
 check_indicator("Check few data rows")
