@@ -1,8 +1,12 @@
 ## 任務
 將資料轉成圖演算法可以使用的格式
 
+## 套件需求(編輯進行中)
+pip install sentence-transformers
+pip install pytorch
+
 ## 工具
-- 使用igraph
+- [SentenceTransformers Documentation](https://www.sbert.net/)
 - [igraph安裝介紹](https://igraph.org/python/)
 
 ## 資料集

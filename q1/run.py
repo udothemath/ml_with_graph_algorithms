@@ -1,12 +1,53 @@
 # %%
 import os
 import pandas as pd
+from IPython.display import display
+import torch
+from sentence_transformers import SentenceTransformer
+
 
 PATH = "/Users/pro/Documents/ml_with_graph_algorithms/q1"
 PATH_DATA = f"{PATH}/data"
 
 os.chdir(PATH)
-print(os.getcwd())
+print(f"Current directory: {os.getcwd()}")
+
+class SequenceEncoder(object):
+    def __init__(self, model_name='all-MiniLM-L6-v2', device=None):
+        self.device = device
+        self.model = SentenceTransformer(model_name, device=device)
+
+    @torch.no_grad()
+    def __call__(self, df):
+        x = self.model.encode(df.values, show_progress_bar=True,
+                              convert_to_tensor=True, device=self.device)
+        return x.cpu()
+
+class GenresEncoder(object):
+    def __init__(self, sep='|'):
+        self.sep = sep
+
+    def __call__(self, df):
+        genres = set(g for col in df.values for g in col.split(self.sep))
+        mapping = {genre: i for i, genre in enumerate(genres)}
+
+        x = torch.zeros(len(df), len(mapping))
+        for i, col in enumerate(df.values):
+            for genre in col.split(self.sep):
+                x[i, mapping[genre]] = 1
+        return x
+
+
+def load_node_csv(path, index_col, encoders=None, **kwargs):
+    df = pd.read_csv(path, index_col=index_col, **kwargs)
+    mapping = {index: i for i, index in enumerate(df.index.unique())}
+
+    x = None
+    if encoders is not None:
+        xs = [encoder(df[col]) for col, encoder in encoders.items()]
+        x = torch.cat(xs, dim=-1)
+
+    return x, mapping
 
 def using_pyg(if_download=True):
     if if_download:
@@ -19,9 +60,26 @@ def using_pyg(if_download=True):
     rating_path = f'{PATH_DATA}/ml-latest-small/ratings.csv'
     print("Download completed")
 
-    print(pd.read_csv(movie_path).head())
-    print(pd.read_csv(rating_path).head())
+    df_movie = pd.read_csv(movie_path)
+    df_rating = pd.read_csv(rating_path)
 
+    display(df_movie.head())
+    display(df_rating.head())
+
+    print(df_movie.shape)
+    print(df_rating.shape)
+
+    _, movie_mapping = load_node_csv(movie_path, index_col='movieId')    
+
+    # movie_x, movie_mapping = load_node_csv(
+    #     movie_path, index_col='movieId', encoders={
+    #         'title': SequenceEncoder(),
+    #         'genres': GenresEncoder()
+    #     })    
+
+    _, user_mapping = load_node_csv(rating_path, index_col='userId')
+    print("Exit in using_pyg")
+    return movie_mapping, user_mapping
 
 def using_igraph(if_plot=False):
     from igraph import Graph, plot
@@ -95,8 +153,25 @@ def using_igraph(if_plot=False):
         plot(g, out_fig_name, **visual_style)
     print("exit from using_igraph")
 
-if __name__ == "__main__":
-    print("hello")
-    # using_igraph()
-    using_pyg(if_download=False)
+# if __name__ == "__main__":
+#     print("hello")
+#     # using_igraph()
+#     using_pyg(if_download=False)
+
+movie_mapping, user_mapping = using_pyg(if_download=False)
+
+# %%
+
+def check_first_fews(the_dict, n):
+    _dict = {k: the_dict[k] for k in list(the_dict)[:n]}
+    print(_dict)
+
+check_first_fews(user_mapping, 5)
+check_first_fews(movie_mapping, 5)
+print(f"Number of user: {len(user_mapping)}")
+print(f"Number of movie: {len(movie_mapping)}")
+
+
+# %%
+
 # %%
