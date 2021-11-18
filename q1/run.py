@@ -78,12 +78,6 @@ def using_pyg(if_download=True):
         url = 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip'
         extract_zip(download_url(url, f"{PATH_DATA}"), f"{PATH_DATA}")
 
-    # movie_x, movie_mapping = load_node_csv(
-    #     movie_path, index_col='movieId', encoders={
-    #         'title': SequenceEncoder(),
-    #         'genres': GenresEncoder()
-    #     })    
-
     print("Exit in using_pyg")
 
 def using_igraph(if_plot=False):
@@ -164,20 +158,43 @@ def using_igraph(if_plot=False):
 #     using_pyg(if_download=False)
 #     using_pyg(if_download=False)
 
-_, movie_mapping = load_node_csv(movie_path, index_col='movieId')       
-_, user_mapping = load_node_csv(rating_path, index_col='userId')
+def check_indicator(input_string):
+    print (f"{'-'*10} {input_string} {'-'*10}")
+
+def check_first_few_items(the_dict, n):
+    _dict = {k: the_dict[k] for k in list(the_dict)[:n]}
+    print(_dict)
 
 # %%
+check_indicator("Check few data rows")
 df_movie = pd.read_csv(movie_path)
 df_rating = pd.read_csv(rating_path)
+
+print(f"Movie info size: {df_movie.shape}")
+print(f"User and movie rating size: {df_rating.shape}")
 
 display(df_movie.head())
 display(df_rating.head())
 
-print(df_movie.shape)
-print(df_rating.shape)
+# %%
+check_indicator("Check node index")
+_, movie_mapping = load_node_csv(movie_path, index_col='movieId')       
+_, user_mapping = load_node_csv(rating_path, index_col='userId')
+
+# movie_x, movie_mapping = load_node_csv(
+#     movie_path, index_col='movieId', encoders={
+#         'title': SequenceEncoder(),
+#         'genres': GenresEncoder()
+#     })    
+
+print(f"Total number of movie: {len(movie_mapping)}")
+print(f"Total number of user: {len(user_mapping)}")
+
+check_first_few_items(movie_mapping, 5)
+check_first_few_items(user_mapping, 5)
 
 # %%
+check_indicator("Check relation attribute")
 edge_index, edge_label = load_edge_csv(
     rating_path,
     src_index_col='userId',
@@ -187,23 +204,6 @@ edge_index, edge_label = load_edge_csv(
     encoders={'rating': IdentityEncoder(dtype=torch.long)},
 )
 
-# %%
 print(edge_index)
-# print(edge_label)
-# print(len(edge_label))
-# %%
-
-def check_first_few_items(the_dict, n):
-    _dict = {k: the_dict[k] for k in list(the_dict)[:n]}
-    print(_dict)
-
-check_first_few_items(movie_mapping, 5)
-check_first_few_items(user_mapping, 5)
-
-print(f"Number of movie: {len(movie_mapping)}")
-print(f"Number of user: {len(user_mapping)}")
-
-
-# %%
 
 # %%
