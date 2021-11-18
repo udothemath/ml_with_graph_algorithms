@@ -2,7 +2,7 @@
 */.ipynb_checkpoints/*
 .ipynb_checkpoints/*
 *.ipynb_checkpoints
-data/*
+*/data/*
 */__pycache__/
 __pycache__/
 *.zip
