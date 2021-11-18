@@ -5,12 +5,21 @@ from IPython.display import display
 import torch
 from sentence_transformers import SentenceTransformer
 
-
 PATH = "/Users/pro/Documents/ml_with_graph_algorithms/q1"
 PATH_DATA = f"{PATH}/data"
 
 os.chdir(PATH)
 print(f"Current directory: {os.getcwd()}")
+
+movie_path = f'{PATH_DATA}/ml-latest-small/movies.csv'
+rating_path = f'{PATH_DATA}/ml-latest-small/ratings.csv'
+
+class IdentityEncoder(object):
+    def __init__(self, dtype=None):
+        self.dtype = dtype
+
+    def __call__(self, df):
+        return torch.from_numpy(df.values).view(-1, 1).to(self.dtype)
 
 class SequenceEncoder(object):
     def __init__(self, model_name='all-MiniLM-L6-v2', device=None):
@@ -37,7 +46,6 @@ class GenresEncoder(object):
                 x[i, mapping[genre]] = 1
         return x
 
-
 def load_node_csv(path, index_col, encoders=None, **kwargs):
     df = pd.read_csv(path, index_col=index_col, **kwargs)
     mapping = {index: i for i, index in enumerate(df.index.unique())}
@@ -49,27 +57,26 @@ def load_node_csv(path, index_col, encoders=None, **kwargs):
 
     return x, mapping
 
+def load_edge_csv(path, src_index_col, src_mapping, dst_index_col, dst_mapping,
+                  encoders=None, **kwargs):
+    df = pd.read_csv(path, **kwargs)
+
+    src = [src_mapping[index] for index in df[src_index_col]]
+    dst = [dst_mapping[index] for index in df[dst_index_col]]
+    edge_index = torch.tensor([src, dst])
+
+    edge_attr = None
+    if encoders is not None:
+        edge_attrs = [encoder(df[col]) for col, encoder in encoders.items()]
+        edge_attr = torch.cat(edge_attrs, dim=-1)
+
+    return edge_index, edge_attr
+
 def using_pyg(if_download=True):
     if if_download:
         from torch_geometric.data import download_url, extract_zip
         url = 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip'
         extract_zip(download_url(url, f"{PATH_DATA}"), f"{PATH_DATA}")
-
-
-    movie_path = f'{PATH_DATA}/ml-latest-small/movies.csv'
-    rating_path = f'{PATH_DATA}/ml-latest-small/ratings.csv'
-    print("Download completed")
-
-    df_movie = pd.read_csv(movie_path)
-    df_rating = pd.read_csv(rating_path)
-
-    display(df_movie.head())
-    display(df_rating.head())
-
-    print(df_movie.shape)
-    print(df_rating.shape)
-
-    _, movie_mapping = load_node_csv(movie_path, index_col='movieId')    
 
     # movie_x, movie_mapping = load_node_csv(
     #     movie_path, index_col='movieId', encoders={
@@ -77,9 +84,7 @@ def using_pyg(if_download=True):
     #         'genres': GenresEncoder()
     #     })    
 
-    _, user_mapping = load_node_csv(rating_path, index_col='userId')
     print("Exit in using_pyg")
-    return movie_mapping, user_mapping
 
 def using_igraph(if_plot=False):
     from igraph import Graph, plot
@@ -157,19 +162,46 @@ def using_igraph(if_plot=False):
 #     print("hello")
 #     # using_igraph()
 #     using_pyg(if_download=False)
+#     using_pyg(if_download=False)
 
-movie_mapping, user_mapping = using_pyg(if_download=False)
+_, movie_mapping = load_node_csv(movie_path, index_col='movieId')       
+_, user_mapping = load_node_csv(rating_path, index_col='userId')
 
 # %%
+df_movie = pd.read_csv(movie_path)
+df_rating = pd.read_csv(rating_path)
 
-def check_first_fews(the_dict, n):
+display(df_movie.head())
+display(df_rating.head())
+
+print(df_movie.shape)
+print(df_rating.shape)
+
+# %%
+edge_index, edge_label = load_edge_csv(
+    rating_path,
+    src_index_col='userId',
+    src_mapping=user_mapping,
+    dst_index_col='movieId',
+    dst_mapping=movie_mapping,
+    encoders={'rating': IdentityEncoder(dtype=torch.long)},
+)
+
+# %%
+print(edge_index)
+# print(edge_label)
+# print(len(edge_label))
+# %%
+
+def check_first_few_items(the_dict, n):
     _dict = {k: the_dict[k] for k in list(the_dict)[:n]}
     print(_dict)
 
-check_first_fews(user_mapping, 5)
-check_first_fews(movie_mapping, 5)
-print(f"Number of user: {len(user_mapping)}")
+check_first_few_items(movie_mapping, 5)
+check_first_few_items(user_mapping, 5)
+
 print(f"Number of movie: {len(movie_mapping)}")
+print(f"Number of user: {len(user_mapping)}")
 
 
 # %%
