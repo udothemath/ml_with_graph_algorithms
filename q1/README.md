@@ -18,3 +18,5 @@ pip install pytorch
 - [Visualising Graph Data with Python-igraph](https://towardsdatascience.com/visualising-graph-data-with-python-igraph-b3cc81a495cf)
 - Visualize a graph online: [GraphVis](https://networkrepository.com/graphvis.php?d=./data/gsm50/labeled/citeseer.edges)
 
+add test from aicloud
+add another test
