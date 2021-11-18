@@ -1,8 +1,13 @@
 ## 任務
 將資料轉成圖演算法可以使用的格式
 
-## 套件需求(編輯進行中)
-pip install sentence-transformers
+## 執行
+- $ python -u run.py  
+- (optional) $ python -u run_igraph.py
+- Note: [python -u](https://stackoverflow.com/questions/14258500/python-significance-of-u-option)
+
+## 套件需求
+pip install sentence-transformers    
 pip install pytorch
 
 ## 工具
