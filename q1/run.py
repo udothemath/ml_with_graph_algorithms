@@ -4,6 +4,8 @@ import pandas as pd
 from IPython.display import display
 import torch
 from sentence_transformers import SentenceTransformer
+from pathlib import Path
+from torch_geometric.data import download_url, extract_zip
 
 PATH = "/Users/pro/Documents/ml_with_graph_algorithms/q1"
 PATH_DATA = f"{PATH}/data"
@@ -13,6 +15,34 @@ print(f"Current directory: {os.getcwd()}")
 
 movie_path = f'{PATH_DATA}/ml-latest-small/movies.csv'
 rating_path = f'{PATH_DATA}/ml-latest-small/ratings.csv'
+
+dict_data = {
+    'citeseer': 'https://nrvis.com/download/data/labeled/citeseer.zip',
+    'ml-latest-small': 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip'}
+
+def download_dataset(dict_dataset, dict_key, path_data):
+    print(dict_dataset[dict_key])
+    url = dict_dataset[dict_key]
+    path_data_sub = f"{PATH_DATA}/{dict_key}/"
+    print(path_data_sub)
+    
+    Path(f"{path_data_sub}").mkdir(parents=True, exist_ok=True)
+    extract_zip(download_url(url, path_data_sub), path_data_sub)
+    # print("Exit from downloading files")
+
+download_dataset(dict_dataset=dict_data, dict_key='ml-latest-small', path_data=PATH_DATA)
+print("done")
+
+# extract_zip(download_url(url, f"{PATH_DATA}"), f"{PATH_DATA}")
+# print("Exit from downloading files")
+
+# %%
+print("done")
+# %%
+
+
+
+# %%
 
 class IdentityEncoder(object):
     def __init__(self, dtype=None):
@@ -72,13 +102,11 @@ def load_edge_csv(path, src_index_col, src_mapping, dst_index_col, dst_mapping,
 
     return edge_index, edge_attr
 
-def using_pyg(if_download=True):
-    if if_download:
-        from torch_geometric.data import download_url, extract_zip
-        url = 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip'
-        extract_zip(download_url(url, f"{PATH_DATA}"), f"{PATH_DATA}")
-
-    print("Exit in using_pyg")
+def using_pyg(path_data=PATH_DATA):
+    from torch_geometric.data import download_url, extract_zip
+    url = 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip'
+    extract_zip(download_url(url, f"{path_data}"), f"{path_data}")
+    print("Exit from downloading files")
 
 def using_igraph(if_plot=False):
     from igraph import Graph, plot
@@ -154,8 +182,7 @@ def using_igraph(if_plot=False):
 
 # if __name__ == "__main__":
 #     print("hello")
-#     # using_igraph()
-#     using_pyg(if_download=False)
+    # using_igraph()
 #     using_pyg(if_download=False)
 
 def check_indicator(input_string):
@@ -176,7 +203,6 @@ print(f"User and movie rating size: {df_rating.shape}")
 display(df_movie.head())
 display(df_rating.head())
 
-# %%
 check_indicator("Check node index")
 _, movie_mapping = load_node_csv(movie_path, index_col='movieId')       
 _, user_mapping = load_node_csv(rating_path, index_col='userId')
@@ -193,7 +219,6 @@ print(f"Total number of user: {len(user_mapping)}")
 check_first_few_items(movie_mapping, 5)
 check_first_few_items(user_mapping, 5)
 
-# %%
 check_indicator("Check relation attribute")
 edge_index, edge_label = load_edge_csv(
     rating_path,
@@ -207,3 +232,5 @@ edge_index, edge_label = load_edge_csv(
 print(edge_index)
 
 # %%
+
+
