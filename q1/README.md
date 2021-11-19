@@ -2,23 +2,35 @@
 將資料轉成圖演算法可以使用的格式
 
 ## 執行
-- $ python -u run.py  
-- (optional) $ python -u run_igraph.py
-- Note: [python -u](https://stackoverflow.com/questions/14258500/python-significance-of-u-option)
+ 
+### install package
+```bash
+$ pip install -r requirements.txt
+```
+
+### pyg 
+
+```bash==
+$ python -u run.py  
+``` 
+
+### (Optional) igraph
+```bash== $ python -u run_igraph.py```
+
+### Note: [python -u](https://stackoverflow.com/questions/14258500/python-significance-of-u-option)
 
 ## 套件需求
 
-or 
 ```bash
-pip install -r requirements.txt
+$ pip install -r requirements.txt
 ```
-
+or
 ```bash==
-$pip install sentence-transformers    
-$pip install torch
-$pip install torch-geometric
-$pip install torch-scatter
-$pip install torch-sparse
+$ pip install sentence-transformers    
+$ pip install torch
+$ pip install torch-geometric
+$ pip install torch-scatter
+$ pip install torch-sparse
 ```
 
 ## 工具
