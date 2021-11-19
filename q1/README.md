@@ -1,21 +1,22 @@
 ## 任務
-將資料轉成圖演算法可以使用的格式
+將資料轉換成圖演算法可以使用的格式
 
 ## 執行
- 
-### install package
+### Step1: 
+- install package
 ```bash
 $ pip install -r requirements.txt
 ```
 
-### pyg 
-
-```bash==
-$ python -u run.py  
-``` 
-
-### (Optional) igraph
-```bash== $ python -u run_igraph.py```
+### Step 2
+- run pyg 
+    ```bash==
+    $ python -u run.py  
+    ``` 
+- (Optional) run igraph
+    ```bash== 
+    $ python -u run_igraph.py
+    ```
 
 ### Note: [python -u](https://stackoverflow.com/questions/14258500/python-significance-of-u-option)
 
