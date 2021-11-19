@@ -13,7 +13,7 @@
 3. 該週討論完後請將個人/小組的分支推送到該週題號的對應分支，並刪除個人/小組分支
 4. 該週結束前會將題號分支推送到develop分支，並保留題號分支
 
-![image](https://user-images.githubusercontent.com/10674490/142558203-0f6e4e36-9fbd-4d90-beb9-6a65eeca58fc.png =x200)
+![image](https://user-images.githubusercontent.com/10674490/142558203-0f6e4e36-9fbd-4d90-beb9-6a65eeca58fc.png)
 
 ## 作法
 每周一次(週四下午1:30-2:30)會議討論作法。兩人一組，當週一人負責開發，另一人負責作法/程式開發/程式理解及說明。
