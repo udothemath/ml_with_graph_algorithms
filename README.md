@@ -10,7 +10,7 @@
 ## repo更新方式
 1. 每週從develop創建新的repo，依據該週的題號命名(feature/<題號>)，如：feature/q1
 ![image](https://user-images.githubusercontent.com/10674490/142558203-0f6e4e36-9fbd-4d90-beb9-6a65eeca58fc.png)
-2. 個人/團隊可創建新的分支，建議命名方式為feature/<題號>_<id>，如：feature/q1_20033
+2. 個人/團隊可創建新的分支，建議命名方式為(feature/<題號>_<個人>)，如：feature/q1_20033
 3. 該週討論完後請將個人/小組的分支推送到該週題號的對應分支，並刪除個人/小組分支
 4. 該週結束前會將題號分支推送到develop分支，並保留題號分支
 
