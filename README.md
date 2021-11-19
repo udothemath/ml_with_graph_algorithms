@@ -22,6 +22,12 @@
 附註： 
 <span style="color:red">紅色標示</span> 的為該週分享組別
 <span style="color:red"> V </span>
+
+```diff
++ this text is highlighted in green
+- this text is highlighted in red
+```
+
 ## 議題
 |日期|題目|說明/開發|相關分支|參考資料|
 |-|-|-|-|-|
