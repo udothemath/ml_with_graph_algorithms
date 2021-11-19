@@ -23,9 +23,11 @@
 <span style="color:red">紅色標示</span> 的為該週分享組別
 <span style="color:red"> V </span>
 
+RED APPLE (&#x1F34E;):
+
 ```diff
 + this text is highlighted in green
-- this text is highlighted in red
+- 紅色標示紅色的為該週分享組別
 ```
 
 ## 議題
