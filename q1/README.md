@@ -7,8 +7,19 @@
 - Note: [python -u](https://stackoverflow.com/questions/14258500/python-significance-of-u-option)
 
 ## 套件需求
-pip install sentence-transformers    
-pip install pytorch
+
+or 
+```bash
+pip install -r requirements.txt
+```
+
+```bash==
+$pip install sentence-transformers    
+$pip install torch
+$pip install torch-geometric
+$pip install torch-scatter
+$pip install torch-sparse
+```
 
 ## 工具
 - [SentenceTransformers Documentation](https://www.sbert.net/)
