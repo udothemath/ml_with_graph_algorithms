@@ -11,8 +11,9 @@
 每周一次(週四下午1:30-2:30)會議討論作法。兩人一組，當週一人負責開發，另一人負責作法/程式開發/程式理解及說明。
 
 |成員|11/25|12/2|12/9|
-|甫璋(a)|ab|ad|af|
-|品瑜(b)|ab|be|bc|
+|-|-|-|-|
+|甫璋(a)|<span style="color:red">ab</span>|ad|af|
+|品瑜(b)|<span style="color:red">ab</span>|be|bc|
 |奕勳(c)|cd|cf|bc|
 |彥銘(d)|cd|ad|de|
 |崇爾(e)|ef|be|de|
