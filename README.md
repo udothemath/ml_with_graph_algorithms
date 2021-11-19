@@ -12,13 +12,16 @@
 
 |成員|11/25|12/2|12/9|
 |-|-|-|-|
+||說明ace開發bdf|說明bdf開發ace|說明ace開發bdf|
 |甫璋(a)|&#x1F34E;ab|ad|&#x1F34E;af|
 |品瑜(b)|&#x1F34E;ab|&#x1F34E;be|bc|
 |奕勳(c)|&#x1F34E;cd|&#x1F34E;cf|bc|
 |彥銘(d)|&#x1F34E;cd|ad|&#x1F34E;de|
 |崇爾(e)|ef|&#x1F34E;be|&#x1F34E;de|
-|昕境(f)|ef|&#x1F34E;cf|&#x1F34E;af|
+|昕靜(f)|ef|&#x1F34E;cf|&#x1F34E;af|
 
+說明：
+開發：
 附註：標示&#x1F34E;的為該週分享組別
 
 ## 議題
