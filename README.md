@@ -12,15 +12,14 @@
 
 |成員|11/25|12/2|12/9|
 |-|-|-|-|
-|甫璋(a)|<span style="color:red">ab</span>|ad|af|
-|品瑜(b)|<span style="color:red">ab</span>|be|bc|
-|奕勳(c)|cd|cf|bc|
-|彥銘(d)|cd|ad|de|
+|甫璋(a)|&#x1F34E;ab|ad|af|
+|品瑜(b)|&#x1F34E;ab|be|bc|
+|奕勳(c)|&#x1F34E;cd|cf|bc|
+|彥銘(d)|&#x1F34E;cd|ad|de|
 |崇爾(e)|ef|be|de|
 |昕境(f)|ef|cf|af|
 
-附註： 
-<span style="color:red">紅色標示</span> 的為該週分享組別
+附註：標示&#x1F34E;的為該週分享組別
 <span style="color:red"> V </span>
 
 RED APPLE (&#x1F34E;):
