@@ -33,6 +33,10 @@ $ pip install torch-sparse==0.6.12
 $ pip install sentence-transformers==2.1.0
 $ pip install igraph==0.9.8
 ```
+
+## 模型說明
+- [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
+
 ## 工具
 - [SentenceTransformers Documentation](https://www.sbert.net/)
 - [igraph安裝介紹](https://igraph.org/python/)
