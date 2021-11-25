@@ -7,25 +7,29 @@ from sentence_transformers import SentenceTransformer
 from pathlib import Path
 from torch_geometric.data import download_url, extract_zip
 
-PATH = "/Users/pro/Documents/ml_with_graph_algorithms/q1"
+QUESTION = 'q2'
+PATH = f"/Users/pro/Documents/ml_with_graph_algorithms/{QUESTION}"
 PATH_DATA = f"{PATH}/data"
 
 os.chdir(PATH)
 print(f"Current directory: {os.getcwd()}")
 
-proj_name = 'ml-latest-small' 
 url = 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip'
 
-movie_path = f'{PATH_DATA}/{proj_name}/movies.csv'
-rating_path = f'{PATH_DATA}/{proj_name}/ratings.csv'
+proj_name = url.rsplit('/', 1)[1].rsplit('.', 1)[0]
+path_for_filename = f"{PATH_DATA}/{proj_name}"
+Path(f"{path_for_filename}").mkdir(parents=True, exist_ok=True)
+movie_path = f'{path_for_filename}/movies.csv'
+rating_path = f'{path_for_filename}/ratings.csv'
 
-def download_dataset(proj_name, url, path_data):
-    print(f"{proj_name}: {url}")
-    path_data_sub = f"{PATH_DATA}/{proj_name}/"
-    print(path_data_sub)
+# print(movie_path, rating_path)
+
+# %%
+def download_dataset(url, path_data):
     
-    Path(f"{path_data_sub}").mkdir(parents=True, exist_ok=True)
-    extract_zip(download_url(url, path_data_sub), path_data_sub)
+    Path(f"{path_data}").mkdir(parents=True, exist_ok=True)
+    extract_zip(download_url(url, path_data), path_data)
+
     # print("Exit from downloading files")
 
 # %%
@@ -97,7 +101,7 @@ def check_first_few_items(the_dict, n):
 
 # if __name__ == "__main__":
 #   pass
-download_dataset(proj_name, url, path_data=PATH_DATA)
+download_dataset(url, path_data=PATH_DATA)
 
 # %%
 check_indicator("Check few data rows")
@@ -111,14 +115,14 @@ display(df_movie.head())
 display(df_rating.head())
 
 check_indicator("Check node index")
-_, movie_mapping = load_node_csv(movie_path, index_col='movieId')       
+# _, movie_mapping = load_node_csv(movie_path, index_col='movieId')       
 _, user_mapping = load_node_csv(rating_path, index_col='userId')
 
-# movie_x, movie_mapping = load_node_csv(
-#     movie_path, index_col='movieId', encoders={
-#         'title': SequenceEncoder(),
-#         'genres': GenresEncoder()
-#     })    
+movie_x, movie_mapping = load_node_csv(
+    movie_path, index_col='movieId', encoders={
+        'title': SequenceEncoder(),
+        'genres': GenresEncoder()
+    })    
 
 print(f"Total number of movie: {len(movie_mapping)}")
 print(f"Total number of user: {len(user_mapping)}")
@@ -139,5 +143,13 @@ edge_index, edge_label = load_edge_csv(
 print(edge_index)
 
 # %%
+print(len(movie_x))
+print(movie_x.shape)
 
 
+
+# %%
+print(len(movie_x.tolist()))
+print(len(movie_x.tolist()[0]))
+
+# %%
