@@ -26,11 +26,12 @@ rating_path = f'{path_for_filename}/ratings.csv'
 
 # %%
 def download_dataset(url, path_data):
-    
+    '''
+    download dataset and put it in path_data
+    '''    
     Path(f"{path_data}").mkdir(parents=True, exist_ok=True)
     extract_zip(download_url(url, path_data), path_data)
-
-    # print("Exit from downloading files")
+    print("Exit from downloading files")
 
 # %%
 
@@ -165,4 +166,17 @@ x = torch.arange(12)
 print(x.view(2, 3, -1))
 print(x.view(3, 2, -1))
 
+# %%
+class Test():
+    def __init__(self):
+        print(f"U r in __init__")
+
+    def __call__(self):
+        print(f"U r in __call__")
+        return 'Hello'
+
+print("Test one")
+test1 = Test()
+print("Test two")
+test2 = Test()()
 # %%
