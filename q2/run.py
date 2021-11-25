@@ -152,3 +152,17 @@ check_indicator("Check movie features")
 print(f"Shape of movie_x: {movie_x.shape}")
 print(f"Example of movie_x: {movie_x[:5]}")
 
+# %% 
+check_indicator("Run example")
+
+x = torch.arange(6)
+
+print(x.view(3, -1))
+print(x.view(1, -1))
+print(x.view(-1, 1))
+# %%
+x = torch.arange(12)
+print(x.view(2, 3, -1))
+print(x.view(3, 2, -1))
+
+# %%
