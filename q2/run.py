@@ -114,9 +114,10 @@ print(f"User and movie rating size: {df_rating.shape}")
 display(df_movie.head())
 display(df_rating.head())
 
-check_indicator("Check node index")
+check_indicator("Generate node index")
 # _, movie_mapping = load_node_csv(movie_path, index_col='movieId')       
 _, user_mapping = load_node_csv(rating_path, index_col='userId')
+## Note: There is no additional feature information for users present in this dataset. As such, we do not define any encoders
 
 movie_x, movie_mapping = load_node_csv(
     movie_path, index_col='movieId', encoders={
@@ -124,12 +125,14 @@ movie_x, movie_mapping = load_node_csv(
         'genres': GenresEncoder()
     })    
 
+check_indicator("Check node index")
 print(f"Total number of movie: {len(movie_mapping)}")
 print(f"Total number of user: {len(user_mapping)}")
 
 check_first_few_items(movie_mapping, 5)
 check_first_few_items(user_mapping, 5)
 
+# %%
 check_indicator("Check relation attribute")
 edge_index, edge_label = load_edge_csv(
     rating_path,
@@ -140,16 +143,12 @@ edge_index, edge_label = load_edge_csv(
     encoders={'rating': IdentityEncoder(dtype=torch.long)},
 )
 
-print(edge_index)
-
 # %%
-print(len(movie_x))
-print(movie_x.shape)
-
-
-
+check_indicator("Check edge index")
+print(f"Size of edge by edge_label: {len(edge_label)}")
+print(f"Few example of edge_label: {edge_label[:5]}")
 # %%
-print(len(movie_x.tolist()))
-print(len(movie_x.tolist()[0]))
+check_indicator("Check movie features")
+print(f"Shape of movie_x: {movie_x.shape}")
+print(f"Example of movie_x: {movie_x[:5]}")
 
-# %%

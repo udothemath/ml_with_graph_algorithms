@@ -1,7 +1,6 @@
 ## 任務
 新增節點(Node)以及連線關係(Edge)的屬性
 
-
 ## 執行步驟
 ### Step1: 
 - install package
