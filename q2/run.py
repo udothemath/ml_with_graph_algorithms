@@ -4,6 +4,7 @@ import pandas as pd
 from IPython.display import display
 import torch
 from sentence_transformers import SentenceTransformer
+
 from pathlib import Path
 from torch_geometric.data import download_url, extract_zip
 
@@ -12,6 +13,7 @@ PATH_DATA = f"{PATH}/data"
 
 os.chdir(PATH)
 print(f"Current directory: {os.getcwd()}")
+
 
 proj_name = 'ml-latest-small' 
 url = 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip'
@@ -27,8 +29,6 @@ def download_dataset(proj_name, url, path_data):
     Path(f"{path_data_sub}").mkdir(parents=True, exist_ok=True)
     extract_zip(download_url(url, path_data_sub), path_data_sub)
     # print("Exit from downloading files")
-
-# %%
 
 class IdentityEncoder(object):
     def __init__(self, dtype=None):
@@ -95,10 +95,6 @@ def check_first_few_items(the_dict, n):
     _dict = {k: the_dict[k] for k in list(the_dict)[:n]}
     print(_dict)
 
-# if __name__ == "__main__":
-#   pass
-download_dataset(proj_name, url, path_data=PATH_DATA)
-
 # %%
 check_indicator("Check few data rows")
 df_movie = pd.read_csv(movie_path)
@@ -109,6 +105,7 @@ print(f"User and movie rating size: {df_rating.shape}")
 
 display(df_movie.head())
 display(df_rating.head())
+
 
 check_indicator("Check node index")
 _, movie_mapping = load_node_csv(movie_path, index_col='movieId')       
@@ -137,7 +134,4 @@ edge_index, edge_label = load_edge_csv(
 )
 
 print(edge_index)
-
-# %%
-
 
