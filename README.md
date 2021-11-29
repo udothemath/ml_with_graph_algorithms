@@ -15,6 +15,9 @@
 
 ![image](https://user-images.githubusercontent.com/10674490/142558203-0f6e4e36-9fbd-4d90-beb9-6a65eeca58fc.png)
 
+
+<img src="https://user-images.githubusercontent.com/10674490/142558203-0f6e4e36-9fbd-4d90-beb9-6a65eeca58fc.png" width="100" height="100">
+
 ## 作法
 每周一次(週四下午1:30-2:30)會議討論作法。兩人一組，當週一人負責開發，另一人負責作法/程式開發/程式理解及說明。
 
