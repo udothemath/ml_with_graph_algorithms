@@ -8,27 +8,40 @@ from sentence_transformers import SentenceTransformer
 from pathlib import Path
 from torch_geometric.data import download_url, extract_zip
 
-PATH = "/Users/pro/Documents/ml_with_graph_algorithms/q1"
+QUESTION = 'q2'
+PATH = f"/Users/pro/Documents/ml_with_graph_algorithms/{QUESTION}"
 PATH_DATA = f"{PATH}/data"
 
 os.chdir(PATH)
 print(f"Current directory: {os.getcwd()}")
 
-
-proj_name = 'ml-latest-small' 
 url = 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip'
 
-movie_path = f'{PATH_DATA}/{proj_name}/movies.csv'
-rating_path = f'{PATH_DATA}/{proj_name}/ratings.csv'
+proj_name = url.rsplit('/', 1)[1].rsplit('.', 1)[0]
+path_for_filename = f"{PATH_DATA}/{proj_name}"
+Path(f"{path_for_filename}").mkdir(parents=True, exist_ok=True)
+movie_path = f'{path_for_filename}/movies.csv'
+rating_path = f'{path_for_filename}/ratings.csv'
 
-def download_dataset(proj_name, url, path_data):
-    print(f"{proj_name}: {url}")
-    path_data_sub = f"{PATH_DATA}/{proj_name}/"
-    print(path_data_sub)
-    
-    Path(f"{path_data_sub}").mkdir(parents=True, exist_ok=True)
-    extract_zip(download_url(url, path_data_sub), path_data_sub)
-    # print("Exit from downloading files")
+# print(movie_path, rating_path)
+
+# %%
+def download_dataset(url, path_data):
+    '''
+    download dataset and put it in path_data
+    '''    
+    Path(f"{path_data}").mkdir(parents=True, exist_ok=True)
+    extract_zip(download_url(url, path_data), path_data)
+    print("Exit from downloading files")
+
+# %%
+def download_dataset(url, path_data):
+    '''
+    download dataset and put it in path_data
+    '''    
+    Path(f"{path_data}").mkdir(parents=True, exist_ok=True)
+    extract_zip(download_url(url, path_data), path_data)
+    print("Exit from downloading files")
 
 class IdentityEncoder(object):
     def __init__(self, dtype=None):
@@ -95,6 +108,10 @@ def check_first_few_items(the_dict, n):
     _dict = {k: the_dict[k] for k in list(the_dict)[:n]}
     print(_dict)
 
+# if __name__ == "__main__":
+#   pass
+download_dataset(url, path_data=PATH_DATA)
+
 # %%
 check_indicator("Check few data rows")
 df_movie = pd.read_csv(movie_path)
@@ -106,23 +123,25 @@ print(f"User and movie rating size: {df_rating.shape}")
 display(df_movie.head())
 display(df_rating.head())
 
+check_indicator("Generate node index")
+# _, movie_mapping = load_node_csv(movie_path, index_col='movieId')       
+_, user_mapping = load_node_csv(rating_path, index_col='userId')
+## Note: There is no additional feature information for users present in this dataset. As such, we do not define any encoders
+
+movie_x, movie_mapping = load_node_csv(
+    movie_path, index_col='movieId', encoders={
+        'title': SequenceEncoder(),
+        'genres': GenresEncoder()
+    })    
 
 check_indicator("Check node index")
-_, movie_mapping = load_node_csv(movie_path, index_col='movieId')       
-_, user_mapping = load_node_csv(rating_path, index_col='userId')
-
-# movie_x, movie_mapping = load_node_csv(
-#     movie_path, index_col='movieId', encoders={
-#         'title': SequenceEncoder(),
-#         'genres': GenresEncoder()
-#     })    
-
 print(f"Total number of movie: {len(movie_mapping)}")
 print(f"Total number of user: {len(user_mapping)}")
 
 check_first_few_items(movie_mapping, 5)
 check_first_few_items(user_mapping, 5)
 
+# %%
 check_indicator("Check relation attribute")
 edge_index, edge_label = load_edge_csv(
     rating_path,
@@ -133,5 +152,39 @@ edge_index, edge_label = load_edge_csv(
     encoders={'rating': IdentityEncoder(dtype=torch.long)},
 )
 
-print(edge_index)
+# %%
+check_indicator("Check edge index")
+print(f"Size of edge by edge_label: {len(edge_label)}")
+print(f"Few example of edge_label: {edge_label[:5]}")
+# %%
+check_indicator("Check movie features")
+print(f"Shape of movie_x: {movie_x.shape}")
+print(f"Example of movie_x: {movie_x[:5]}")
 
+# %% 
+check_indicator("Run example")
+
+x = torch.arange(6)
+
+print(x.view(3, -1))
+print(x.view(1, -1))
+print(x.view(-1, 1))
+# %%
+x = torch.arange(12)
+print(x.view(2, 3, -1))
+print(x.view(3, 2, -1))
+
+# %%
+class Test():
+    def __init__(self):
+        print(f"U r in __init__")
+
+    def __call__(self):
+        print(f"U r in __call__")
+        return 'Hello'
+
+print("Test one")
+test1 = Test()
+print("Test two")
+test2 = Test()()
+# %%
