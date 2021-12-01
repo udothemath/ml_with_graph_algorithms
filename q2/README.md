@@ -6,12 +6,12 @@
 ### Step 1 行外空間(aicloud @esun)
 - install package
 ```bash
-$ pip install -r requirements_basic.txt
+$ pip install -r requirements.txt
 ```
 ### Step 1 行內空間
 - install package
 ```bash
-$ pip install -r requirements.txt
+$ pip install -r requirements_basic.txt
 ```
 and then
 
