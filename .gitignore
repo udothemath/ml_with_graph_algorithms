@@ -2,7 +2,9 @@
 */.ipynb_checkpoints/*
 .ipynb_checkpoints/*
 *.ipynb_checkpoints
-*/data/*
+q1/data/*
+
+## */data/*
 */__pycache__/
 __pycache__/
 *.zip
