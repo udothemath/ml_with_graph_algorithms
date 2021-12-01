@@ -37,15 +37,6 @@ def download_dataset(url, path_data):
     extract_zip(download_url(url, path_data), path_data)
     print("Exit from downloading files")
 
-# %%
-def download_dataset(url, path_data):
-    '''
-    download dataset and put it in path_data
-    '''    
-    Path(f"{path_data}").mkdir(parents=True, exist_ok=True)
-    extract_zip(download_url(url, path_data), path_data)
-    print("Exit from downloading files")
-
 class IdentityEncoder(object):
     def __init__(self, dtype=None):
         self.dtype = dtype
@@ -111,9 +102,8 @@ def check_first_few_items(the_dict, n):
     _dict = {k: the_dict[k] for k in list(the_dict)[:n]}
     print(_dict)
 
-# if __name__ == "__main__":
-#   pass
-download_dataset(url, path_data=PATH_DATA)
+# %%
+## download_dataset(url, path_data=PATH_DATA)
 
 # %%
 # check_indicator("Check few data rows")
