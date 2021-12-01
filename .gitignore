@@ -10,7 +10,7 @@ __pycache__/
 *.zip
 *.eps
 *.h5
-*.csv 
+## *.csv 
 *.feather
 *.json
 *.pyc
