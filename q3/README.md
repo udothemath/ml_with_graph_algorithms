@@ -11,3 +11,17 @@ $ conda create -n graphgym python=3.7
 ```bash== 
 $ conda activate graphgym
 ```
+```bash==
+$ pip install torch==1.10.0 -f https://download.pytorch.org/whl/torch_stable.html 
+``` 
+```bash==
+$ sh torch==1.10.0 -f https://download.pytorch.org/whl/torch_stable.html 
+``` 
+
+## Torch版本
+``` python -c "import torch; print(torch.__version__); print(torch.cuda.is_available())" ```
+
+## 印出現在virtual environment的路徑
+```
+python -c 'import sys; print(sys.prefix)'
+```
