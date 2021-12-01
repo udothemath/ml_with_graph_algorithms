@@ -10,6 +10,9 @@ from torch_geometric.data import download_url, extract_zip
 
 QUESTION = 'q2'
 PATH = f"/Users/pro/Documents/ml_with_graph_algorithms/{QUESTION}"
+
+PATH = f"/home/jovyan/a_sandbox/ml_with_graph_algorithms/{QUESTION}"
+
 PATH_DATA = f"{PATH}/data"
 
 os.chdir(PATH)
