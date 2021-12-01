@@ -3,7 +3,7 @@ import os
 import pandas as pd
 from IPython.display import display
 import torch
-from sentence_transformers import SentenceTransformer
+# from sentence_transformers import SentenceTransformer
 
 from pathlib import Path
 from torch_geometric.data import download_url, extract_zip
@@ -113,78 +113,78 @@ def check_first_few_items(the_dict, n):
 download_dataset(url, path_data=PATH_DATA)
 
 # %%
-check_indicator("Check few data rows")
-df_movie = pd.read_csv(movie_path)
-df_rating = pd.read_csv(rating_path)
+# check_indicator("Check few data rows")
+# df_movie = pd.read_csv(movie_path)
+# df_rating = pd.read_csv(rating_path)
 
-print(f"Movie info size: {df_movie.shape}")
-print(f"User and movie rating size: {df_rating.shape}")
+# print(f"Movie info size: {df_movie.shape}")
+# print(f"User and movie rating size: {df_rating.shape}")
 
-display(df_movie.head())
-display(df_rating.head())
+# display(df_movie.head())
+# display(df_rating.head())
 
-check_indicator("Generate node index")
-# _, movie_mapping = load_node_csv(movie_path, index_col='movieId')       
-_, user_mapping = load_node_csv(rating_path, index_col='userId')
-## Note: There is no additional feature information for users present in this dataset. As such, we do not define any encoders
+# check_indicator("Generate node index")
+# # _, movie_mapping = load_node_csv(movie_path, index_col='movieId')       
+# _, user_mapping = load_node_csv(rating_path, index_col='userId')
+# ## Note: There is no additional feature information for users present in this dataset. As such, we do not define any encoders
 
-movie_x, movie_mapping = load_node_csv(
-    movie_path, index_col='movieId', encoders={
-        'title': SequenceEncoder(),
-        'genres': GenresEncoder()
-    })    
+# movie_x, movie_mapping = load_node_csv(
+#     movie_path, index_col='movieId', encoders={
+#         'title': SequenceEncoder(),
+#         'genres': GenresEncoder()
+#     })    
 
-check_indicator("Check node index")
-print(f"Total number of movie: {len(movie_mapping)}")
-print(f"Total number of user: {len(user_mapping)}")
+# check_indicator("Check node index")
+# print(f"Total number of movie: {len(movie_mapping)}")
+# print(f"Total number of user: {len(user_mapping)}")
 
-check_first_few_items(movie_mapping, 5)
-check_first_few_items(user_mapping, 5)
+# check_first_few_items(movie_mapping, 5)
+# check_first_few_items(user_mapping, 5)
 
-# %%
-check_indicator("Check relation attribute")
-edge_index, edge_label = load_edge_csv(
-    rating_path,
-    src_index_col='userId',
-    src_mapping=user_mapping,
-    dst_index_col='movieId',
-    dst_mapping=movie_mapping,
-    encoders={'rating': IdentityEncoder(dtype=torch.long)},
-)
+# # %%
+# check_indicator("Check relation attribute")
+# edge_index, edge_label = load_edge_csv(
+#     rating_path,
+#     src_index_col='userId',
+#     src_mapping=user_mapping,
+#     dst_index_col='movieId',
+#     dst_mapping=movie_mapping,
+#     encoders={'rating': IdentityEncoder(dtype=torch.long)},
+# )
 
-# %%
-check_indicator("Check edge index")
-print(f"Size of edge by edge_label: {len(edge_label)}")
-print(f"Few example of edge_label: {edge_label[:5]}")
-# %%
-check_indicator("Check movie features")
-print(f"Shape of movie_x: {movie_x.shape}")
-print(f"Example of movie_x: {movie_x[:5]}")
+# # %%
+# check_indicator("Check edge index")
+# print(f"Size of edge by edge_label: {len(edge_label)}")
+# print(f"Few example of edge_label: {edge_label[:5]}")
+# # %%
+# check_indicator("Check movie features")
+# print(f"Shape of movie_x: {movie_x.shape}")
+# print(f"Example of movie_x: {movie_x[:5]}")
 
-# %% 
-check_indicator("Run example")
+# # %% 
+# check_indicator("Run example")
 
-x = torch.arange(6)
+# x = torch.arange(6)
 
-print(x.view(3, -1))
-print(x.view(1, -1))
-print(x.view(-1, 1))
-# %%
-x = torch.arange(12)
-print(x.view(2, 3, -1))
-print(x.view(3, 2, -1))
+# print(x.view(3, -1))
+# print(x.view(1, -1))
+# print(x.view(-1, 1))
+# # %%
+# x = torch.arange(12)
+# print(x.view(2, 3, -1))
+# print(x.view(3, 2, -1))
 
-# %%
-class Test():
-    def __init__(self):
-        print(f"U r in __init__")
+# # %%
+# class Test():
+#     def __init__(self):
+#         print(f"U r in __init__")
 
-    def __call__(self):
-        print(f"U r in __call__")
-        return 'Hello'
+#     def __call__(self):
+#         print(f"U r in __call__")
+#         return 'Hello'
 
-print("Test one")
-test1 = Test()
-print("Test two")
-test2 = Test()()
-# %%
+# print("Test one")
+# test1 = Test()
+# print("Test two")
+# test2 = Test()()
+# # %%
