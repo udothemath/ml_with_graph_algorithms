@@ -2,11 +2,24 @@
 新增節點(Node)以及連線關係(Edge)的屬性
 
 ## 執行步驟
-### Step1: 
+請依照執行環境(行內或是行外)選擇安裝流程
+### Step 1 行外空間(aicloud @esun)
+- install package
+```bash
+$ pip install -r requirements_basic.txt
+```
+### Step 1 行內空間
 - install package
 ```bash
 $ pip install -r requirements.txt
 ```
+and then
+
+```bash
+$ sh requirements_pytorch_bash.sh
+```
+附註：由於pytorch套件有相容性的問題，請選擇有GPU的instance確保可以正確執行
+
 ### Step 2
 - run pyg 
     ```bash==
@@ -17,22 +30,6 @@ $ pip install -r requirements.txt
     $ python -u run_igraph.py
     ```
 ### Note: [python -u explanation](https://stackoverflow.com/questions/14258500/python-significance-of-u-option)
-
-## 套件需求
-```bash
-$ pip install -r requirements.txt
-```
-or
-```bash==
-$ pip install numpy==1.21.4
-$ pip install pandas==1.3.4
-$ pip install torch==1.10.0
-$ pip install torch-geometric==2.0.2
-$ pip install torch-scatter==2.0.9
-$ pip install torch-sparse==0.6.12
-$ pip install sentence-transformers==2.1.0
-$ pip install igraph==0.9.8
-```
 
 ## 模型說明
 - [all-MiniLM-L6-v2](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2)
