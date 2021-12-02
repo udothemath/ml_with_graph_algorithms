@@ -25,8 +25,9 @@ $ sh requirements_torch.sh
 ``` 
 
 ## 補充資訊
-- 印出Torch版本
+- 印出Torch版本   
     ``` python -c "import torch; print(torch.__version__); print(torch.cuda.is_available())" ```
 - 印出現在virtual environment的路徑    
     ``` python -c 'import sys; print(sys.prefix)' ```
-- [Pytorch What's the difference between define layer in __init__() and directly use in forward()?](https://stackoverflow.com/questions/50376463/pytorch-whats-the-difference-between-define-layer-in-init-and-directly-us)
+- 圖網絡中的__init__()和forward()的差異   
+    [Pytorch What's the difference between define layer in __init__() and directly use in forward()?](https://stackoverflow.com/questions/50376463/pytorch-whats-the-difference-between-define-layer-in-init-and-directly-us)
