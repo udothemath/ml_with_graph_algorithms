@@ -24,10 +24,9 @@ $ sh torch==1.10.0 -f https://download.pytorch.org/whl/torch_stable.html
 $ sh requirements_torch.sh
 ``` 
 
-## Torch版本
-``` python -c "import torch; print(torch.__version__); print(torch.cuda.is_available())" ```
-
 ## 補充資訊
-- 印出現在virtual environment的路徑
+- 印出Torch版本
+    ``` python -c "import torch; print(torch.__version__); print(torch.cuda.is_available())" ```
+- 印出現在virtual environment的路徑    
     ``` python -c 'import sys; print(sys.prefix)' ```
 - [Pytorch What's the difference between define layer in __init__() and directly use in forward()?](https://stackoverflow.com/questions/50376463/pytorch-whats-the-difference-between-define-layer-in-init-and-directly-us)
