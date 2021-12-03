@@ -10,7 +10,7 @@
     - [ ] train_mask / val_mask / test_mask 
     - data.train_idx = torch.tensor([...], dtype=torch.long)
     - data.test_mask = torch.tensor([...], dtype=torch.bool) 
-- [ ] 使用 Hetero Graph 程式 
+- [X] 使用 Hetero Graph 程式 
     - [X] Using the Heterogenous Convolution Wrapper: 
             Using the Heterogenous Convolution Wrapper
     - [X] 調整graph架構，使資料可以餵進去
