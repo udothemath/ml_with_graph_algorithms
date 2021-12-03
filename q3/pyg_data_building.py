@@ -525,5 +525,7 @@ with torch.no_grad():  # Initialize lazy modules.
      out = model(data.x_dict, data.edge_index_dict)
 
 print('SUCCESSFULLY CONNECT DATA TO MODEL')
+print('Output:', out) 
+print('Output Shape:', out.shape)
 
 # %%
