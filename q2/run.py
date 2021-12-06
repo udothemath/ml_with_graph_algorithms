@@ -1,4 +1,4 @@
-# %%
+#%% 
 import os
 import pandas as pd
 from IPython.display import display
@@ -9,12 +9,12 @@ from pathlib import Path
 from torch_geometric.data import download_url, extract_zip
 
 QUESTION = 'q2'
-PATH = f"/Users/pro/Documents/ml_with_graph_algorithms/{QUESTION}"
+PATH = f"/home/jovyan/ml_with_graph_algorithms/{QUESTION}"
 PATH_DATA = f"{PATH}/data"
 
 os.chdir(PATH)
 print(f"Current directory: {os.getcwd()}")
-
+#%%
 url = 'https://files.grouplens.org/datasets/movielens/ml-latest-small.zip'
 
 proj_name = url.rsplit('/', 1)[1].rsplit('.', 1)[0]
@@ -22,9 +22,7 @@ path_for_filename = f"{PATH_DATA}/{proj_name}"
 Path(f"{path_for_filename}").mkdir(parents=True, exist_ok=True)
 movie_path = f'{path_for_filename}/movies.csv'
 rating_path = f'{path_for_filename}/ratings.csv'
-
 # print(movie_path, rating_path)
-
 # %%
 def download_dataset(url, path_data):
     '''
