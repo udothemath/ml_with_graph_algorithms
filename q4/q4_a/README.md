@@ -32,9 +32,13 @@
 
 ## Environment
 - [Create virtual environments for python with conda](https://uoa-eresearch.github.io/eresearch-cookbook/recipe/2014/11/20/conda/)
-```bash== 
-$ conda create -n <venv_name> python=3.8
-``` 
+    ```bash== 
+    $ conda create -n <venv_name> python=3.8
+    ``` 
+    ```bash== 
+    $ conda activate env_torch
+    ``` 
+
 
 ## Reference
 - [GDC in PyG](https://pytorch-geometric.readthedocs.io/en/latest/_modules/torch_geometric/transforms/gdc.html)
