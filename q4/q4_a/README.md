@@ -8,7 +8,11 @@
 - [nn](https://pytorch-geometric.readthedocs.io/en/latest/modules/nn.html#torch-geometric-nn)
     - Linear, Sequential, and Model layers
 - [TORCH.NN.FUNCTIONAL.NLL_LOSS](https://pytorch.org/docs/1.9.0/generated/torch.nn.functional.nll_loss.html)
-    - The negative log likelihood loss. It is useful to train a classification problem with C classes.
+    - The negative log likelihood loss. It is useful to train a classification problem with C classes. Details in [NLLLoss](https://pytorch.org/docs/1.9.0/generated/torch.nn.NLLLoss.html#torch.nn.NLLLoss).
+        - Obtaining log-probabilities in a neural network is easily achieved by adding a LogSoftmax layer in the last layer of your network. You may use CrossEntropyLoss instead, if you prefer not to add an extra layer.
+
+## Question
+1. How to pick appropriate loss function?
 
 ## GCN
 - [docs: GCNConv @ PyG](https://github.com/pyg-team/pytorch_geometric/blob/master/examples/gat.py)
@@ -25,6 +29,12 @@
 ## GAT
 - [docs: GATConv @PyG](https://pytorch-geometric.readthedocs.io/en/latest/modules/nn.html#torch_geometric.nn.conv.GATConv)
     - [repo(example): gat.py](https://github.com/pyg-team/pytorch_geometric/blob/master/examples/gat.py)
+
+## Environment
+- [Create virtual environments for python with conda](https://uoa-eresearch.github.io/eresearch-cookbook/recipe/2014/11/20/conda/)
+```bash== 
+$ conda create -n <venv_name> python=3.8
+``` 
 
 ## Reference
 - [GDC in PyG](https://pytorch-geometric.readthedocs.io/en/latest/_modules/torch_geometric/transforms/gdc.html)
