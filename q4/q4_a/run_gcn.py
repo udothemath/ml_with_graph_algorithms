@@ -5,7 +5,6 @@ import argparse
 import sys
 print(sys.prefix)
 
-
 import torch
 import torch.nn.functional as F
 from torch_geometric.datasets import Planetoid
@@ -24,8 +23,6 @@ dataset = Planetoid(path, dataset, transform=T.NormalizeFeatures())
 data = dataset[0]
 
 print(f"Data: {path}")
-
-# %%
 
 if args.use_gdc:
     gdc = T.GDC(self_loop_weight=1, normalization_in='sym',
@@ -59,7 +56,6 @@ def train():
     F.nll_loss(model()[data.train_mask], data.y[data.train_mask]).backward()
     optimizer.step()
 
-
 @torch.no_grad()
 def test():
     model.eval()
@@ -70,13 +66,27 @@ def test():
         accs.append(acc)
     return accs
 
-
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model, data = Net().to(device), data.to(device)
 optimizer = torch.optim.Adam([
     dict(params=model.conv1.parameters(), weight_decay=5e-4),
     dict(params=model.conv2.parameters(), weight_decay=0)
 ], lr=0.01)  # Only perform weight-decay on first convolution.
+
+
+print(f"Show data info")
+
+print(dataset)
+print(dataset.__dir__())
+print(dataset.num_classes)
+print(dataset.num_features)
+print(dataset.num_edge_features)
+print(data)
+print(data.x)
+print(data.x.size())
+print(data.train_mask)
+print(data.y[:5])
+
 
 def run_epoch():
     best_val_acc = test_acc = 0
@@ -89,7 +99,7 @@ def run_epoch():
         print(f'Epoch: {epoch:03d}, Train: {train_acc:.4f}, '
             f'Val: {best_val_acc:.4f}, Test: {test_acc:.4f}')
 
+run_epoch()
 print ("Done!")
-
 
 # %%
