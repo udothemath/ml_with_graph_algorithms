@@ -3,8 +3,9 @@
 .ipynb_checkpoints/*
 *.ipynb_checkpoints
 */data/*
-q3/env_pythorch/*
-q3/GraphGym/*
+q3/q3_a/env_pythorch/*
+q3/q3_a/GraphGym/*
+*/*/__pycache__/
 */__pycache__/
 __pycache__/
 *.zip
