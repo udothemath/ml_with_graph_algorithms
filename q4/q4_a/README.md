@@ -31,12 +31,12 @@
     - [repo(example): gat.py](https://github.com/pyg-team/pytorch_geometric/blob/master/examples/gat.py)
 
 ## Environment
-- [Create virtual environments for python with conda](https://uoa-eresearch.github.io/eresearch-cookbook/recipe/2014/11/20/conda/)
+- [Installing packages using pip and virtual environments](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/)
     ```bash== 
-    $ conda create -n <venv_name> python=3.8
+    $ python3 -m venv /Users/pro/Documents/env_torch
     ``` 
     ```bash== 
-    $ conda activate env_torch
+    $ source /Users/pro/Documents/env_torch/bin/activate
     ``` 
 
 
