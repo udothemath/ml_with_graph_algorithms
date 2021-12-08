@@ -2,6 +2,10 @@
 import os.path as osp
 import argparse
 
+import sys
+print(sys.prefix)
+
+
 import torch
 import torch.nn.functional as F
 from torch_geometric.datasets import Planetoid
@@ -85,7 +89,7 @@ def run_epoch():
         print(f'Epoch: {epoch:03d}, Train: {train_acc:.4f}, '
             f'Val: {best_val_acc:.4f}, Test: {test_acc:.4f}')
 
-# # %%
+print ("Done!")
 
 
 # %%

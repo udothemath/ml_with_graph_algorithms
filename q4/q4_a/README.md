@@ -30,7 +30,7 @@
 - [docs: GATConv @PyG](https://pytorch-geometric.readthedocs.io/en/latest/modules/nn.html#torch_geometric.nn.conv.GATConv)
     - [repo(example): gat.py](https://github.com/pyg-team/pytorch_geometric/blob/master/examples/gat.py)
 
-## Environment
+## Install package (with virtual environment)
 - [Installing packages using pip and virtual environments](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/)
     ```bash== 
     $ python3 -m venv /Users/pro/Documents/env_torch
@@ -38,6 +38,16 @@
     ```bash== 
     $ source /Users/pro/Documents/env_torch/bin/activate
     ``` 
+- Install torch
+    ```bash== 
+    $ pip install torch==1.10.0 -f https://download.pytorch.org/whl/torch_stable.html 
+    ```
+- Install torch relevant package
+    ```bash== 
+    $ sh sh requirements_torch.sh
+    ```
+
+
 
 
 ## Reference
