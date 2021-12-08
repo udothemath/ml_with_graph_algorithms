@@ -1,5 +1,5 @@
 ## Pytorch建模基礎架構
-[以mnist為例](https://blog.csdn.net/qq_40211493/article/details/106580655)
+- [以mnist為例](https://blog.csdn.net/qq_40211493/article/details/106580655)
 
 ## PyTorch Geometric Data 格式
 - [torch_geometric.data.Data](https://pytorch-geometric.readthedocs.io/en/latest/modules/data.html#torch_geometric.data.Data)
