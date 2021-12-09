@@ -64,10 +64,13 @@ def test(data):
         accs.append(acc)
     return accs
 
+def run_epoch():
+    for epoch in range(1, 11):
+        train(data)
+        train_acc, val_acc, test_acc = test(data)
+        print(f'Epoch: {epoch:03d}, Train: {train_acc:.4f}, Val: {val_acc:.4f}, '
+            f'Test: {test_acc:.4f}')
 
-for epoch in range(1, 10):
-    train(data)
-    train_acc, val_acc, test_acc = test(data)
-    print(f'Epoch: {epoch:03d}, Train: {train_acc:.4f}, Val: {val_acc:.4f}, '
-          f'Test: {test_acc:.4f}')
+run_epoch()
+print(f"Done")
 # %%
