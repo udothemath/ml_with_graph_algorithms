@@ -87,6 +87,8 @@ print(data.x.size())
 print(data.train_mask)
 print(data.y[:5])
 
+print(f"{'-'*50}")
+
 def run_epoch():
     best_val_acc = test_acc = 0
     for epoch in range(1, 201):
