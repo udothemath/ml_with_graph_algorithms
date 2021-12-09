@@ -73,9 +73,7 @@ optimizer = torch.optim.Adam([
     dict(params=model.conv2.parameters(), weight_decay=0)
 ], lr=0.01)  # Only perform weight-decay on first convolution.
 
-
 print(f"Show data info")
-
 print(dataset)
 print(dataset.__dir__())
 print(dataset.num_classes)
@@ -87,6 +85,7 @@ print(data.x.size())
 print(data.train_mask)
 print(data.y[:5])
 
+print(f"{'-'*50}")
 
 def run_epoch():
     best_val_acc = test_acc = 0
@@ -99,7 +98,8 @@ def run_epoch():
         print(f'Epoch: {epoch:03d}, Train: {train_acc:.4f}, '
             f'Val: {best_val_acc:.4f}, Test: {test_acc:.4f}')
 
-run_epoch()
+# run_epoch()
 print ("Done!")
+
 
 # %%
