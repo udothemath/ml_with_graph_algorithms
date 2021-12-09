@@ -22,8 +22,6 @@ print(data.train_mask)
 print(data.val_mask)
 print(data.test_mask)
 
-
-
 # %%
 class Net(torch.nn.Module):
     def __init__(self, in_channels, out_channels):
