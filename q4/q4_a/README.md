@@ -47,9 +47,6 @@
     $ sh sh requirements_torch.sh
     ```
 
-
-
-
 ## Reference
 - [GDC in PyG](https://pytorch-geometric.readthedocs.io/en/latest/_modules/torch_geometric/transforms/gdc.html)
     - Processes the graph via Graph Diffusion Convolution (GDC) from the `"Diffusion Improves Graph Learning" <https://www.kdd.in.tum.de/gdc>` paper.
