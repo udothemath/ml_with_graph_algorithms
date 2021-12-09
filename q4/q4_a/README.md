@@ -11,6 +11,13 @@
         - Obtaining log-probabilities in a neural network is easily achieved by adding a LogSoftmax layer in the last layer of your network. You may use CrossEntropyLoss instead, if you prefer not to add an extra layer.
 - Activation function
     - Relu, elu, selu, celu, ... search at [TORCH.NN.FUNCTIONAL](https://pytorch.org/docs/stable/nn.functional.html)
+- [Deep learning basics — weight decay](https://medium.com/analytics-vidhya/deep-learning-basics-weight-decay-3c68eb4344e9)
+    - Why do we use weight decay?
+        - To prevent overfitting
+        - To keep the weights small and avoid exploding gradient
+- [Loss func for classification problem](https://www.yanxishe.com/columnDetail/16855)
+- [Softmax](https://pytorch.org/docs/stable/generated/torch.nn.functional.softmax.html#torch.nn.functional.softmax)
+    - This function doesn’t work directly with NLLLoss, which expects the Log to be computed between the Softmax and itself. Use log_softmax instead (it’s faster and has better numerical properties).
 
 ## Question
 1. How to chhoose appropriate loss function?
