@@ -8,6 +8,10 @@
 - [torch_geometric.loader](https://pytorch-geometric.readthedocs.io/en/latest/modules/loader.html)
 - NeighborLoader可泛化在異質圖上，但NeighborSampler只能用在同質圖上。
 
+## Unsupervised Graph Representation Learning
+- 利用positive sample和negative sample，希望真實有連的點之間距離越近越好，沒有連的點之間距離越遠越好。
+- 實務上會找到這些samples後，利用GNN找到他們的embedding，再去計算之間的距離當作loss
+
 ## GraphSage
 - [docs: SAGEConv @PyG ](https://pytorch-geometric.readthedocs.io/en/latest/modules/nn.html#torch_geometric.nn.conv.SAGEConv)
     - [repo(example1): reddit.py](https://github.com/pyg-team/pytorch_geometric/blob/master/examples/reddit.py)
