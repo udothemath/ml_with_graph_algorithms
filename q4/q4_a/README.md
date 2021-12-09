@@ -25,7 +25,7 @@
 2. How does message passing function work within graph based layers?
 3. How to set up batch computation using multi-cores?
 4. How to modify model architecture to improve performance?
-
+5. How to apply GAT on inductive problem?
 
 ## GCN
 - [docs: GCNConv @ PyG](https://github.com/pyg-team/pytorch_geometric/blob/master/examples/gat.py)
@@ -42,6 +42,7 @@
 ## GAT
 - [docs: GATConv @PyG](https://pytorch-geometric.readthedocs.io/en/latest/modules/nn.html#torch_geometric.nn.conv.GATConv)
     - [repo(example): gat.py](https://github.com/pyg-team/pytorch_geometric/blob/master/examples/gat.py)
+- [paper: GRAPH ATTENTION NETWORKS(ICLR 2018)](https://arxiv.org/pdf/1710.10903.pdf)
 - [post: Graph Attention Network](https://petar-v.com/GAT/)
 - [post: 探討graph attention機制有效性 — Understanding Attention and Generalization in Graph Neural Networks(NIPS 2019)](https://medium.com/@qaz7821819/%E6%8E%A2%E8%A8%8Egraph-attention%E6%A9%9F%E5%88%B6%E6%9C%89%E6%95%88%E6%80%A7-understanding-attention-and-generalization-in-graph-neural-networks-d1ad54084bc0)
 - [paper: ADAPTIVE STRUCTURAL FINGERPRINTS FOR GRAPH
