@@ -1,7 +1,7 @@
 ## Objective
 說明圖演算法中的GCN，GraphSage，以及GAT的程式碼
 
-## Key Element
+## Key Component
 - [docs: nn functional](https://pytorch.org/docs/stable/nn.functional.html)
 - [repo: Implemented GNN Models @PyG](https://github.com/pyg-team/pytorch_geometric#implemented-gnn-models)
 - [docs: nn in torch-geometric](https://pytorch-geometric.readthedocs.io/en/latest/modules/nn.html#torch-geometric-nn)
@@ -9,6 +9,8 @@
 - [docs: TORCH.NN.FUNCTIONAL.NLL_LOSS](https://pytorch.org/docs/1.9.0/generated/torch.nn.functional.nll_loss.html)
     - The negative log likelihood loss. It is useful to train a classification problem with C classes. Details in [NLLLoss](https://pytorch.org/docs/1.9.0/generated/torch.nn.NLLLoss.html#torch.nn.NLLLoss).
         - Obtaining log-probabilities in a neural network is easily achieved by adding a LogSoftmax layer in the last layer of your network. You may use CrossEntropyLoss instead, if you prefer not to add an extra layer.
+- Activation function
+    - Relu, elu, selu, celu, ... search at [TORCH.NN.FUNCTIONAL](https://pytorch.org/docs/stable/nn.functional.html)
 
 ## Question
 1. How to chhoose appropriate loss function?
@@ -16,6 +18,7 @@
 2. How does message passing function work within graph based layers?
 3. How to set up batch computation using multi-cores?
 4. How to modify model architecture to improve performance?
+5. 
 
 ## GCN
 - [docs: GCNConv @ PyG](https://github.com/pyg-team/pytorch_geometric/blob/master/examples/gat.py)

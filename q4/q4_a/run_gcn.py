@@ -73,9 +73,7 @@ optimizer = torch.optim.Adam([
     dict(params=model.conv2.parameters(), weight_decay=0)
 ], lr=0.01)  # Only perform weight-decay on first convolution.
 
-
 print(f"Show data info")
-
 print(dataset)
 print(dataset.__dir__())
 print(dataset.num_classes)
