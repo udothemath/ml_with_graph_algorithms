@@ -34,7 +34,7 @@ class Net(torch.nn.Module):
 
     def forward(self, x, edge_index):
         x = F.dropout(x, p=0.6, training=self.training)
-        x = F.elu(self.conv1(x, edge_index))
+        x = F.lu(self.conv1(x, edge_index))
         x = F.dropout(x, p=0.6, training=self.training)
         x = self.conv2(x, edge_index)
         return F.log_softmax(x, dim=-1)
@@ -65,8 +65,9 @@ def test(data):
     return accs
 
 
-for epoch in range(1, 201):
+for epoch in range(1, 10):
     train(data)
     train_acc, val_acc, test_acc = test(data)
     print(f'Epoch: {epoch:03d}, Train: {train_acc:.4f}, Val: {val_acc:.4f}, '
           f'Test: {test_acc:.4f}')
+# %%
