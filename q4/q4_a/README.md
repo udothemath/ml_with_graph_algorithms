@@ -12,7 +12,11 @@
         - Obtaining log-probabilities in a neural network is easily achieved by adding a LogSoftmax layer in the last layer of your network. You may use CrossEntropyLoss instead, if you prefer not to add an extra layer.
 
 ## Question
-1. How to pick appropriate loss function?
+1. How to chhoose appropriate loss function?
+    - [post: Deep Learning: Which Loss and Activation Functions should I use?](https://towardsdatascience.com/deep-learning-which-loss-and-activation-functions-should-i-use-ac02f1c56aa8)
+2. How does message passing function work within graph based layers?
+3. How to set up batch computation using multi-cores?
+4. How to modify model architecture to improve performance?
 
 ## GCN
 - [docs: GCNConv @ PyG](https://github.com/pyg-team/pytorch_geometric/blob/master/examples/gat.py)
@@ -29,6 +33,7 @@
 ## GAT
 - [docs: GATConv @PyG](https://pytorch-geometric.readthedocs.io/en/latest/modules/nn.html#torch_geometric.nn.conv.GATConv)
     - [repo(example): gat.py](https://github.com/pyg-team/pytorch_geometric/blob/master/examples/gat.py)
+- [post: Graph Attention Network](https://petar-v.com/GAT/)
 
 ## Install package (with virtual environment)
 - [Installing packages using pip and virtual environments](https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/)
@@ -44,7 +49,7 @@
     ```
 - Install torch relevant package
     ```bash== 
-    $ sh sh requirements_torch.sh
+    $ sh requirements_torch.sh
     ```
 
 
