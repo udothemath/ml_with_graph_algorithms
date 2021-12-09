@@ -87,7 +87,6 @@ print(data.x.size())
 print(data.train_mask)
 print(data.y[:5])
 
-
 def run_epoch():
     best_val_acc = test_acc = 0
     for epoch in range(1, 201):
@@ -99,7 +98,8 @@ def run_epoch():
         print(f'Epoch: {epoch:03d}, Train: {train_acc:.4f}, '
             f'Val: {best_val_acc:.4f}, Test: {test_acc:.4f}')
 
-run_epoch()
+# run_epoch()
 print ("Done!")
+
 
 # %%
