@@ -6,6 +6,7 @@
 
 ## NeighborLoader與NeighborSampler
 - [torch_geometric.loader](https://pytorch-geometric.readthedocs.io/en/latest/modules/loader.html)
+- NeighborLoader可泛化在異質圖上，但NeighborSampler只能用在同質圖上。
 
 ## GraphSage
 - [docs: SAGEConv @PyG ](https://pytorch-geometric.readthedocs.io/en/latest/modules/nn.html#torch_geometric.nn.conv.SAGEConv)
