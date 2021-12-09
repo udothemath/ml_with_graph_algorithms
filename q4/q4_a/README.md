@@ -67,10 +67,11 @@ ATTENTION NETWORKS(2020)](https://openreview.net/pdf?id=BJxWx0NYPr)
     $ sh requirements_torch.sh
     ```
 
-    
+
 ## Reference
 - [GDC in PyG](https://pytorch-geometric.readthedocs.io/en/latest/_modules/torch_geometric/transforms/gdc.html)
     - Processes the graph via Graph Diffusion Convolution (GDC) from the `"Diffusion Improves Graph Learning" <https://www.kdd.in.tum.de/gdc>` paper.
 - [終於有人總結了圖神經網絡！](https://www.readfog.com/a/1639181535368286208)
 - [Python Module: typing](https://myapollo.com.tw/zh-tw/python-typing-module/)
     - 該模組並非用來規定 Python 程式必須使用什麼型別，而是透過型別註釋(type annotations)讓開發者或協作者可以更加了解某個變數的型別，也讓第三方的工具能夠實作型別檢查器(type checker)。
+- [parse_args()報錯:ipykernel_launcher.py: error: unrecognized arguments](http://corettainformation.blogspot.com/2021/02/parseargsipykernellauncherpy-error.html)
