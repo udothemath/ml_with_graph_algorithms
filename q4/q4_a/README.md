@@ -1,13 +1,12 @@
 ## Objective
 說明圖演算法中的GCN，GraphSage，以及GAT的程式碼
 
-## PyTorch Geometric
+## Key Element
+- [docs: nn functional](https://pytorch.org/docs/stable/nn.functional.html)
 - [repo: Implemented GNN Models @PyG](https://github.com/pyg-team/pytorch_geometric#implemented-gnn-models)
-
-## Concept
-- [nn](https://pytorch-geometric.readthedocs.io/en/latest/modules/nn.html#torch-geometric-nn)
+- [docs: nn in torch-geometric](https://pytorch-geometric.readthedocs.io/en/latest/modules/nn.html#torch-geometric-nn)
     - Linear, Sequential, and Model layers
-- [TORCH.NN.FUNCTIONAL.NLL_LOSS](https://pytorch.org/docs/1.9.0/generated/torch.nn.functional.nll_loss.html)
+- [docs: TORCH.NN.FUNCTIONAL.NLL_LOSS](https://pytorch.org/docs/1.9.0/generated/torch.nn.functional.nll_loss.html)
     - The negative log likelihood loss. It is useful to train a classification problem with C classes. Details in [NLLLoss](https://pytorch.org/docs/1.9.0/generated/torch.nn.NLLLoss.html#torch.nn.NLLLoss).
         - Obtaining log-probabilities in a neural network is easily achieved by adding a LogSoftmax layer in the last layer of your network. You may use CrossEntropyLoss instead, if you prefer not to add an extra layer.
 
