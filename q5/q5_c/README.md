@@ -7,5 +7,6 @@
     - [code: gat v2](https://nn.labml.ai/graphs/gatv2/experiment.html)
 
 ## Cora (transductive) and PPI (inductive) examples
+- [dataset: protein protein interaction()](https://paperswithcode.com/dataset/ppi)
 - [repo: gordicaleksa/pytorch-GAT](https://github.com/gordicaleksa/pytorch-GAT)
 - [jupyter notebook: The Annotated GAT (PPI)](https://github.com/gordicaleksa/pytorch-GAT/blob/main/The%20Annotated%20GAT%20(PPI).ipynb)
