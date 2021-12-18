@@ -1,13 +1,20 @@
 # %%
+import sys, os
+print (os.getcwd())
+
+DIR_DATA = '/Users/pro/Documents/z_data'
+DIR_DATA_OGB = f'{DIR_DATA}/dataset/'
+
+# %%
 from torch_geometric.datasets import TUDataset
 
-root = './enzymes'
+root = f'{DIR_DATA}/enzymes'
 name = 'ENZYMES'
 
 # The ENZYMES dataset
-pyg_dataset= TUDataset('./enzymes', 'ENZYMES')
+pyg_dataset= TUDataset(root, 'ENZYMES')
 
-a# You can find that there are 600 graphs in this dataset
+# You can find that there are 600 graphs in this dataset
 print(pyg_dataset)
 
 # %%
@@ -80,6 +87,7 @@ from ogb.nodeproppred import PygNodePropPredDataset
 dataset_name = 'ogbn-arxiv'
 # Load the dataset and transform it to sparse tensor
 dataset = PygNodePropPredDataset(name=dataset_name,
+                                 root=DIR_DATA_OGB,
                                  transform=T.ToSparseTensor())
 print('The {} dataset has {} graph'.format(dataset_name, len(dataset)))
 
@@ -116,6 +124,7 @@ from ogb.nodeproppred import PygNodePropPredDataset, Evaluator
 # %%
 dataset_name = 'ogbn-arxiv'
 dataset = PygNodePropPredDataset(name=dataset_name,
+                                 root=DIR_DATA_OGB,
                                  transform=T.ToSparseTensor())
 data = dataset[0]
 
@@ -123,7 +132,6 @@ data = dataset[0]
 # print (data.adj_t)
 
 # %%
-
 
 # Make the adjacency matrix to symmetric
 data.adj_t = data.adj_t.to_symmetric()
