@@ -214,3 +214,105 @@ class GCN(torch.nn.Module):
         #########################################
 
         return out
+
+
+# %%
+def train(model, data, train_idx, optimizer, loss_fn):
+    # TODO: Implement this function that trains the model by 
+    # using the given optimizer and loss_fn.
+    model.train()
+    loss = 0
+
+    ############# Your code here ############
+    ## Note:
+    ## 1. Zero grad the optimizer
+    ## 2. Feed the data into the model
+    ## 3. Slicing the model output and label by train_idx
+    ## 4. Feed the sliced output and label to loss_fn
+    ## (~4 lines of code)
+
+    #########################################
+
+    loss.backward()
+    optimizer.step()
+
+    return loss.item()
+
+
+# %%
+# Test function here
+@torch.no_grad()
+def test(model, data, split_idx, evaluator):
+    # TODO: Implement this function that tests the model by 
+    # using the given split_idx and evaluator.
+    model.eval()
+
+    # The output of model on all data
+    out = None
+
+    ############# Your code here ############
+    ## (~1 line of code)
+    ## Note:
+    ## 1. No index slicing here
+
+    #########################################
+
+    y_pred = out.argmax(dim=-1, keepdim=True)
+
+    train_acc = evaluator.eval({
+        'y_true': data.y[split_idx['train']],
+        'y_pred': y_pred[split_idx['train']],
+    })['acc']
+    valid_acc = evaluator.eval({
+        'y_true': data.y[split_idx['valid']],
+        'y_pred': y_pred[split_idx['valid']],
+    })['acc']
+    test_acc = evaluator.eval({
+        'y_true': data.y[split_idx['test']],
+        'y_pred': y_pred[split_idx['test']],
+    })['acc']
+
+    return train_acc, valid_acc, test_acc
+
+# %%
+# Please do not change the args
+args = {
+    'device': device,
+    'num_layers': 3,
+    'hidden_dim': 256,
+    'dropout': 0.5,
+    'lr': 0.01,
+    'epochs': 100,
+}
+args
+
+# %%
+model = GCN(data.num_features, args['hidden_dim'],
+            dataset.num_classes, args['num_layers'],
+            args['dropout']).to(device)
+evaluator = Evaluator(name='ogbn-arxiv')
+
+# %%
+import copy
+
+# reset the parameters to initial random value
+model.reset_parameters()
+
+optimizer = torch.optim.Adam(model.parameters(), lr=args['lr'])
+loss_fn = F.nll_loss
+
+best_model = None
+best_valid_acc = 0
+
+for epoch in range(1, 1 + args["epochs"]):
+  loss = train(model, data, train_idx, optimizer, loss_fn)
+  result = test(model, data, split_idx, evaluator)
+  train_acc, valid_acc, test_acc = result
+  if valid_acc > best_valid_acc:
+      best_valid_acc = valid_acc
+      best_model = copy.deepcopy(model)
+  print(f'Epoch: {epoch:02d}, '
+        f'Loss: {loss:.4f}, '
+        f'Train: {100 * train_acc:.2f}%, '
+        f'Valid: {100 * valid_acc:.2f}% '
+        f'Test: {100 * test_acc:.2f}%')
