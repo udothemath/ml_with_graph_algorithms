@@ -1,5 +1,12 @@
-## colab連結
+## Stanford課程colab連結
 - [colab2](https://colab.research.google.com/drive/1Aa0eKSmyYef1gORvlHv7EeQzSVRb30eL?usp=sharing)
+
+## Files 
+- run_colab2.py
+    - 實作colab2
+- run_test_layers.py
+    - 實作nn.Modulelist和nn.Sequential深度學習層的設定
+
 
 ## Note
 - How to read and make tensor matrix using SparseTensor?
