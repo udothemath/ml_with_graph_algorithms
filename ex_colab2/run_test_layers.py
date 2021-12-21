@@ -7,7 +7,9 @@ print(torch.__version__)
 class net1(torch.nn.Module):
     def __init__(self):
         super(net1, self).__init__()
-        self.linears = nn.ModuleList([nn.Linear(10, 10) for i in range(2)])
+        # self.linears = nn.ModuleList([nn.Linear(10, 10) for i in range(2)])
+        abc = nn.ModuleList([nn.Linear(10, 10) for i in range(2)])
+        self.linears = abc.extend(nn.ModuleList(nn.Linear(10, 10)))
 
     def forward(self, x):
         for m in self.linears:
@@ -103,4 +105,25 @@ input = torch.randn(2, 3)  ## batch size: 2
 output = net(input)
 for each_layer in net.trace:
     print(each_layer.shape)
+
+# %%
+class net7(nn.Module):
+    def __init__(self, in_features, nb_classes, nb_hidden_layer, 
+        hidden_size, act=nn.ReLU):
+        super(net7, self).__init__()
+        self.act = act()
+        
+        self.fc1 = nn.Linear(in_features, hidden_size)
+        self.fcs = nn.ModuleList([nn.Linear(hidden_size, hidden_size)])
+        self.out = nn.Linear(hidden_size, nb_classes)
+        
+    def forward(self, x):
+        x = self.act(self.fc1(x))
+        for l in self.fcs:
+            x = F.relu(l(x))
+        x = self.out(x)
+        return x
+            
+net = net7(2, 3, 4, 5, nn.ReLU)
+print(net)
 # %%

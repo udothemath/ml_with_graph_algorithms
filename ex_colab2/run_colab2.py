@@ -158,7 +158,16 @@ class GCN(torch.nn.Module):
         super(GCN, self).__init__()
 
         # A list of GCNConv layers
-        self.convs = None
+        self.convs = self.ModuleList([GCNConv(input_dim, hidden_dim),
+                                      GCNConv(hidden_dim, hidden_dim) for i in range(num_layers - 1)])
+
+        self.conv1 = GCNConv(dataset.num_features, 16, cached=True,
+                             normalize=not args.use_gdc)
+        self.conv2 = GCNConv(16, dataset.num_classes, cached=True,
+                             normalize=not args.use_gdc)
+        # self.conv1 = ChebConv(data.num_features, 16, K=2)
+        # self.conv2 = ChebConv(16, data.num_features, K=2)
+
 
         # A list of 1D batch normalization layers
         self.bns = None

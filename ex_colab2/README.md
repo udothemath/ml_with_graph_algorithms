@@ -7,7 +7,6 @@
 - run_test_layers.py
     - 實作nn.Modulelist和nn.Sequential深度學習層的設定
 
-
 ## Note
 - How to read and make tensor matrix using SparseTensor?
 - [PyTorch 中的 ModuleList 和 Sequential: 区别和使用场景](https://zhuanlan.zhihu.com/p/64990232)
