@@ -58,7 +58,7 @@ print(net)
 class net4(nn.Module):
     def __init__(self):
         super(net4, self).__init__()
-        self.layers = nn.ModuleList([nn.Linear(10, 10)for i in range(2)])
+        self.layers = nn.ModuleList([nn.Linear(10, 10) for i in range(2)])
 
     def forward(self, x):
         for layer in self.layers:
@@ -67,5 +67,19 @@ class net4(nn.Module):
 
 net = net4()
 print(net)
+# %%
+class net5(nn.Module):
+    def __init__(self):
+        super(net5, self).__init__()
+        self.list_layers = [nn.Linear(10, 10) for i in range(2)]
+        self.layers = nn.Sequential(*self.list_layers)
+    def forward(self, x):
+        self.x = self.layers(x)
+        return x
+
+net = net5()
+print(net)
+
+    
 
 # %%
