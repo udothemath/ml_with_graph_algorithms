@@ -79,7 +79,27 @@ class net5(nn.Module):
 
 net = net5()
 print(net)
-
+# %%
+class net6(nn.Module):
+    def __init__(self):
+        super(net6, self).__init__()
+        self.layers = nn.ModuleList([nn.Linear(5, 10),
+                                     nn.Linear(10,20),
+                                     nn.Linear(20,30)])
+        self.trace = []
+    def forward(self, x):
+        for layer in self.layers:
+            self.x = layer(x)
+            self.trace.append(self.x)
+        return x
     
+net = net6()
+print(net)
+
+input = torch.randn(4, 5)  ## batch size: 4
+output = net(input)
+for each_layer in net.trace:
+    print(each_layer.shape)
+
 
 # %%
