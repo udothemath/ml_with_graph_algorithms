@@ -1,10 +1,11 @@
+q5/q5_c/pytorch-GAT/*
 .DS_Store
 */.ipynb_checkpoints/*
 .ipynb_checkpoints/*
 *.ipynb_checkpoints
 */data/*
 q3/q3_a/env_pythorch/*
-q3/q3_a/GraphGym/*
+*/q3/q3_a/GraphGym/*
 */*/__pycache__/
 */__pycache__/
 __pycache__/
