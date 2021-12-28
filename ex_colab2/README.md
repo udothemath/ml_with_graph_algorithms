@@ -22,3 +22,4 @@
 
 ## Reference
 - [Training Better Deep Learning Models for Structured Data using Semi-supervised Learning](https://towardsdatascience.com/training-better-deep-learning-models-for-structured-data-using-semi-supervised-learning-8acc3b536319)
+- [repo: CS224W-Colab](https://github.com/luciusssss/CS224W-Colab/blob/main/CS224W-Colab%202.ipynb)
