@@ -158,17 +158,17 @@ class GCN(torch.nn.Module):
         super(GCN, self).__init__()
 
         # A list of GCNConv layers
-        self.convs = self.ModuleList([GCNConv(input_dim, hidden_dim)]+
+        self.convs = torch.nn.ModuleList([GCNConv(input_dim, hidden_dim)]+
                                      [GCNConv(hidden_dim, hidden_dim) for i in range(num_layers - 1)] +
                                      [GCNConv(hidden_dim, output_dim)]       
                                     )
 
         # A list of 1D batch normalization layers
-        self.bns = self.ModuleList([self.BatchNorm1d(hidden_dim)
+        self.bns = torch.nn.ModuleList([torch.nn.BatchNorm1d(hidden_dim)
                                     for i in range(num_layers-1)
                                     ])
         # The log softmax layer
-        self.softmax = self.LogSoftmax()
+        self.softmax = torch.nn.LogSoftmax()
 
         ############# Your code here ############
         ## Note:
@@ -206,6 +206,12 @@ class GCN(torch.nn.Module):
         out = None
 
         ############# Your code here ############
+        for conv, bn in zip(self.convs[:-1], self.bn):
+            x1 = F.relu(bn(conv(x, adj_t)))
+
+            x1 = F.dropout(x1, p=self.training)
+        x = self.convs[-1](x1, adj_t)
+        out = x if self.return_embeds else self.softmax(x)
         ## Note:
         ## 1. Construct the network as showing in the figure
         ## 2. torch.nn.functional.relu and torch.nn.functional.dropout are useful
@@ -294,7 +300,12 @@ args
 model = GCN(data.num_features, args['hidden_dim'],
             dataset.num_classes, args['num_layers'],
             args['dropout']).to(device)
-evaluator = Evaluator(name='ogbn-arxiv')
+print(model)
+
+
+# evaluator = Evaluator(name='ogbn-arxiv')
+
+
 
 # %%
 import copy

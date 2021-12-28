@@ -18,3 +18,7 @@
     - When defining the optimizer() for that net, you’ll get an error saying that your model has no parameters, because PyTorch does not see the parameters of the layers stored in a Python list. If you use a nn.ModuleList instead, you’ll get no error.
     - Q: Why use ModuleList instead of a normal python list? is it so that parameters are included in the .parameters() iterator?
     - A: Exactly! If you use a plain python list, the parameters won’t be registered properly and you can’t pass them to your optimizer using model.parameters().
+
+
+## Reference
+- [Training Better Deep Learning Models for Structured Data using Semi-supervised Learning](https://towardsdatascience.com/training-better-deep-learning-models-for-structured-data-using-semi-supervised-learning-8acc3b536319)
