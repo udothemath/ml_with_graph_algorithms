@@ -12,6 +12,22 @@ from torch_geometric.nn import SAGEConv
 from torch_geometric.datasets import Planetoid
 from torch_geometric.loader import NeighborSampler as RawNeighborSampler
 
+from time import time
+import time as t
+def time_decorator(original_func):
+    # print('Inside decorator')
+    def wrapper(*args, **kwargs):
+        # print("Hello")
+        start = time()
+        result = original_func(*args, **kwargs)
+        # print(result)
+        # t.sleep(1)
+        end = time()      
+        print(f'Elapsed time: {end-start:6.2f} seconds for {original_func.__name__}')
+        return result
+    return wrapper
+
+
 EPS = 1e-15
 
 dataset = 'Cora'
@@ -113,11 +129,16 @@ def test():
 
     return val_acc, test_acc
 
-for epoch in range(1, 11):
-    loss = train()
-    val_acc, test_acc = test()
-    print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, '
-          f'Val: {val_acc:.4f}, Test: {test_acc:.4f}')
+# %%
 
+@time_decorator
+def run_epoch(num_of_epoch=10):
+    for epoch in range(1, num_of_epoch+1):
+        loss = train()
+        val_acc, test_acc = test()
+        print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, '
+            f'Val: {val_acc:.4f}, Test: {test_acc:.4f}')
 
+run_epoch(num_of_epoch=2)
 print("Done!")
+# %%
