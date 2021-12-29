@@ -458,7 +458,6 @@ class GCN_Graph(torch.nn.Module):
 
         return out
 
-
 # %%
 def train(model, device, data_loader, optimizer, loss_fn):
     # TODO: Implement this function that trains the model by 
@@ -577,6 +576,4 @@ if 'IS_GRADESCOPE_ENV' not in os.environ:
         f'Train: {100 * train_acc:.2f}%, '
         f'Valid: {100 * valid_acc:.2f}% '
         f'Test: {100 * test_acc:.2f}%')
-# %%
-
 # %%
