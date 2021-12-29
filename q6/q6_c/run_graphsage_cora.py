@@ -50,8 +50,6 @@ class NeighborSampler(RawNeighborSampler):
         batch = torch.cat([batch, pos_batch, neg_batch], dim=0)
         return super().sample(batch)
 
-train_loader = NeighborSampler(data.edge_index, sizes=[10, 10], batch_size=256, shuffle=True, num_nodes=data.num_nodes)
-
 class SAGE(nn.Module):
     def __init__(self, in_channels, hidden_channels, num_layers, number_workers=1):
         super().__init__()
@@ -82,7 +80,7 @@ class SAGE(nn.Module):
         for conv in self.convs:
             conv.reset_parameters()
 
-def train(model, optimizer, x):
+def train(model, optimizer, x, train_loader):
     model.train()
 
     total_loss = 0
@@ -146,9 +144,11 @@ def test_number_of_workers(num_of_epoch=2):
 
         optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
         x, edge_index = data.x.to(device), data.edge_index.to(device)
+
+        train_loader = NeighborSampler(data.edge_index, sizes=[10, 10], batch_size=256, shuffle=True, num_nodes=data.num_nodes, num_workers=0)
         
         for epoch in range(1, num_of_epoch+1):
-            loss = train(model, optimizer, x)
+            loss = train(model, optimizer, x, train_loader)
             val_acc, test_acc = test(model, optimizer, x, edge_index)
             if epoch == num_of_epoch:
                 print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, '
@@ -159,7 +159,8 @@ def test_number_of_workers(num_of_epoch=2):
         print(f'Number of workers: {i}. Elapsed time: {elapsed_time:6.2f} seconds.')
         del model 
 
-test_number_of_workers(num_of_epoch=4)
 
-print("Done!")
+if __name__ == '__main__':
+    test_number_of_workers(num_of_epoch=4)
+    print("Done!")
 # %%
