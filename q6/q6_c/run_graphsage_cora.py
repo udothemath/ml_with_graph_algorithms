@@ -12,21 +12,17 @@ from torch_geometric.nn import SAGEConv
 from torch_geometric.datasets import Planetoid
 from torch_geometric.loader import NeighborSampler as RawNeighborSampler
 
-from time import time
-import time as t
-def time_decorator(original_func):
-    # print('Inside decorator')
-    def wrapper(*args, **kwargs):
-        # print("Hello")
-        start = time()
-        result = original_func(*args, **kwargs)
-        # print(result)
-        # t.sleep(1)
-        end = time()      
-        print(f'Elapsed time: {end-start:6.2f} seconds for {original_func.__name__}')
-        return result
-    return wrapper
+from functools import wraps
+import time
 
+def elapsed_time(func):
+    @wraps(func)
+    def out(*args, **kwargs):
+        init_time = time.time()
+        func(*args, **kwargs)
+        elapsed_time = time.time() - init_time
+        print(f'Elapsed time: {elapsed_time:6.2f} seconds for {func.__name__}')
+    return out
 
 EPS = 1e-15
 
@@ -54,19 +50,16 @@ class NeighborSampler(RawNeighborSampler):
         batch = torch.cat([batch, pos_batch, neg_batch], dim=0)
         return super().sample(batch)
 
-
-train_loader = NeighborSampler(data.edge_index, sizes=[10, 10], batch_size=256,
-                               shuffle=True, num_nodes=data.num_nodes)
-
+train_loader = NeighborSampler(data.edge_index, sizes=[10, 10], batch_size=256, shuffle=True, num_nodes=data.num_nodes)
 
 class SAGE(nn.Module):
-    def __init__(self, in_channels, hidden_channels, num_layers):
+    def __init__(self, in_channels, hidden_channels, num_layers, number_workers=1):
         super().__init__()
         self.num_layers = num_layers
         self.convs = nn.ModuleList()
         for i in range(num_layers):
             in_channels = in_channels if i == 0 else hidden_channels
-            self.convs.append(SAGEConv(in_channels, hidden_channels))
+            self.convs.append(SAGEConv(in_channels, hidden_channels, number_workers))
 
     def forward(self, x, adjs):
         for i, (edge_index, _, size) in enumerate(adjs):
@@ -85,15 +78,11 @@ class SAGE(nn.Module):
                 x = F.dropout(x, p=0.5, training=self.training)
         return x
 
+    def reset_parameters(self):
+        for conv in self.convs:
+            conv.reset_parameters()
 
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = SAGE(data.num_node_features, hidden_channels=64, num_layers=2)
-model = model.to(device)
-optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
-x, edge_index = data.x.to(device), data.edge_index.to(device)
-
-
-def train():
+def train(model, optimizer, x):
     model.train()
 
     total_loss = 0
@@ -115,9 +104,8 @@ def train():
 
     return total_loss / data.num_nodes
 
-
 @torch.no_grad()
-def test():
+def test(model, optimizer, x, edge_index):
     model.eval()
     out = model.full_forward(x, edge_index).cpu()
 
@@ -130,15 +118,48 @@ def test():
     return val_acc, test_acc
 
 # %%
+# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# model = SAGE(data.num_node_features, hidden_channels=64, num_layers=8, number_workers=2).to(device)
+# optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+# x, edge_index = data.x.to(device), data.edge_index.to(device)
 
-@time_decorator
-def run_epoch(num_of_epoch=10):
-    for epoch in range(1, num_of_epoch+1):
-        loss = train()
-        val_acc, test_acc = test()
-        print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, '
-            f'Val: {val_acc:.4f}, Test: {test_acc:.4f}')
+# @elapsed_time
+# def run_epoch(num_of_epoch=10):
+#     for epoch in range(1, num_of_epoch+1):
+#         loss = train(model)
+#         val_acc, test_acc = test(model)
+#         print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, '
+#             f'Val: {val_acc:.4f}, Test: {test_acc:.4f}')
 
-run_epoch(num_of_epoch=2)
+# run_epoch(num_of_epoch=2)
+# run_epoch(num_of_epoch=10)
+
+# %%
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+def test_number_of_workers(num_of_epoch=2):
+
+    for i in [1, 2, 4, 8]:
+        init_time = time.time()
+        model = SAGE(data.num_node_features, hidden_channels=64, num_layers=8, number_workers=i).to(device)
+        model.reset_parameters()
+
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
+        x, edge_index = data.x.to(device), data.edge_index.to(device)
+        
+        for epoch in range(1, num_of_epoch+1):
+            loss = train(model, optimizer, x)
+            val_acc, test_acc = test(model, optimizer, x, edge_index)
+            if epoch == num_of_epoch:
+                print(f'Epoch: {epoch:03d}, Loss: {loss:.4f}, '
+                    f'Val: {val_acc:.4f}, Test: {test_acc:.4f}')
+
+        # feed_in_model(model, num_of_epoch)
+        elapsed_time = time.time() - init_time
+        print(f'Number of workers: {i}. Elapsed time: {elapsed_time:6.2f} seconds.')
+        del model 
+
+test_number_of_workers(num_of_epoch=4)
+
 print("Done!")
 # %%
