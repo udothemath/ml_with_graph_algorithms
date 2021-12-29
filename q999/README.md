@@ -1,6 +1,4 @@
 ## Question in General
-
-
 ### Can GCN predict the unseen nodes?
 Quick answer: It is possible, but not clear how to do it yet.
 - [repo: can gcn predict the unseen nodes?](https://github.com/tkipf/gcn/issues/103)
