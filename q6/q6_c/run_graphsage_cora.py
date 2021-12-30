@@ -10,6 +10,12 @@ import torch.nn.functional as F
 # from torch_cluster import random_walk
 from sklearn.linear_model import LogisticRegression
 
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print (device)
+print(torch.cuda.get_device_name(0))
+print(torch._C._cuda_getCompiledVersion(), 'cuda compiled version')
+
+# %%
 import torch_geometric.transforms as T
 from torch_geometric.nn import SAGEConv
 from torch_geometric.datasets import Planetoid
