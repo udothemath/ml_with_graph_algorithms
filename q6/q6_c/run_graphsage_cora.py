@@ -2,14 +2,12 @@
 import sys, os
 print (os.getcwd())
 
-
 # %%
 import os.path as osp
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch_cluster import random_walk
+# from torch_cluster import random_walk
 from sklearn.linear_model import LogisticRegression
 
 import torch_geometric.transforms as T

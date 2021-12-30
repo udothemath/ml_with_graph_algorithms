@@ -1,6 +1,10 @@
 ## Task
 實作GraphSage並測試計算加速前後的效能比較
 
+## Installation @AI cloud for GPU computation
+- pip install torch==1.9.0 -f https://download.pytorch.org/whl/torch_stable.html
+
+
 ## Ref
 - [post: Sampling Large Graphs in PyTorch Geometric](https://towardsdatascience.com/sampling-large-graphs-in-pytorch-geometric-97a6119c41f9)
     - setting for number of worker
