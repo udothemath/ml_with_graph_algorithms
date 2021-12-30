@@ -1,4 +1,9 @@
 # %%
+import sys, os
+print (os.getcwd())
+
+
+# %%
 import os.path as osp
 
 import torch
@@ -133,10 +138,13 @@ def test(model, optimizer, x, edge_index):
 # run_epoch(num_of_epoch=10)
 
 # %%
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+# print(device)
 
+# %%
 def test_number_of_workers(num_of_epoch=2):
-
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print(f'Device: {device}')
     for i in [1, 2, 4, 8]:
         init_time = time.time()
         model = SAGE(data.num_node_features, hidden_channels=64, num_layers=8, number_workers=i).to(device)
@@ -161,6 +169,6 @@ def test_number_of_workers(num_of_epoch=2):
 
 
 if __name__ == '__main__':
-    test_number_of_workers(num_of_epoch=4)
+    test_number_of_workers(num_of_epoch=10)
     print("Done!")
 # %%
