@@ -8,6 +8,11 @@
 ![perf_v0_cpu](https://user-images.githubusercontent.com/10674490/147724036-6a292b6d-9639-4289-8e4f-33594c02011b.png)
 ![perf_v1_gpu](https://user-images.githubusercontent.com/10674490/147724040-38de823f-5cbd-4419-9818-e10d8e3cd08a.png)
 
+## ToDo
+- Optimize the setting of number of worker
+- Utilize pytorch lightning
+- Implement different framework
+
 ## Ref
 - [post: Sampling Large Graphs in PyTorch Geometric](https://towardsdatascience.com/sampling-large-graphs-in-pytorch-geometric-97a6119c41f9)
     - setting for number of worker
