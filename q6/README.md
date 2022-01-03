@@ -1,6 +1,7 @@
 ## 任務
 實作GraphSage並測試計算加速前後的效能比較
 
+## 作法
 q6_c: 使用cora資料集，測試number of worker，cpu，和gpu執行時間差異　　　
 q6_f: 測試不同的num_workers對速度的影響　　　
 q6_e: Paper分享:     
