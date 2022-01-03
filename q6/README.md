@@ -3,6 +3,6 @@
 
 ## Paper分享: 
 
-PYG AutoScale: 透過PyG AutoScale Framework將任意GNN轉為Scalable Version 
-github repo: https://github.com/rusty1s/pyg_autoscale
-paper: https://arxiv.org/pdf/2106.05609.pdf
+PYG AutoScale: 透過PyG AutoScale Framework將任意GNN轉為Scalable Version     
+github repo: https://github.com/rusty1s/pyg_autoscale    
+paper: https://arxiv.org/pdf/2106.05609.pdf    
