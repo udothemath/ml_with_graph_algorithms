@@ -3,23 +3,12 @@
 
 ## Execution @AI cloud for GPU computation
 ### 環境設定
-- 選取instance type with GPU   
-    ![image](https://user-images.githubusercontent.com/10674490/147896458-953cd4e2-21cb-4c5f-ba1a-c1c869ffaf0a.png)
-    
+- 選取instance type with GPU       
     <img src="https://user-images.githubusercontent.com/10674490/147896458-953cd4e2-21cb-4c5f-ba1a-c1c869ffaf0a.png" height="200">
 
-    <img src="https://user-images.githubusercontent.com/10674490/147896458-953cd4e2-21cb-4c5f-ba1a-c1c869ffaf0a.png" height="100">
-
-
 - 選取image   
-    - 建議使用Option GPU Cuda10
-    ![image](https://user-images.githubusercontent.com/10674490/147896477-2ddb77ae-37d2-44dd-8a85-057fa6fa07d5.png)
-    
-    <img src="https://user-images.githubusercontent.com/10674490/147896477-2ddb77ae-37d2-44dd-8a85-057fa6fa07d5.png" height="200">
-   
-    <img src="https://user-images.githubusercontent.com/10674490/147896477-2ddb77ae-37d2-44dd-8a85-057fa6fa07d5.png" height="100">
-    
-    
+    - 建議使用Option GPU Cuda10        
+    <img src="https://user-images.githubusercontent.com/10674490/147896477-2ddb77ae-37d2-44dd-8a85-057fa6fa07d5.png" height="200">    
 ### 虛擬環境設定
 
 ### 安裝套件
