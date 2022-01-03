@@ -2,6 +2,12 @@
 實作GraphSage並測試計算加速前後的效能比較
 
 ## Execution @AI cloud for GPU computation
+若(第一次)要在行內研發環境執行，請依序進行以下三步驟
+1. 環境設定　　
+2. 虛擬環境設定
+3. 安裝套件
+設定完成後，下次直接啟用虛擬環境即可套用設定。　　
+
 ### 環境設定
 - 選取instance type with GPU       
     <img src="https://user-images.githubusercontent.com/10674490/147896458-953cd4e2-21cb-4c5f-ba1a-c1c869ffaf0a.png" height="200">
