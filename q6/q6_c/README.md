@@ -16,8 +16,10 @@
 - bash requirements_torch.sh
 
 ## Result
-![perf_v0_cpu](https://user-images.githubusercontent.com/10674490/147724036-6a292b6d-9639-4289-8e4f-33594c02011b.png)
-![perf_v1_gpu](https://user-images.githubusercontent.com/10674490/147724040-38de823f-5cbd-4419-9818-e10d8e3cd08a.png)
+- cpu    
+    ![perf_v0_cpu](https://user-images.githubusercontent.com/10674490/147724036-6a292b6d-9639-4289-8e4f-33594c02011b.png)
+- gpu    
+    ![perf_v1_gpu](https://user-images.githubusercontent.com/10674490/147724040-38de823f-5cbd-4419-9818-e10d8e3cd08a.png)
 
 ## ToDo
 - Optimize the setting of number of worker
