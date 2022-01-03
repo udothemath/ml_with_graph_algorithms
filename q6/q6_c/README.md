@@ -10,6 +10,15 @@
     - 建議使用Option GPU Cuda10        
     <img src="https://user-images.githubusercontent.com/10674490/147896477-2ddb77ae-37d2-44dd-8a85-057fa6fa07d5.png" height="200">    
 ### 虛擬環境設定
+- 安裝virtual environment
+    $ python3 -m venv <name_of_your_virtual_env>
+    舉例，如果你要把虛擬環境安裝在路徑/home/jovyan，虛擬環境的名稱為torch_190，則使用
+    $ python3 -m venv /home/jovyan/torch_190
+- 啟動虛擬環境(activate)
+    $ source /home/jovyan/torch_190/bin/activate
+- 不需要使用時，退出虛擬環境(deactivate)
+    $ deactivate
+- 參考資料：[虛擬環境與套件](https://docs.python.org/zh-tw/3/tutorial/venv.html)
 
 ### 安裝套件
 - pip install torch==1.9.0 -f https://download.pytorch.org/whl/torch_stable.html
