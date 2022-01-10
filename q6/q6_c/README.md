@@ -1,3 +1,5 @@
+## Last updated: 2022/1/10
+
 ## Task
 實作GraphSage並測試計算加速前後的效能比較
 
@@ -28,7 +30,6 @@
 - 參考資料：[虛擬環境與套件](https://docs.python.org/zh-tw/3/tutorial/venv.html)    
 
 ### 安裝套件
-- pip install torch==1.9.0 -f https://download.pytorch.org/whl/torch_stable.html
 - bash requirements_torch.sh
 
 ## Result
