@@ -1,8 +1,16 @@
 ## pytorch 與 pytorch-lightning比較
+- 使用檔案為 **pytorch_origin** & **pytorch_lightning**兩個python notebook
 - 使用mnist作為dataset建立簡單的AE
   > 使用行內的環境無法下載torchvision裡的mnist，在這裡使用keras的mnist
 - 用pytorch和pytorch-lightning建同一個模型，比較兩者的差異
 
+## 將graphsage example code使用pytorch_lightning改寫
+- 使用檔案為 **pl_graphsage_cora**
+- 遇到的問題:
+    - neighborsampler是dataloader的變形，取的是node的id不是node feature
+    - traning使用GPU但validation和test在CPU上
+    - 以上讓目前的寫法只能在CPU上跑
+    
 
 ## 參考資料
 - https://pytorch-lightning.readthedocs.io/en/stable/starter/new-project.html
