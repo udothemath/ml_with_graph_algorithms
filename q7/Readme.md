@@ -1,15 +1,25 @@
 - 自由定義題目
 
-### 題目 1: pytorch改寫成pytorch lightning
+# 題目 1: pytorch改寫成pytorch lightning
 
 
-### 題目 2: PyG_AutoScale Paper 研讀與example導入研發雲 
+# 題目 2: PyG_AutoScale Paper 研讀與example導入研發雲 
 
 Paper: arxiv.org/abs/2106.05609
 
 Github Repo: https://github.com/rusty1s/pyg_autoscale
 
-安裝方法: 
+## PyG AutoScale Example導入研發雲 
+
+### 進度: 
+
+成功執行pyg_autoscale/small_benchmark
+
+成功執行pyg_autoscale/examples 中前三個範例 
+
+### 安裝與操作說明
+
+
 
 1. 使用研發雲Image: 
 
@@ -85,7 +95,7 @@ You can choose between the following models and datasets:
 Models: gcn, gat, appnp, gcn2
 Datasets: cora, citesser, pubmed, coauthor-cs, coauthor-physics, amazon-computers, amazon-photo, wikics
 
-### 題目2未來展望: 
+## 未來展望: 
 
 - 確認large scale benchmark可以在研發雲跑，目前large scale 資料源因防火牆無法自動下載，需手動移入研發雲進行測試
 - 將此框架整合到edu_framework，變成一個可以長出各種Scalable版本GNN的框架 (不過此框架有很多cpu/gpu之間溝通的客製化，會與pytorch lightning底層有衝突，要思考如何在盡量不改動edu_framework框架的情況下，解決這些衝突) 
