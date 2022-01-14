@@ -2,6 +2,32 @@
 
 # 題目 1: pytorch改寫成pytorch lightning
 
+## Introduction
+* 官方document
+https://pytorch-lightning.rtfd.io/en/latest/
+
+* 如何將Pytorch程式碼改寫成Pytorch lightning框架
+https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/pl_docs/pl_docs_animation_final.m4v
+
+## 基本功能說明 (以MNIST為例)
+https://pytorch-lightning.readthedocs.io/en/latest/starter/new-project.html
+
+## 安裝方式
+```
+pip install pytorch-lightning
+```
+
+## 擴充功能
+* DataModule
+可將資料loading, splitting, transformation等流程模組化
+	* 影片: https://pl-bolts-doc-images.s3.us-east-2.amazonaws.com/pl_docs/pt_dm_vid.m4v
+	* 說明文件: https://pytorch-lightning.readthedocs.io/en/stable/extensions/datamodules.html
+
+* EarlyStopping
+https://pytorch-lightning.readthedocs.io/en/latest/common/early_stopping.html
+
+* Logger
+https://pytorch-lightning.readthedocs.io/en/latest/common/loggers.html
 
 # 題目 2: PyG_AutoScale Paper 研讀與example導入研發雲 
 
