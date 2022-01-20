@@ -25,8 +25,8 @@
 ### 分享主題
 | 時間 |  類別(課程/實作)|  分享組員 | 任務/成果發表 |連結|
 | ------ | -------- |  --- | ---------- |----|
-| Week17 TBD| 課程 | TBD | 13. GNNs for Recommender Systems | --|
-| Week16 TBD| 課程 | TBD | 12. Frequent Subgraph Mining with GNNs | --|
+| TBD| 課程 | TBD | 13. GNNs for Recommender Systems | --|
+| TBD| 課程 | TBD | 12. Frequent Subgraph Mining with GNNs | --|
 | Week15 (1/27)| 課程 | 甫璋 | 11. Reasoning over Knowledge Graphs | --|
 | Week14 (2022/1/14)| 課程 | 崇爾，昕靜 | 10. Knowledge Graph Embeddings | --|
 | Week13 (12/23)| 課程 | 甫璋，奕勳| 9. Theory of Graph Neural Networks |奕勳1-52, 甫璋53-81|
