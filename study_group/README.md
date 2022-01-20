@@ -1,5 +1,4 @@
-## CS224W讀書會 (feat. Stanford)
-
+## 圖演算法讀書會 (feat. CS224W@Stanford)
 ### 課程內容
 - LATEST: [CS224W@Stanford: Fall 2021](http://web.stanford.edu/class/cs224w/)
 - [CS224W@Stanford: Winter 2021](http://snap.stanford.edu/class/cs224w-2020/)
