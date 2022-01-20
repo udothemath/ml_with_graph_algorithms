@@ -16,23 +16,19 @@
 ### 好用工具
 - [RISE](https://rise.readthedocs.io/en/stable/)
 - [使用RISE製作投影片](https://dataxujing.github.io/RISE-making-slides/)
-:::
-### 課程大綱
 
-<img src="https://i.imgur.com/f0SNHKh.png" height="100">
-<img src="https://i.imgur.com/ismGdA3.png" height="200">
+### 課程大綱
+<img src="https://i.imgur.com/f0SNHKh.png" height="400">
+<img src="https://i.imgur.com/ismGdA3.png" height="400">
 <img src="https://i.imgur.com/C75YgRF.png" height="400">
 
 ### 分享主題
-
-分享順序：甫璋 -> 彥銘 -> 奕勳 -> 崇爾 -> 品瑜 -> 昕靜 -> 甫璋 -> ...(loop)
-
 | 時間 |  類別(課程/實作)|  分享組員 | 任務/成果發表 |連結|
 | ------ | -------- |  --- | ---------- |----|
-| Week16 (2/4)| 課程 | 昕靜，甫璋 | 13. GNNs for Recommender Systems | --|
-| Week16 (1/28)| 課程 | 崇爾，品瑜 | 12. Frequent Subgraph Mining with GNNs | --|
-| Week15 (1/21)| 課程 | 彥銘，奕勳 | 11. Reasoning over Knowledge Graphs | --|
-| Week14 (1/14)| 課程 | 崇爾，昕靜 | 10. Knowledge Graph Embeddings | --|
+| Week17 TBD| 課程 | TBD | 13. GNNs for Recommender Systems | --|
+| Week16 TBD| 課程 | TBD | 12. Frequent Subgraph Mining with GNNs | --|
+| Week15 (1/27)| 課程 | 甫璋 | 11. Reasoning over Knowledge Graphs | --|
+| Week14 (2022/1/14)| 課程 | 崇爾，昕靜 | 10. Knowledge Graph Embeddings | --|
 | Week13 (12/23)| 課程 | 甫璋，奕勳| 9. Theory of Graph Neural Networks |奕勳1-52, 甫璋53-81|
 | Week12 (12/17)| 實作 | 品瑜 | [colab2](https://colab.research.google.com/drive/1Aa0eKSmyYef1gORvlHv7EeQzSVRb30eL?usp=sharing) | --|
 | Week11 (12/10)| 課程 | 甫璋，彥銘 | 8. Applications of Graph Neural Networks | 彥銘 p1-p48, 甫璋 p49-89 |
