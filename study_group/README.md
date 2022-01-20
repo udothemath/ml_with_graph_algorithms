@@ -19,6 +19,9 @@
 - [使用RISE製作投影片](https://dataxujing.github.io/RISE-making-slides/)
 :::
 ### 課程大綱
-![](https://i.imgur.com/f0SNHKh.png =200x)
-![](https://i.imgur.com/ismGdA3.png =200x)
-![](https://i.imgur.com/C75YgRF.png =200x)
+
+<img src="https://i.imgur.com/f0SNHKh.png" height="100">
+<img src="https://i.imgur.com/ismGdA3.png" height="200">
+<img src="https://i.imgur.com/C75YgRF.pn" height="400">
+
+
