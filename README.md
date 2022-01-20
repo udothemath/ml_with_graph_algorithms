@@ -16,7 +16,7 @@
 <img src="https://user-images.githubusercontent.com/10674490/142558203-0f6e4e36-9fbd-4d90-beb9-6a65eeca58fc.png" height="400">
 
 ## 作法
-每週四(下午1:30-2:30)會議討論作法及相關參考資料。兩人一組，共同負責程式開發及說明。
+每週四(下午1:30-2:30)會議討論作法及相關參考資料。兩人一組，共同負責程式開發及說明。    
 每週五(下午1:30-2:30)討論CS224W@Stanford[課程](http://web.stanford.edu/class/cs224w/)，資料夾[連結](https://github.com/udothemath/ml_with_graph_algorithms/tree/features/add_cs224/study_group)
 
 |成員/日期|1/20(q8)|1/27(q9)|2/3(q10)|
