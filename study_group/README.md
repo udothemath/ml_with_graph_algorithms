@@ -1,4 +1,4 @@
-## cs224讀書會 (feat. Stanford)
+## CS224W讀書會 (feat. Stanford)
 
 :::success
 ### 課程內容
