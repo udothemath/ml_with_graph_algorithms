@@ -27,7 +27,7 @@
 | TBD| 課程 | TBD | 13. GNNs for Recommender Systems | --|
 | TBD| 課程 | TBD | 12. Frequent Subgraph Mining with GNNs | --|
 | Week15 (1/27)| 課程 | 甫璋 | 11. Reasoning over Knowledge Graphs | [知识图谱与机器学习｜KG入门 -- Part2 建立知识图谱](https://zhuanlan.zhihu.com/p/76544483)|
-| Week14 (2022/1/14)| 課程 | 崇爾，昕靜 | 10. Knowledge Graph Embeddings | --|
+| Week14 (2022/1/14)| 課程 | 崇爾，昕靜 | 10. Knowledge Graph Embeddings | [cs224w（图机器学习）2021冬季课程学习笔记12 Knowledge Graph Embeddings](https://blog.csdn.net/PolarisRisingWar/article/details/118398869)|
 | Week13 (12/23)| 課程 | 甫璋，奕勳| 9. Theory of Graph Neural Networks |奕勳1-52, 甫璋53-81|
 | Week12 (12/17)| 實作 | 品瑜 | [colab2](https://colab.research.google.com/drive/1Aa0eKSmyYef1gORvlHv7EeQzSVRb30eL?usp=sharing) | --|
 | Week11 (12/10)| 課程 | 甫璋，彥銘 | 8. Applications of Graph Neural Networks | 彥銘 p1-p48, 甫璋 p49-89 |
