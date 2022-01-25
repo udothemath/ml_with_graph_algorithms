@@ -1,0 +1,3 @@
+Introduction:
+
+若要在python上面進行多核心加速，需使用多進程才有辦法做到，常用的一個工具是multiprocessing套件，但multiprocessing目前在airflow上面會有相容性的問題，且multiprocessing沒有提供callback function，供開發者指定一個process要停止前可以做的事情 (e.g., 關閉db connection)。根據stackoverflow上面的建議就是使用一個multiprocessing的延伸工具 - billiard。
