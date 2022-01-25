@@ -1,11 +1,8 @@
 ## Paper Survey
-圖分析技術 @research_graph @奕勳 @甫璋 #Discuss 
-
-- 資源連結: Graph讀書會 HackMD
 - Graph Surveys:
   - Issues
-    - Blog: Do we need "deep" graph neural networks?
-    - [COMPLETE] Blog: Over-smoothing issue in graph neural network @research_graph @甫璋 
+    - Blog: ［Do we need "deep" graph neural networks?］(https://towardsdatascience.com/do-we-need-deep-graph-neural-networks-be62d3ec5c59#dd10-e43ce4231f64)
+    - Blog: [Over-smoothing issue in graph neural network](https://towardsdatascience.com/over-smoothing-issue-in-graph-neural-network-bddc8fbc2472) 
       - Note
         - GNN的核心概念是什麼?
           - (保留節點資訊以及(圖)結構資訊)。GNN  is a model that can build upon the information given in both: the nodes’ features and the local structures in our graph
@@ -25,19 +22,19 @@
         - 結論(及討論)
           - 其他圖資訊更新作法。all of these issues can be linked to the main mechanisms that we use to train our graph models which is Message-passing
       - Reference
-        - Blog: Do we need deep graph neural networks? by Michael Bronstein
+        - Blog: [Do we need deep graph neural networks? by Michael Bronstein](https://towardsdatascience.com/do-we-need-deep-graph-neural-networks-be62d3ec5c59)
   - General: #Discuss
     - Introduction to Graph Neural Network.pdf
     - A Comprehensive Survey on Graph Neural Networks.pdf
-  - Explainability: #Discuss
-    - How to Explain Graph Neural Network — GNNExplainer
+  - Explainability:
+    - [How to Explain Graph Neural Network — GNNExplainer](https://towardsdatascience.com/how-can-we-explain-graph-neural-network-5031ea127004)
       - https://github.com/dmlc/dgl/tree/master/examples/pytorch/gnn_explainer
-    - Towards Explainable Graph Neural Networks
+    - [Towards Explainable Graph Neural Networks](https://link.medium.com/qTCP69rXOgb)
     - GAT
     - TABNET
     - https://towardsdatascience.com/explainable-graph-neural-networks-cb009c2bc8ea
-  - Temporal: #Discuss
-    - T-GCN: A Temporal Graph Convolutional Network for Traffic Prediction
+  - Temporal: 
+    - [T-GCN: A Temporal Graph Convolutional Network for Traffic Prediction](https://arxiv.org/pdf/1811.05320.pdf)
   - Survey of Scalable Graph Neural Networks #Discuss
     - Evernote Link: https://www.evernote.com/l/AFm48VILG6oI-R4UCQH2mmJHqBCIC1MLuYg/
     - Articles:
@@ -45,8 +42,8 @@
       - Simple Scalable GNN: https://towardsdatascience.com/simple-scalable-graph-neural-networks-7eb04f366d07
       - Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour: https://arxiv.org/abs/1706.02677
     - History:
-      - 2017 GraphSage (Node Sampling Approach) @甫璋 
-        - 摘要 @甫璋
+      - 2017 [GraphSage](https://arxiv.org/abs/1706.02216) (Node Sampling Approach)
+        - 摘要
           - 名稱由來： GraphSAGE (SAmple and aggreGatE)
           - 示意圖：
           - 應用場景：節點分類，分群，連結預測
@@ -61,28 +58,28 @@
           - 精進方向：有向圖(考慮關聯的方向性)的預測
             - extending GraphSAGE to incorporate directed or multi-modal graphs. A particularly interesting direction for future work is exploring non-uniform neighborhood sampling functions, and perhaps even learning these functions as part of the GraphSAGE optimization.
           - 參考資料
-            - GraphSAINT
-            - GraphSAGE on neo4j
-            - Heterogeneous GraphSAGE (HinSAGE)
-            - Graph Representation Learning
-            - PyTorch geometric
-          - 待辦事項 #Next-Up
-            - 實作SAGEConv
-        - 介紹@Stanford @甫璋
-        - 補充： @奕勳
+            - [GraphSAINT](https://github.com/GraphSAINT/GraphSAINT)
+            - [GraphSAGE on neo4j](https://neo4j.com/docs/graph-data-science/current/algorithms/graph-sage/)
+            - [Heterogeneous GraphSAGE (HinSAGE)](https://stellargraph.readthedocs.io/en/stable/hinsage.html)
+            - [Graph Representation Learning](https://paperswithcode.com/task/graph-representation-learning)
+            - [PyTorch geometric](https://github.com/rusty1s/pytorch_geometric)
+          - 待辦事項
+            - [實作SAGEConv](https://pytorch-geometric.readthedocs.io/en/latest/modules/nn.html#torch_geometric.nn.conv.SAGEConv)
+        - 介紹@Stanford
+        - 補充：
           - https://www.researchgate.net/post/What-is-the-model-architectural-difference-between-transductive-GCN-and-inductive-GraphSAGE
             - The main novelty of GraphSAGE is a neighborhood sampling step (but this is independent of whether these models are used inductively or transductively). You can think of GraphSAGE as GCN with subsampled neighbors.
             - In practice, both can be used inductively and transductively.
             - The title of the GraphSAGE paper ("Inductive representation learning") is unfortunately a bit misleading in that regard. The main benefit of the sampling step of GraphSAGE is scalability (but at the cost of higher variance gradients).
           - https://link.medium.com/VKLnyI0onhb
             - GraphSAGE is capable of predicting embedding of a new node, without requiring a re-training procedure. To do so, GraphSAGE learns aggregator functions that can induce the embedding of a new node given its features and neighborhood. This is called inductive learning.
-        - Notes @奕勳
+        - Notes
           - It used neighbourhood sampling combined with mini-batch training to train GNNs on large graphs.
           - To compute the training loss on a single node with an L-layer GCN, only the L-hop neighbours of that node are necessary, as nodes further away in the graph are not involved in the computation.
           - For graphs of the “small-world” type, such as social networks, the 2-hop neighbourhood of some nodes may already contain millions of nodes, making it too big to be stored in memory [9].
             - GraphSAGE tackles this problem by sampling the neighbours up to the L-th hop: starting from the training node, it samples uniformly with replacement [10] a fixed number k of 1-hop neighbours, then for each of these neighbours it again samples k neighbours, and so on for L times.
           - A notable drawback of GraphSAGE is that sampled nodes might appear multiple times, thus potentially introducing a lot of redundant computation.
-      - 2018 Graph Attention Network(GATs) @甫璋 
+      - [2018 Graph Attention Network(GATs)](https://arxiv.org/pdf/1710.10903.pdf)
         - Quick Brief Intro of Graph
           - A graph G consists of two types of elements: vertices and edges (Source)
           - Source from Stanford
@@ -182,7 +179,7 @@
   - Pytorch Geometric 
     - Survey of Pytorch Geometric
     - Survey of Pytorch Geometric Temporal
-  - Deep Graph Library 知識整理 @玄懷 
+  - Deep Graph Library 知識整理
     - Deep Graph Library(DGL), message passing and financial relations modelling
     - Training DGL GraphSAGE with PyTorch Lightning
     - https://github.com/dmlc/dgl#dgl-for-domain-applications - DGL-RecSys(coming soon)
@@ -193,8 +190,6 @@
     - Amazon have done it: https://link.medium.com/3JHAtVXVRgb
   - ETL Visualization Tool
     - https://github.com/udothemath/ncku_customer_embedding/blob/enhance_preprocess_module/DesignNewPreprocessModule.ipynb
-
-
 
 ## Question in General
 ### Can GCN predict the unseen nodes?
