@@ -1,7 +1,7 @@
 ## Paper Survey
 - Graph Surveys:
   - Issues
-    - Blog: ［Do we need "deep" graph neural networks?］(https://towardsdatascience.com/do-we-need-deep-graph-neural-networks-be62d3ec5c59#dd10-e43ce4231f64)
+    - Blog: [Do we need "deep" graph neural networks?](https://towardsdatascience.com/do-we-need-deep-graph-neural-networks-be62d3ec5c59#dd10-e43ce4231f64)
     - Blog: [Over-smoothing issue in graph neural network](https://towardsdatascience.com/over-smoothing-issue-in-graph-neural-network-bddc8fbc2472) 
       - Note
         - GNN的核心概念是什麼?
@@ -65,7 +65,7 @@
             - [PyTorch geometric](https://github.com/rusty1s/pytorch_geometric)
           - 待辦事項
             - [實作SAGEConv](https://pytorch-geometric.readthedocs.io/en/latest/modules/nn.html#torch_geometric.nn.conv.SAGEConv)
-        - 介紹@Stanford
+        - [課程介紹@Stanford](http://snap.stanford.edu/graphsage/)
         - 補充：
           - https://www.researchgate.net/post/What-is-the-model-architectural-difference-between-transductive-GCN-and-inductive-GraphSAGE
             - The main novelty of GraphSAGE is a neighborhood sampling step (but this is independent of whether these models are used inductively or transductively). You can think of GraphSAGE as GCN with subsampled neighbors.
