@@ -2,6 +2,7 @@
 此README共有以下六大類。新增參考資料時，請一同附上連結內容的簡易說明。
 
 - Discussion in General
+- GNN Intro
 - Explainability
 - Temporal
 - Survey of Scalable Graph Neural Networks
@@ -47,22 +48,7 @@ Q: do we need deep GNN?
   - Reference
     - Blog: [Do we need deep graph neural networks? by Michael Bronstein](https://towardsdatascience.com/do-we-need-deep-graph-neural-networks-be62d3ec5c59)
 
-### Explainability
-- [How to Explain Graph Neural Network — GNNExplainer](https://towardsdatascience.com/how-can-we-explain-graph-neural-network-5031ea127004)
-  - https://github.com/dmlc/dgl/tree/master/examples/pytorch/gnn_explainer
-- [Towards Explainable Graph Neural Networks](https://link.medium.com/qTCP69rXOgb)
-- GAT
-- TABNET
-- https://towardsdatascience.com/explainable-graph-neural-networks-cb009c2bc8ea
-
-### Temporal: 
-- [T-GCN: A Temporal Graph Convolutional Network for Traffic Prediction](https://arxiv.org/pdf/1811.05320.pdf)
-
-### Survey of Scalable Graph Neural Networks
-- Articles:
-  - Sampling Large Graphs in Pytorch Geometric: https://towardsdatascience.com/sampling-large-graphs-in-pytorch-geometric-97a6119c41f9
-  - Simple Scalable GNN: https://towardsdatascience.com/simple-scalable-graph-neural-networks-7eb04f366d07
-  - Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour: https://arxiv.org/abs/1706.02677
+### GNN Intro
 - History:
   - 2017 [GraphSage](https://arxiv.org/abs/1706.02216) (Node Sampling Approach)
     - 摘要
@@ -150,20 +136,38 @@ Q: do we need deep GNN?
       - Graph Sampling reduce the bottleneck and the "over-squashing phenominon": https://arxiv.org/pdf/2006.05205.pdf (Because we use a smaller sub-graph)
   - 2020: SIGN: simple, sampling-free architectures
     - Decompose graph into 1-hop neighbor graph, 1-hop neighbor graph, ..., and apply a single-layer GNN on each of the graph to avoid multi-hop unscalability of multi-layer GNN.
-- In the field of recommendation [Graph Neural Networks in Recommender Systems: A Survey]: #Next-Up
-  - Sampling large graph:
-    - 2017: GraphSage [28]
-    - 2018: PinSage  -  Graph Convolutional Neural Networks for Web-Scale Recommender Systems [145]
-  - Reconstruct small-scale subgraph (mostly for knowledge graph augmented graph):
-    - 2019: Attentive Knowledge Graph Embedding for Personalized Recommendation [91]
-    - 2020: ATBRG: Adaptive Target-Behavior Relational Graph Network for Effective Recommendation [18]
-  - Decouple the operations of non-linearities and collapsing weight matrices between consecutive layers.
-    - 2019: Simplifying graph convolutional networks [129]
-    - 2020: LightGCN: Simplifying and Powering Graph Convolution Network for Recommendation [31]
-    - 2020: SIGN: Scalable Inception Graph Neural Networks. [20]
+
+### Explainability
+- [How to Explain Graph Neural Network — GNNExplainer](https://towardsdatascience.com/how-can-we-explain-graph-neural-network-5031ea127004)
+  - https://github.com/dmlc/dgl/tree/master/examples/pytorch/gnn_explainer
+- [Towards Explainable Graph Neural Networks](https://link.medium.com/qTCP69rXOgb)
+- GAT
+- TABNET
+- https://towardsdatascience.com/explainable-graph-neural-networks-cb009c2bc8ea
+
+### Temporal: 
+- [T-GCN: A Temporal Graph Convolutional Network for Traffic Prediction](https://arxiv.org/pdf/1811.05320.pdf)
+
+### Survey of Scalable Graph Neural Networks
+- Articles:
+  - Sampling Large Graphs in Pytorch Geometric: https://towardsdatascience.com/sampling-large-graphs-in-pytorch-geometric-97a6119c41f9
+  - Simple Scalable GNN: https://towardsdatascience.com/simple-scalable-graph-neural-networks-7eb04f366d07
+  - Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour: https://arxiv.org/abs/1706.02677
+
 ### Application Related
-- 推薦系統:  #RecSys
-  - Graph Neural Networks in Recommender Systems: A Survey #Next-Up
+- 推薦系統: 
+  - In the field of recommendation [Graph Neural Networks in Recommender Systems: A Survey]:
+    - Sampling large graph:
+      - 2017: GraphSage [28]
+      - 2018: PinSage  -  Graph Convolutional Neural Networks for Web-Scale Recommender Systems
+    - Reconstruct small-scale subgraph (mostly for knowledge graph augmented graph):
+      - 2019: Attentive Knowledge Graph Embedding for Personalized Recommendation 
+      - 2020: ATBRG: Adaptive Target-Behavior Relational Graph Network for Effective Recommendation
+    - Decouple the operations of non-linearities and collapsing weight matrices between consecutive layers.
+      - 2019: Simplifying graph convolutional networks 
+      - 2020: LightGCN: Simplifying and Powering Graph Convolution Network for Recommendation
+      - 2020: SIGN: Scalable Inception Graph Neural Networks. 
+  - Graph Neural Networks in Recommender Systems: A Survey
     - Evernote Link : https://www.evernote.com/shard/s89/nl/19207065/9546232e-dac3-4e82-9547-03bcece15d84
     - Dynamic Graph Neural Networks for Sequential Recommendation
   - Cross-Domain Recommendation (CDR):
@@ -172,14 +176,14 @@ Q: do we need deep GNN?
       - (2021) Cross-Domain Recommendation: Challenges, Progress, and Prospects # Cross-Domain Recommendation (CDR) 的Survey，可以先從這篇出發了解CDR的各面向與學術發展
       - (2020) HeroGRAPH: A Heterogeneous Graph Framework for Multi-Target Cross-Domain Recommendation # 這篇是最符合我們未來跨售情境的Paper (跨產品線顧客僅部分重疊)，且是使用Graph來解決此問題，值得參考。
       - (2020) Graphical and Attentional Framework for Dual-Target Cross-Domain Recommendation # 雖然只考慮兩個產品線，但是也如同我們未來跨售情境，兩產品線顧客僅部分重疊，也值得參考。
-      - (2019) Cross Domain Recommendation via Bi-directional Transfer Graph Collaborative Filtering Networks # 符合成大產學目標要求的Paper (跨產品線顧客完全重疊)，雖只考慮了兩個產品線，但是也值得給成大團隊參考。
+      - (2019) Cross Domain Recommendation via Bi-directional Transfer Graph Collaborative Filtering Networks # 考慮了兩個產品線，跨產品線顧客完全重疊，
         - Cross Domain Recommendation via Bi-directional Transfer Graph Collaborative Filtering Networks.pdf
     - Source: Evernote 論文整理 [Survey of Cross-Domain Recommendation]
   - From Spotify to Fund Recommendation https://www.evernote.com/shard/s89/sh/5e762cd5-51f5-cb48-03c3-e9d285e9187b/e63acfbb97ee6d154200b339dd149b44
-- 金流相關: #Loan #RegTech 
+- 金流相關: 
   - Linking bank clients using graph neural networks powered by rich transactional data.pdf
-- #RegTech (信用風險外的風險模型)
-### Programming Frameworks:   
+- 信用風險外的風險模型
+### Programming Frameworks   
 - Pytorch Geometric 
   - [Survey of Pytorch Geometric](https://www.evernote.com/shard/s89/nl/19207065/825fff45-5289-84b2-3af1-08a1376bdbd5)
   - [Survey of Pytorch Geometric Temporal](https://www.evernote.com/shard/s89/nl/19207065/93a91816-8705-ee18-5756-4d29fc22e169)
