@@ -1,6 +1,5 @@
 ## Note 
-此README共有以下六大類。新增參考資料時，請一同附上連結內容的簡易說明。
-
+此README共有以下七大類。新增參考資料時，請一同附上連結內容的簡易說明。
 - Discussion in General
 - GNN Intro
 - Explainability
@@ -156,6 +155,8 @@ Q: do we need deep GNN?
 
 ### Application Related
 - 推薦系統: 
+  - [blog: 推荐系统中二分图表示学习调研](http://xtf615.com/2020/02/13/Representation-Learning-on-Bipartite-Graphs/)
+    - 主要介绍图表示学习在推荐系统中常见的user-item interaction数据上的建模
   - In the field of recommendation [Graph Neural Networks in Recommender Systems: A Survey]:
     - Sampling large graph:
       - 2017: GraphSage [28]
