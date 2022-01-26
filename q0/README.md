@@ -1,7 +1,31 @@
-## Paper Survey
+## Note 
+此README共有以下六大類。新增參考資料時，請一同附上連結內容的簡易說明。
+
+- Discussion in General
+- Explainability
+- Temporal
+- Survey of Scalable Graph Neural Networks
+- Application Related
+- Programming Framework
+
 ### Discussion in General
-- Blog: [Do we need "deep" graph neural networks?](https://towardsdatascience.com/do-we-need-deep-graph-neural-networks-be62d3ec5c59#dd10-e43ce4231f64)
-- Blog: [Over-smoothing issue in graph neural network](https://towardsdatascience.com/over-smoothing-issue-in-graph-neural-network-bddc8fbc2472) 
+Q: Can GCN predict the unseen nodes?
+Quick answer: It is possible, but not clear how to do it yet.
+  - [repo: can gcn predict the unseen nodes?](https://github.com/tkipf/gcn/issues/103)
+  - [post: Recent Advances in Graph Convolutional Network (GCN)](https://towardsdatascience.com/recent-advances-in-graph-convolutional-network-gcn-9166b27969e5)
+  - [post: Graph Neural Networks](https://snap-stanford.github.io/cs224w-notes/machine-learning-with-networks/graph-neural-networks)
+
+Q: Semi-supervised Learning 
+  - [post: Training Better Deep Learning Models for Structured Data using Semi-supervised Learning](https://towardsdatascience.com/training-better-deep-learning-models-for-structured-data-using-semi-supervised-learning-8acc3b536319)
+
+Q: How to set up dataloader for GraphSage algorithm?
+  - [post: GraphSAGE for Classification in Python](https://antonsruberts.github.io/graph/graphsage/)
+  - [post: 图神经网络(GNN)入门之旅(五)-GraphSAGE源码解析](https://zhuanlan.zhihu.com/p/354831060)
+  - [github issue: Is the size always the same between number of layers in SAGE and len(size) in NeighborSampler?](https://github.com/pyg-team/pytorch_geometric/discussions/3799#discussioncomment-1913294)
+
+Q: do we need deep GNN?
+  - Blog: [Do we need "deep" graph neural networks?](https://towardsdatascience.com/do-we-need-deep-graph-neural-networks-be62d3ec5c59#dd10-e43ce4231f64)
+  - Blog: [Over-smoothing issue in graph neural network](https://towardsdatascience.com/over-smoothing-issue-in-graph-neural-network-bddc8fbc2472) 
   - Note
     - GNN的核心概念是什麼?
       - (保留節點資訊以及(圖)結構資訊)。GNN  is a model that can build upon the information given in both: the nodes’ features and the local structures in our graph
@@ -23,7 +47,7 @@
   - Reference
     - Blog: [Do we need deep graph neural networks? by Michael Bronstein](https://towardsdatascience.com/do-we-need-deep-graph-neural-networks-be62d3ec5c59)
 
-### Explainability:
+### Explainability
 - [How to Explain Graph Neural Network — GNNExplainer](https://towardsdatascience.com/how-can-we-explain-graph-neural-network-5031ea127004)
   - https://github.com/dmlc/dgl/tree/master/examples/pytorch/gnn_explainer
 - [Towards Explainable Graph Neural Networks](https://link.medium.com/qTCP69rXOgb)
@@ -33,8 +57,8 @@
 
 ### Temporal: 
 - [T-GCN: A Temporal Graph Convolutional Network for Traffic Prediction](https://arxiv.org/pdf/1811.05320.pdf)
-### Survey of Scalable Graph Neural Networks #Discuss
-- Evernote Link: https://www.evernote.com/l/AFm48VILG6oI-R4UCQH2mmJHqBCIC1MLuYg/
+
+### Survey of Scalable Graph Neural Networks
 - Articles:
   - Sampling Large Graphs in Pytorch Geometric: https://towardsdatascience.com/sampling-large-graphs-in-pytorch-geometric-97a6119c41f9
   - Simple Scalable GNN: https://towardsdatascience.com/simple-scalable-graph-neural-networks-7eb04f366d07
@@ -137,7 +161,7 @@
     - 2019: Simplifying graph convolutional networks [129]
     - 2020: LightGCN: Simplifying and Powering Graph Convolution Network for Recommendation [31]
     - 2020: SIGN: Scalable Inception Graph Neural Networks. [20]
-### Application Related:
+### Application Related
 - 推薦系統:  #RecSys
   - Graph Neural Networks in Recommender Systems: A Survey #Next-Up
     - Evernote Link : https://www.evernote.com/shard/s89/nl/19207065/9546232e-dac3-4e82-9547-03bcece15d84
@@ -170,19 +194,4 @@
   - Amazon have done it: https://link.medium.com/3JHAtVXVRgb
 - ETL Visualization Tool
   - https://github.com/udothemath/ncku_customer_embedding/blob/enhance_preprocess_module/DesignNewPreprocessModule.ipynb
-
-## Question in General
-### Can GCN predict the unseen nodes?
-Quick answer: It is possible, but not clear how to do it yet.
-- [repo: can gcn predict the unseen nodes?](https://github.com/tkipf/gcn/issues/103)
-- [post: Recent Advances in Graph Convolutional Network (GCN)](https://towardsdatascience.com/recent-advances-in-graph-convolutional-network-gcn-9166b27969e5)
-- [post: Graph Neural Networks](https://snap-stanford.github.io/cs224w-notes/machine-learning-with-networks/graph-neural-networks)
-
-### Semi-supervised Learning 
-- [post: Training Better Deep Learning Models for Structured Data using Semi-supervised Learning](https://towardsdatascience.com/training-better-deep-learning-models-for-structured-data-using-semi-supervised-learning-8acc3b536319)
-
-### How to set up dataloader for GraphSage algorithm?
-- [post: GraphSAGE for Classification in Python](https://antonsruberts.github.io/graph/graphsage/)
-- [post: 图神经网络(GNN)入门之旅(五)-GraphSAGE源码解析](https://zhuanlan.zhihu.com/p/354831060)
-- [github issue: Is the size always the same between number of layers in SAGE and len(size) in NeighborSampler?](https://github.com/pyg-team/pytorch_geometric/discussions/3799#discussioncomment-1913294)
 
