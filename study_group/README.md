@@ -17,10 +17,25 @@
 - [使用RISE製作投影片](https://dataxujing.github.io/RISE-making-slides/)
 
 ### 課程大綱
-<img src="https://user-images.githubusercontent.com/10674490/153386593-6e1db46c-0e75-4ec9-8cb7-7a5d31df6170.png" height="400">
-<img src="https://user-images.githubusercontent.com/10674490/153386624-0a1e617c-12f7-4f76-afdc-4ade382afd42.png" height="400">
-<img src="https://user-images.githubusercontent.com/10674490/153386390-5352270a-51ad-4d2d-b5b4-3c7a084bd4d8.png" height="400">
-<img src="https://user-images.githubusercontent.com/10674490/153557783-08459416-4185-42c7-ba59-996f4ba1c202.png" height="400">
+- 1. Introduction; Machine Learning for Graphs
+- 2. Traditional Methods for ML on Graphs
+- 3. Node Embeddings
+- 4. Link Analysis: PageRank
+- 5. Label Propagation for Node Classification
+- 6. Graph Neural Networks 1: GNN Model
+- 7. Graph Neural Networks 2: Design Space
+- 8. Applications of Graph Neural Networks
+- 9. Theory of Graph Neural Networks
+- 10. Knowledge Graph Embeddings
+- 11. Reasoning over Knowledge Graphs
+- 12. Frequent Subgraph Mining with GNNs
+- 13. GNNs for Recommender Systems
+- 14. Community Structure in Networks
+- 15. Deep Generative Models for Graphs
+- 16. Advanced Topics on GNNs
+- 17. Scaling Up GNNs
+- 18. Guest Lecture: Petar Veličković
+- 19. Design Space of Graph Neural Networks
 
 ### 分享主題
 | 時間 |  類別(課程/實作)|  分享組員 | 任務/成果發表 |連結|
