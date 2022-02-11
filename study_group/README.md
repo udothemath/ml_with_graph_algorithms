@@ -37,6 +37,14 @@
 18. Guest Lecture: Petar Veličković
 19. Design Space of Graph Neural Networks
 
+### 實作課程
+- [colab 0](https://colab.research.google.com/drive/16tqEHKOLUgYvXKx1V3blfYGpQb1_09MG?usp=sharing)
+- [colab 1](https://colab.research.google.com/drive/1p2s0on6nibUYhJnONBWEAwpBlue37Tcc?usp=sharing)
+- [colab 2](https://colab.research.google.com/drive/1BRPw3WQjP8ANSFz-4Z1ldtNt9g7zm-bv?usp=sharing)
+- [colab 3](https://colab.research.google.com/drive/1bAvutxJhjMyNsbzlLuQybzn_DXM63CuE?usp=sharing)
+- [colab 4](https://colab.research.google.com/drive/1X4uOWv_xkefDu_h-pbJg-fEkMfR7NGz9?usp=sharing)
+- [colab 5](https://colab.research.google.com/drive/17Pe4o_oSsD2J-wTb_xGtYJQsyCawK6sJ?usp=sharing)
+
 ### 分享主題
 | 時間 |  類別(課程/實作)|  分享組員 | 任務/成果發表 |連結|
 | ------ | -------- |  --- | ---------- |----|
