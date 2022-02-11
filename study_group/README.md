@@ -40,7 +40,7 @@
 ### 分享主題
 | 時間 |  類別(課程/實作)|  分享組員 | 任務/成果發表 |連結|
 | ------ | -------- |  --- | ---------- |----|
-| Week21 (3/18)| 課程 | 崇爾，甫璋 | 19. Design Space of Graph Neural Networks | |
+| Week21 (3/18)| 課程 | 崇爾，奕勳 | 19. Design Space of Graph Neural Networks | |
 | Week20 (3/11)| 課程 | 昕靜，甫璋 | 16. Advanced Topics on GNNs | |
 | Week19 (3/4) | 課程 | 奕勳，甫璋 | 17. Scaling Up GNNs | |
 | Week18 (2/25)| 課程 | 品瑜，彥銘 | 15. Deep Generative Models for Graphs | |
