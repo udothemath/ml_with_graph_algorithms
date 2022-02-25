@@ -70,6 +70,13 @@
 | Week2 (10/8)| 課程 | 奕勳，~~品瑜~~(疫苗假)，彥銘 | 2. Traditional Methods for ML on Graphs | --|
 | Week1 (10/1)| 課程 | 甫璋 | 1. Introduction; Machine Learning for Graphs | |
 
+### Discussion
+#### 13. GNNs for Recommender Systems
+- [Pinterest](https://www.pinterest.com/pin/417286721722485462/)
+- [Paper: PinSage Graph Convolutional Neural Networks for Web-Scale Recommender Systems](https://arxiv.org/pdf/1806.01973.pdf)
+    - [PinSage: How Pinterest improved their recommendation system?](https://williamscott701.medium.com/pinsage-how-pinterest-improved-their-recommendation-system-149cb35fdfa5)
+    - [How to perform PinSAGE prediction on new nodes - Questions](https://discuss.dgl.ai/t/how-to-perform-pinsage-prediction-on-new-nodes/981)
+
 ### Archive
 HackMD[連結](https://hackmd.io/@udothemath/ml_graph_study_group)
 
