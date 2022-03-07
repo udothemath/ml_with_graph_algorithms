@@ -50,7 +50,7 @@
 | ------ | -------- |  --- | ---------- |----|
 | Week21 (3/25)| 課程 | 崇爾，奕勳 | 19. Design Space of Graph Neural Networks | |
 | Week20 (3/18)| 課程 | 奕勳，甫璋 | 17. Scaling Up GNNs | |
-| Week19 (3/11) | 課程 | 昕靜，甫璋 | 16. Advanced Topics on GNNs | |
+| Week19 (3/11) | 課程 | 昕靜，甫璋 | 16. Advanced Topics on GNNs | 昕靜:p1-p33, 甫璋:p34-p68|
 | Week18 (3/4)| 課程 | 品瑜，彥銘 | 15. Deep Generative Models for Graphs | |
 | Week17 (2/25)| 課程 | 崇爾，甫璋 | 13. GNNs for Recommender Systems | [图神经网络(GNN)入门之旅(四)-GraphSAGE和PinSAGE](https://zhuanlan.zhihu.com/p/347749809) <br/> [图神经网络(GNN)入门之旅(五)-GraphSAGE源码解析](https://zhuanlan.zhihu.com/p/354831060) <br/> [图神经网络(GNN)入门之旅(六)-PinSAGE源码解析](https://zhuanlan.zhihu.com/p/347750180)|
 | Week16 (2/11)| 課程 | 甫璋 | 11. Reasoning over Knowledge Graphs (continue) | [圖機器學習，2020年將有哪些研究趨勢？](https://kknews.cc/zh-tw/tech/q9z28nr.html) |
