@@ -39,12 +39,17 @@
 
 ### 實作課程
 - [colab 0](https://colab.research.google.com/drive/16tqEHKOLUgYvXKx1V3blfYGpQb1_09MG?usp=sharing)
+    - In this Colab, we will introduce two packages, NetworkX and PyTorch Geometric. 
 - [colab 1](https://colab.research.google.com/drive/1p2s0on6nibUYhJnONBWEAwpBlue37Tcc?usp=sharing)
+    - In this Colab, we will write a full pipeline for learning node embeddings.
 - [colab 2](https://colab.research.google.com/drive/1BRPw3WQjP8ANSFz-4Z1ldtNt9g7zm-bv?usp=sharing)
-    - In Colab 2, we will work to construct our own graph neural network using PyTorch Geometric (PyG) and then apply that model on two Open Graph Benchmark (OGB) datasets. These two datasets will be used to benchmark your model's performance on two different graph-based tasks: 1) node property prediction, predicting properties of single nodes and 2) graph property prediction, predicting properties of entire graphs or subgraphs.      
+    - In Colab 2, we will work to construct our own graph neural network using PyTorch Geometric (PyG) and then apply that model on two Open Graph Benchmark (OGB) datasets. These two datasets will be used to benchmark your model's performance on two different graph-based tasks: 1) node property prediction, predicting properties of single nodes and 2) graph property prediction, predicting properties of entire graphs or subgraphs. 
 - [colab 3](https://colab.research.google.com/drive/1bAvutxJhjMyNsbzlLuQybzn_DXM63CuE?usp=sharing)
+    - In Colab 2 we constructed GNN models by using PyTorch Geometric's built in GCN layer, GCNConv. In this Colab we will go a step deeper and implement the GraphSAGE (Hamilton et al. (2017)) layer directly. 
 - [colab 4](https://colab.research.google.com/drive/1X4uOWv_xkefDu_h-pbJg-fEkMfR7NGz9?usp=sharing)
+    - In Colab 2 we constructed GNN models by using PyTorch Geometric's built in GCN layer, GCNConv. In Colab 3 we implemented the GraphSAGE (Hamilton et al. (2017)) layer. In this colab you'll use what you've learned and implement a more powerful layer: GAT (Veličković et al. (2018)). 
 - [colab 5](https://colab.research.google.com/drive/17Pe4o_oSsD2J-wTb_xGtYJQsyCawK6sJ?usp=sharing)
+    - In this Colab, we will shift our focus from homogenous graphs to heterogeneous graphs. Heterogeneous graphs extend the traditional homogenous graphs that we have been working with by incorperating different node and edge types. This additional information allows us to extend the graph neural nework models that we have worked with before. Namely, we can apply heterogenous message passing, where different message types now exist between different node and edge type relationships.
 
 ### 分享主題
 | 時間 |  類別(課程/實作)|  分享組員 | 任務/成果發表 |連結|
