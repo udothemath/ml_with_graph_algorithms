@@ -8,6 +8,6 @@
 - 將資料儲存於圖資料庫中
 - python開發環境(vs code)執行neo4j
 - 結果呈現在瀏覽器上
-- 當圖已經建好時，產生圖結構生成的特徵(graph enhancement
+- 當圖已經建好時，產生圖結構生成的特徵(graph feature enhancement)
 - 研究圖暫存檔格式(效能優化)
 - cipher語法介紹
