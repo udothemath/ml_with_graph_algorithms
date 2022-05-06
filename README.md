@@ -58,7 +58,7 @@
 |2021/12/16|q5|實作GraphSage演算法於Link Prediction問題<br />實作GAT演算法於inductive問題|崇爾/品瑜<br />甫璋/彥銘|-|
 |2021/12/30|q6|實作GraphSage並測試計算加速前後的效能比較|品瑜/奕勳, 甫璋/昕靜|-|
 |2022/1/13|q7|PyTorch Lightning簡介<br />[PyG AutoScale Framework](https://arxiv.org/pdf/2106.05609.pdf)實作|崇爾/昕靜<br /> 彥銘/奕勳|-|
-|2022/1/20|q8||介紹平行化處理工具 billiard<br />介紹玉山人工智慧公開挑戰賽建模嘗試|-|
+|2022/1/20|q8|介紹平行化處理工具 billiard<br />介紹玉山人工智慧公開挑戰賽建模嘗試|-|-|
 
 ## 預計新增議題
 - 平行化處理
