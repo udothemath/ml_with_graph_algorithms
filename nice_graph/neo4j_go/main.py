@@ -1,45 +1,44 @@
 # %%
-%load_ext autoreload
-%autoreload 2
-# %%
-from neo4j import GraphDatabase
-import pandas as pd
-import numpy as np
-from tqdm import tqdm
 import json
 import time
 
+import numpy as np
+import pandas as pd
+from neo4j import GraphDatabase
+from tqdm import tqdm
+
+from src.cypher_code import cypher_clean, cypher_csv_cnt, cypher_csv_limit
 from src.neo4j_conn import Neo4jConnection
 
-path_bolt="bolt://127.0.0.1:7687"
+%load_ext autoreload
+%autoreload 2
+PATH_BOLT = "bolt://localhost:7687"
+USER = "neo4j"
+PASSWORD = "1234"
 
-conn = Neo4jConnection(uri=f"{path_bolt}", user="neo4j", pwd="1234")
+conn = Neo4jConnection(uri=PATH_BOLT, user=USER, pwd=PASSWORD)
 
+
+# print(conn.query(cypher_clean))
+print(conn.query(cypher_csv_cnt))
+print(conn.query(cypher_csv_limit))
+
+
+# %%
 cypher_code = '''
-LOAD CSV WITH HEADERS from 'file:///csv_mdsjr_hist2022_mini1000_asof202206.csv' as row 
-with row.oba as id_from, row.psu_acn1 as id_to, 
-row.amt as amt, row.txd as txd
-match (node_1:ID {id: id_from})
-match (node_2:ID {id: id_to})
-merge (node_1)-[rel:TRANSFER_TO {amount: toInteger(amt), date: txd}]->(node_2)
+MATCH (n) return n limit 4
 '''
-
-cypher_code = '''
-CREATE (p:Person {name:"AAA"})-[r:SAYS]->(message:Message {name:"Hello World!"}) 
-RETURN p, message, r
-
-'''
-
 conn.query(cypher_code)
 
 
+# cypher_code = '''
+# MATCH (n:Company) return n limit 4
+# '''
+# conn.query(cypher_code)
 
 # if __name__=="__main__":
 #     print("hello")
 #     conn = Neo4jConnection(uri="bolt://localhost:7687", user="neo4j", pwd="1234")
 #     print("good bye")
-
-# %%
-
 
 # %%
