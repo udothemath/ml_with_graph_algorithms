@@ -3,7 +3,7 @@ fastapi==0.78.0
 # lower-level things. Hence, we want to list it explicltly but leave its
 # version unspecified so that what ever version matches the one of fastapi will
 # be installed.
-starlette
+starlette==0.19.1
 
 neo4j==5.0.0a1
 uvicorn==0.17.6

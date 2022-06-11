@@ -1,33 +1,48 @@
 #!/usr/bin/env python
-from contextlib import asynccontextmanager
 import logging
 import os
+from contextlib import asynccontextmanager
 from typing import Optional
 
 from fastapi import FastAPI
-from neo4j import (
-    basic_auth,
-    AsyncGraphDatabase,
-)
+from neo4j import AsyncGraphDatabase, basic_auth
 from starlette.responses import FileResponse
 
+db_on_remote = False
 
 PATH = os.path.dirname(os.path.abspath(__file__))
 
 app = FastAPI()
 
-url = os.getenv("NEO4J_URI", "neo4j+s://demo.neo4jlabs.com")
-username = os.getenv("NEO4J_USER", "movies")
-password = os.getenv("NEO4J_PASSWORD", "movies")
-neo4j_version = os.getenv("NEO4J_VERSION", "4")
-database = os.getenv("NEO4J_DATABASE", "movies")
+if db_on_remote:
+    url = os.getenv("NEO4J_URI", "neo4j+s://demo.neo4jlabs.com")
+    username = os.getenv("NEO4J_USER", "movies")
+    password = os.getenv("NEO4J_PASSWORD", "movies")
+    neo4j_version = os.getenv("NEO4J_VERSION", "4")
+    database = os.getenv("NEO4J_DATABASE", "movies")
 
-port = os.getenv("PORT", 8080)
+    port = os.getenv("PORT", 8080)
+else:
+    url = "neo4j://localhost:7687"
+    username = 'neo4j'
+    password = '1234'
+    neo4j_version = '4'
+    database = 'neo4j'
+    port = os.getenv("PORT", 8080)
+
+
+print(f"{'*'*20} Info {'*'*20}")
+print(f"url: {url}")
+print(f"username: {username}")
+print(f"password: {password}")
+print(f"database: {database}")
+print(f"{'*'*20} Info {'*'*20}")
+
 
 driver = AsyncGraphDatabase.driver(url, auth=basic_auth(username, password))
 
 
-@asynccontextmanager
+@ asynccontextmanager
 async def get_db():
     if neo4j_version.startswith("4"):
         async with driver.session(database=database) as session_:
@@ -37,7 +52,7 @@ async def get_db():
             yield session_
 
 
-@app.get("/")
+@ app.get("/")
 async def get_index():
     return FileResponse(os.path.join(PATH, "static", "index.html"))
 
@@ -63,7 +78,7 @@ def serialize_cast(cast):
     }
 
 
-@app.get("/graph")
+@ app.get("/graph")
 async def get_graph(limit: int = 100):
     async def work(tx):
         result = await tx.run(
@@ -95,7 +110,7 @@ async def get_graph(limit: int = 100):
         return {"nodes": nodes, "links": rels}
 
 
-@app.get("/search")
+@ app.get("/search")
 async def get_search(q: Optional[str] = None):
     async def work(tx, q_):
         result = await tx.run(
@@ -112,7 +127,7 @@ async def get_search(q: Optional[str] = None):
         return [serialize_movie(record["movie"]) for record in results]
 
 
-@app.get("/movie/{title}")
+@ app.get("/movie/{title}")
 async def get_movie(title: str):
     async def work(tx):
         result_ = await tx.run(
@@ -134,7 +149,7 @@ async def get_movie(title: str):
                          for member in result["cast"]]}
 
 
-@app.post("/movie/{title}/vote")
+@ app.post("/movie/{title}/vote")
 async def vote_in_movie(title: str):
     async def work(tx):
         result = await tx.run(
