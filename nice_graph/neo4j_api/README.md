@@ -1,3 +1,5 @@
+## [Ref](https://github.com/neo4j-examples/movies-python-bolt)
+
 == Neo4j Movies Application: Quick Start
 
 image:https://github.com/neo4j-examples/movies-python-bolt/actions/workflows/python-app.yml/badge.svg?branch=main[alt="CI", link="https://github.com/neo4j-examples/movies-python-bolt/actions/workflows/python-app.yml"]
@@ -15,13 +17,13 @@ We offer two different ways to run the application: synchronous and asynchronous
 
 These are the components of our Web Application:
 
-* Application Type:         Python-Web Application
-* Web framework:
+- Application Type: Python-Web Application
+- Web framework:
   - sync: https://palletsprojects.com/p/flask/[Flask] (Micro-Webframework)
   - async: https://fastapi.tiangolo.com/[FastAPI] (Micro-Webframework)
-* Neo4j Database Connector: https://github.com/neo4j/neo4j-python-driver[Neo4j Python Driver] for Cypher https://neo4j.com/developer/python[Docs]
-* Database:                 Neo4j-Server (4.x) with multi-database
-* Frontend:                 jquery, bootstrap, https://d3js.org/[d3.js]
+- Neo4j Database Connector: https://github.com/neo4j/neo4j-python-driver[Neo4j Python Driver] for Cypher https://neo4j.com/developer/python[Docs]
+- Database: Neo4j-Server (4.x) with multi-database
+- Frontend: jquery, bootstrap, https://d3js.org/[d3.js]
 
 Provision a database quickly with https://sandbox.neo4j.com/?usecase=movies[Neo4j Sandbox] or https://neo4j.com/cloud/aura/[Neo4j Aura].
 
@@ -31,27 +33,26 @@ Install Python 3.6-3.9 (sync) or 3.7-3.10 (async).
 
 Then get yourself set up with link:http://docs.python-guide.org/en/latest/dev/virtualenvs/[virtualenv] so we don't break any other Python stuff you have on your machine. After you've got that installed let's set up an environment for our app:
 
-[source]
-----
+## [source]
+
 virtualenv neo4j-movies
 source neo4j-movies/bin/activate
-----
+
+---
 
 The next step is to install the dependencies for the app with pip (or pip3 for python3):
 
 sync:
 
-[source]
-----
-pip install -r requirements.txt
-----
+## [source]
+
+## pip install -r requirements.txt
 
 async:
 
-[source]
-----
-pip install -r requirements-async.txt
-----
+## [source]
+
+## pip install -r requirements-async.txt
 
 === Run locally
 
@@ -59,26 +60,25 @@ And finally let's start up a web server:
 
 sync:
 
-[source]
-----
+## [source]
+
 python movies.py
+
 # or python3 movies.py
 
-Running on http://127.0.0.1:8080/
-----
+## Running on http://127.0.0.1:8080/
 
 async:
 
-[source]
-----
+## [source]
+
 python movies-async.py
+
 # or python3 movies-async.py
 
-Running on http://127.0.0.1:8080/
-----
+## Running on http://127.0.0.1:8080/
 
 Navigate to http://localhost:8080 and you should see your first Neo4j application
-
 
 === Changing the Database
 By default, this example application connects to a remote Neo4j database run by
@@ -99,22 +99,19 @@ database.
 
 sync:
 
-[source]
-----
+## [source]
+
 NEO4J_URI=neo4j://localhost:7687 NEO4J_DATABASE=neo4j NEO4J_USER="<username>" NEO4J_PASSWORD="<password>" python movies.py
 
-Running on http://127.0.0.1:8080/
-----
+## Running on http://127.0.0.1:8080/
 
 async:
 
-[source]
-----
+## [source]
+
 NEO4J_URI=neo4j://localhost:7687 NEO4J_DATABASE=neo4j NEO4J_USER="<username>" NEO4J_PASSWORD="<password>" python movies-async.py
 
-Running on http://127.0.0.1:8080/
-----
-
+## Running on http://127.0.0.1:8080/
 
 === All Configuration Options
 

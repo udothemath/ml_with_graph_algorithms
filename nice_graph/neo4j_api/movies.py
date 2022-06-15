@@ -1,29 +1,30 @@
 #!/usr/bin/env python
-from json import dumps
 import logging
 import os
+from json import dumps
 
-from flask import (
-    Flask,
-    g,
-    request,
-    Response,
-)
-from neo4j import (
-    GraphDatabase,
-    basic_auth,
-)
+from flask import Flask, Response, g, request
+from neo4j import GraphDatabase, basic_auth
 
+db_on_remote = False
 
 app = Flask(__name__, static_url_path="/static/")
 
-url = os.getenv("NEO4J_URI", "neo4j+s://demo.neo4jlabs.com")
-username = os.getenv("NEO4J_USER", "movies")
-password = os.getenv("NEO4J_PASSWORD", "movies")
-neo4j_version = os.getenv("NEO4J_VERSION", "4")
-database = os.getenv("NEO4J_DATABASE", "movies")
+if db_on_remote:
+    url = os.getenv("NEO4J_URI", "neo4j+s://demo.neo4jlabs.com")
+    username = os.getenv("NEO4J_USER", "movies")
+    password = os.getenv("NEO4J_PASSWORD", "movies")
+    neo4j_version = os.getenv("NEO4J_VERSION", "4")
+    database = os.getenv("NEO4J_DATABASE", "movies")
 
-port = os.getenv("PORT", 8080)
+    port = os.getenv("PORT", 8080)
+else:
+    url = "neo4j://localhost:7687"
+    username = 'neo4j'
+    password = '1234'
+    neo4j_version = '4'
+    database = 'neo4j'
+    port = os.getenv("PORT", 8080)
 
 driver = GraphDatabase.driver(url, auth=basic_auth(username, password))
 
@@ -80,7 +81,7 @@ def get_graph():
         ))
 
     db = get_db()
-    results = db.read_transaction(work, request.args.get("limit", 100))
+    results = db.read_transaction(work, request.args.get("limit", 10))
     nodes = []
     rels = []
     i = 0
