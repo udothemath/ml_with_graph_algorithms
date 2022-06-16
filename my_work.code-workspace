@@ -1,0 +1,20 @@
+{
+    "settings": {
+        "python.pythonPath": "/home/jovyan/eb-customer-embedding/a_env/proj_neo4j/bin/python",
+        "python.venvFolders": [
+            "/home/jovyan/eb-customer-embedding/a_env/proj_neo4j/"
+        ],
+
+        "AREPL.envFile": " /home/jovyan/eb-customer-embedding/a_env/proj_neo4j/"
+    },
+    "folders": [
+        {
+            "path": "."
+        },
+        {
+            "path": "/home/jovyan/pr-erc-risk-model/20033"
+        }
+    ],
+}
+
+
