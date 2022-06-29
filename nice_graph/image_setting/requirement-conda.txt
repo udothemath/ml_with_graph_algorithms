@@ -1,0 +1,12 @@
+ipywidgets
+jupyter_dashboards
+jupyterlab-dash
+nb_conda_kernels
+pytest
+pytest-cov
+pytest-django
+pytest-flakes
+pytest-html
+pytest-pep8
+pytest-sugar
+pytest-xdist
