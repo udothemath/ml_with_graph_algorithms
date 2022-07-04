@@ -32,3 +32,5 @@ timeout-decorator
 webdriver-manager
 xgboost
 yattag
+matplotlib==3.0.2
+urllib3

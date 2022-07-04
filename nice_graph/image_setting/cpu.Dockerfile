@@ -52,7 +52,7 @@ RUN wget -O /usr/share/tesseract-ocr/4.00/tessdata/chi_tra.traineddata \
  && git clone https://github.com/Microsoft/dowhy.git /usr/local/dowhy
 
 #----powerline
-COPY .bash_profile /etc/profile.d/bashrc.sh
+# COPY .bash_profile /etc/profile.d/bashrc.sh
 
 ###############################
 #     VS Code Remote SSH      #
@@ -71,11 +71,12 @@ EXPOSE 22
 #############################
 #   Conda                   #
 #############################
-USER $NB_UID
-
+USER root
+# $NB_UID
 COPY requirement-conda.txt $HOME
-
-RUN conda install --quiet --yes --file $HOME/requirement-conda.txt \
+RUN conda update --all --yes
+RUN conda config --set channel_priority false
+RUN conda install --yes --debug --file $HOME/requirement-conda.txt \
  && conda clean -tipsy \
  && fix-permissions $CONDA_DIR
 
@@ -105,7 +106,7 @@ USER $NB_UID
 
 COPY requirement-pip.txt $HOME
 
-RUN pip install --no-cache-dir -r $HOME/requirement-pip.txt
+RUN pip install --no-cache-dir --user -r $HOME/requirement-pip.txt
 
 # Install fastFM
 RUN git clone --recursive https://github.com/ibayer/fastFM.git \
@@ -116,71 +117,73 @@ RUN git clone --recursive https://github.com/ibayer/fastFM.git \
 #############################
 #   Update                  #
 #############################
-RUN conda install --update-specs --yes\
-        mako==1.1.2
+# RUN conda update --all \
+# && conda install --update-specs --yes\
+#        mako==1.1.2
 
-RUN pip install --upgrade \
-        matplotlib==3.0.2 \
-        urllib3
+# RUN pip install --upgrade \
+#         matplotlib==3.0.2 \
+#         urllib3
 
 #############################
 #   Jupyter Extension       #
 #############################
-USER $NB_UID
+# USER $NB_UID
 
-RUN jupyter nbextension install --py \
-        jupyter_dashboards \
-        --sys-prefix \
- && jupyter nbextension enable --py jupyter_dashboards --sys-prefix \
- && jupyter nbextension enable --py widgetsnbextension
+# RUN jupyter nbextension install --py \
+#         jupyter_dashboards \
+#         --sys-prefix \
+#  && jupyter nbextension enable --py jupyter_dashboards --sys-prefix \
+#  && jupyter nbextension enable --py widgetsnbextension
 
-RUN jupyter labextension install \
-        @bokeh/jupyter_bokeh \
-        @jupyterlab/hub-extension \
-        @jupyterlab/toc \
-        @ryantam626/jupyterlab_sublime \
-        jupyter-matplotlib \
-        jupyterlab_filetree \
-        jupyterlab_tensorboard \
-        jupyterlab-dash \
-        jupyterlab-drawio \
-        nbdime-jupyterlab \
-        --no-build \
- && jupyter lab build -y \
- && jupyter lab clean -y \
- && npm cache clean --force \ 
- && rm -rf /home/$NB_USER/.cache/yarn \
- && rm -rf /home/$NB_USER/.node-gyp \
- && fix-permissions $CONDA_DIR \
- && fix-permissions /home/$NB_USER
+# RUN jupyter labextension install \
+#         @bokeh/jupyter_bokeh \
+#         @jupyterlab/hub-extension \
+#         @jupyterlab/toc \
+#         @ryantam626/jupyterlab_sublime \
+#         jupyter-matplotlib \
+#         jupyterlab_filetree \
+#         jupyterlab_tensorboard \
+#         jupyterlab-dash \
+#         jupyterlab-drawio \
+#         nbdime-jupyterlab \
+#         --no-build \
+#  && jupyter lab build -y \
+#  && jupyter lab clean -y \
+#  && npm cache clean --force \ 
+#  && rm -rf /home/$NB_USER/.cache/yarn \
+#  && rm -rf /home/$NB_USER/.node-gyp \
+#  && fix-permissions $CONDA_DIR \
+#  && fix-permissions /home/$NB_USER
 
-RUN pip install --no-cache-dir nbresuse \
- && jupyter serverextension enable --py nbresuse \
- && jupyter lab clean -y
+# RUN pip install --no-cache-dir nbresuse \
+#  && jupyter serverextension enable --py nbresuse \
+#  && jupyter lab clean -y
 
 #############################
 #   Julia                   #
 #############################
-USER root
+# USER root
 
-RUN wget --directory-prefix=/usr/local/lib/ https://julialang-s3.julialang.org/bin/linux/x64/1.1/julia-1.1.0-linux-x86_64.tar.gz \
- && tar -xvf /usr/local/lib/julia-1.1.0-linux-x86_64.tar.gz -C /usr/local/lib/ \
- && rm /usr/local/lib/julia-1.1.0-linux-x86_64.tar.gz \
- && chown -R jovyan:users /usr/local/lib/julia-1.1.0/
+# RUN wget --directory-prefix=/usr/local/lib/ https://julialang-s3.julialang.org/bin/linux/x64/1.1/julia-1.1.0-linux-x86_64.tar.gz \
+#  && tar -xvf /usr/local/lib/julia-1.1.0-linux-x86_64.tar.gz -C /usr/local/lib/ \
+#  && rm /usr/local/lib/julia-1.1.0-linux-x86_64.tar.gz \
+#  && chown -R jovyan:users /usr/local/lib/julia-1.1.0/
 
-ENV PATH "/usr/local/lib/julia-1.1.0/bin:$PATH"
-ENV JULIA_DEPOT_PATH "/usr/local/lib/julia-1.1.0/"
-ENV JUPYTER "/opt/conda/bin/jupyter-labhub"
+# ENV PATH "/usr/local/lib/julia-1.1.0/bin:$PATH"
+# ENV JULIA_DEPOT_PATH "/usr/local/lib/julia-1.1.0/"
+# ENV JUPYTER "/opt/conda/bin/jupyter-labhub"
 
-RUN julia -e 'using Pkg; Pkg.add("PyPlot"); Pkg.build("PyPlot"); \
-        Pkg.add("IJulia"); Pkg.build("IJulia"); \
-        Pkg.add("NetCDF"); Pkg.build("NetCDF"); \
-        Pkg.add("MAT"); Pkg.build("MAT")' \
- && chown -R jovyan:users /usr/local/lib/julia-1.1.0/
+# RUN julia -e 'using Pkg; Pkg.add("PyPlot"); Pkg.build("PyPlot"); \
+#         Pkg.add("IJulia"); Pkg.build("IJulia"); \
+#         Pkg.add("NetCDF"); Pkg.build("NetCDF"); \
+#         Pkg.add("MAT"); Pkg.build("MAT")' \
+#  && chown -R jovyan:users /usr/local/lib/julia-1.1.0/
 
 #############################
 #   Tesseract Package       #
 #############################
+USER root
 RUN apt-get update \
  && apt-get install -y --no-install-recommends software-properties-common \
  && echo "deb http://ppa.launchpad.net/alex-p/tesseract-ocr/ubuntu bionic main" >> /etc/apt/source.list \
@@ -192,6 +195,7 @@ RUN apt-get update \
 #########################
 #   Docker CLI          #
 #########################
+USER root
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - \
  && add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable" \
  && apt-get update \
@@ -200,18 +204,50 @@ RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 #############################
 #       RPA Package         #
 #############################
+USER root
 RUN wget https://chromedriver.storage.googleapis.com/87.0.4280.88/chromedriver_linux64.zip \
  && unzip chromedriver_linux64.zip \
  && chmod +x chromedriver \
  && mv chromedriver /usr/bin/ \
  && rm chromedriver_linux64.zip
 
+#############################
+#       Redis Stack         #
+#############################
+USER root
+RUN curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg \
+ && echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/redis.list \
+ && apt-get update \
+ && apt-get install redis-stack-server \
+ && pip install redis-server
+RUN curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+ && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+ && apt update \
+ && apt install -y yarn
+RUN conda upgrade -c bkreider nodejs 
+RUN git clone https://github.com/RedisInsight/RedisInsight.git /usr/local/RedisInsight \
+ && cd /usr/local/RedisInsight \
+ && yarn install \
+ && yarn add -D webpack-cli \
+ && yarn --cwd redisinsight/api/ 
+RUN npm install --save-dev 
+RUN npm install --save-dev node-gyp -g
+RUN npm install --save-dev webpack webpack-cli webpack-dev-server -g \
+ && npm install --save-dev cross-env -get 
+RUN npm install --save-dev electron@16.2.8 node-sass@4.14.1
+RUN yarn install \
+ && yarn add -D webpack-cli \
+ && yarn add -D web \
+ && cd $HOME
+
+
+
 ##############################
 # For PrimeHub Job Submission#
 ##############################
-USER $NB_UID
+# USER $NB_UID
 
-ENV PATH $PATH:/opt/conda/bin
-ENV PIP_CONFIG_FILE /etc/python/pip.config
+# ENV PATH $PATH:/opt/conda/bin
+# ENV PIP_CONFIG_FILE /etc/python/pip.config
 
-COPY ai-cloud-pip.config /etc/python/pip.config
+# COPY ai-cloud-pip.config /etc/python/pip.config
