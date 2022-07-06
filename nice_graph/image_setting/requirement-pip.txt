@@ -25,11 +25,8 @@ pytest-picked
 pytest-tldr
 python-docx
 retry
-selenium
-tesserocr
 textract
 timeout-decorator
-webdriver-manager
 xgboost
 yattag
 matplotlib==3.0.2

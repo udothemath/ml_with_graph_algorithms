@@ -61,3 +61,4 @@ NOTE:
 # ENV PIP_CONFIG_FILE /etc/python/pip.config
 # COPY ai-cloud-pip.config /etc/python/pip.config
 ```
+- When port forwarding fail, check if the reference solve the problem: https://github.com/microsoft/vscode-remote-release/issues/764#issuecomment-506983759 (set serving host from localhost to 0.0.0.0 in container)

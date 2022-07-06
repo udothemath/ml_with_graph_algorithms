@@ -68,17 +68,47 @@ RUN mkdir -p /vat/run/sshd \
  
 EXPOSE 22
 
+
+
 #############################
 #   Conda                   #
 #############################
-USER root
-# $NB_UID
+USER $NB_UID
 COPY requirement-conda.txt $HOME
-RUN conda update --all --yes
 RUN conda config --set channel_priority false
-RUN conda install --yes --debug --file $HOME/requirement-conda.txt \
+RUN conda install --yes --file $HOME/requirement-conda.txt \
  && conda clean -tipsy \
  && fix-permissions $CONDA_DIR
+
+
+#############################
+#   Jupyter Extension       #
+#############################
+USER $NB_UID
+RUN jupyter nbextension install --py \
+        jupyter_dashboards \
+        --sys-prefix \
+ && jupyter nbextension enable --py jupyter_dashboards --sys-prefix \
+ && jupyter nbextension enable --py widgetsnbextension
+RUN jupyter labextension update --all
+RUN jupyter labextension install @jupyterlab/hub-extension
+RUN jupyter labextension install @jupyterlab/toc
+RUN jupyter labextension install @ryantam626/jupyterlab_sublime
+RUN jupyter labextension install jupyter-matplotlib
+RUN jupyter labextension install jupyter-cytoscape
+RUN jupyter labextension install jupyterlab-dash
+RUN jupyter labextension install jupyterlab-drawio
+RUN jupyter labextension install nbdime-jupyterlab
+RUN jupyter lab clean -y \
+ && npm cache clean --force \ 
+ && rm -rf /home/$NB_USER/.cache/yarn \
+ && rm -rf /home/$NB_USER/.node-gyp 
+RUN fix-permissions $CONDA_DIR \
+ && fix-permissions /home/$NB_USER
+
+RUN pip install --no-cache-dir nbresuse \
+ && jupyter serverextension enable --py nbresuse \
+ && jupyter lab clean -y
 
 #############################
 #   Update Python Package   #
@@ -105,14 +135,13 @@ RUN conda install --yes --debug --file $HOME/requirement-conda.txt \
 USER $NB_UID
 
 COPY requirement-pip.txt $HOME
-
-RUN pip install --no-cache-dir --user -r $HOME/requirement-pip.txt
+RUN pip install --no-cache-dir -r $HOME/requirement-pip.txt
 
 # Install fastFM
-RUN git clone --recursive https://github.com/ibayer/fastFM.git \
- && pip install -r fastFM/requirements.txt \
- && make -C fastFM/ \
- && pip install fastFM/
+# RUN git clone --recursive https://github.com/ibayer/fastFM.git \
+#  && pip install -r fastFM/requirements.txt \
+#  && make -C fastFM/ \
+#  && pip install fastFM/
 
 #############################
 #   Update                  #
@@ -125,40 +154,7 @@ RUN git clone --recursive https://github.com/ibayer/fastFM.git \
 #         matplotlib==3.0.2 \
 #         urllib3
 
-#############################
-#   Jupyter Extension       #
-#############################
-# USER $NB_UID
 
-# RUN jupyter nbextension install --py \
-#         jupyter_dashboards \
-#         --sys-prefix \
-#  && jupyter nbextension enable --py jupyter_dashboards --sys-prefix \
-#  && jupyter nbextension enable --py widgetsnbextension
-
-# RUN jupyter labextension install \
-#         @bokeh/jupyter_bokeh \
-#         @jupyterlab/hub-extension \
-#         @jupyterlab/toc \
-#         @ryantam626/jupyterlab_sublime \
-#         jupyter-matplotlib \
-#         jupyterlab_filetree \
-#         jupyterlab_tensorboard \
-#         jupyterlab-dash \
-#         jupyterlab-drawio \
-#         nbdime-jupyterlab \
-#         --no-build \
-#  && jupyter lab build -y \
-#  && jupyter lab clean -y \
-#  && npm cache clean --force \ 
-#  && rm -rf /home/$NB_USER/.cache/yarn \
-#  && rm -rf /home/$NB_USER/.node-gyp \
-#  && fix-permissions $CONDA_DIR \
-#  && fix-permissions /home/$NB_USER
-
-# RUN pip install --no-cache-dir nbresuse \
-#  && jupyter serverextension enable --py nbresuse \
-#  && jupyter lab clean -y
 
 #############################
 #   Julia                   #
@@ -183,15 +179,22 @@ RUN git clone --recursive https://github.com/ibayer/fastFM.git \
 #############################
 #   Tesseract Package       #
 #############################
+# USER root
+# RUN apt-get update \
+#  && apt-get install -y --no-install-recommends software-properties-common \
+#  && echo "deb http://ppa.launchpad.net/alex-p/tesseract-ocr/ubuntu bionic main" >> /etc/apt/source.list \
+#  && echo "deb-src http://ppa.launchpad.net/alex-p/tesseract-ocr/ubuntu bionic main" >> /etc/apt/source.list \
+#  && add-apt-repository --yes ppa:alex-p/tesseract-ocr \
+#  && apt-get update \
+#  && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-chi-tra
+#########################
+#   UPDATE APT          #
+#########################
 USER root
+RUN apt update \
+ && apt install -y --no-install-recommends software-properties-common
 RUN apt-get update \
- && apt-get install -y --no-install-recommends software-properties-common \
- && echo "deb http://ppa.launchpad.net/alex-p/tesseract-ocr/ubuntu bionic main" >> /etc/apt/source.list \
- && echo "deb-src http://ppa.launchpad.net/alex-p/tesseract-ocr/ubuntu bionic main" >> /etc/apt/source.list \
- && add-apt-repository --yes ppa:alex-p/tesseract-ocr \
- && apt-get update \
- && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-chi-tra
-
+ && apt-get install -y --no-install-recommends software-properties-common
 #########################
 #   Docker CLI          #
 #########################
@@ -204,43 +207,66 @@ RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 #############################
 #       RPA Package         #
 #############################
-USER root
-RUN wget https://chromedriver.storage.googleapis.com/87.0.4280.88/chromedriver_linux64.zip \
- && unzip chromedriver_linux64.zip \
- && chmod +x chromedriver \
- && mv chromedriver /usr/bin/ \
- && rm chromedriver_linux64.zip
+# USER root
+# RUN wget https://chromedriver.storage.googleapis.com/87.0.4280.88/chromedriver_linux64.zip \
+#  && unzip chromedriver_linux64.zip \
+#  && chmod +x chromedriver \
+#  && mv chromedriver /usr/bin/ \
+#  && rm chromedriver_linux64.zip
 
 #############################
-#       Redis Stack         #
+#       Python3.8 & 3.6     #
+#############################
+USER root 
+RUN add-apt-repository -y ppa:deadsnakes/ppa \
+ && apt update 
+RUN apt install -y python3.8 \
+ && apt-get install -y python3.8-venv 
+RUN apt install -y python3.6 \
+ && apt-get install -y python3.6-venv
+#############################
+#    Redis Stack Server     #
 #############################
 USER root
 RUN curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg \
  && echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/redis.list \
  && apt-get update \
- && apt-get install redis-stack-server \
+ && apt-get install -y redis-stack-server \
  && pip install redis-server
-RUN curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
- && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
- && apt update \
- && apt install -y yarn
-RUN conda upgrade -c bkreider nodejs 
-RUN git clone https://github.com/RedisInsight/RedisInsight.git /usr/local/RedisInsight \
- && cd /usr/local/RedisInsight \
- && yarn install \
- && yarn add -D webpack-cli \
- && yarn --cwd redisinsight/api/ 
-RUN npm install --save-dev 
-RUN npm install --save-dev node-gyp -g
-RUN npm install --save-dev webpack webpack-cli webpack-dev-server -g \
- && npm install --save-dev cross-env -get 
-RUN npm install --save-dev electron@16.2.8 node-sass@4.14.1
-RUN yarn install \
- && yarn add -D webpack-cli \
- && yarn add -D web \
- && cd $HOME
-
-
+#############################
+#       RedisInsight        #
+#############################
+# RUN curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+#  && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+#  && apt update \
+#  && apt install -y yarn
+# RUN conda upgrade -c bkreider nodejs 
+# RUN git clone https://github.com/RedisInsight/RedisInsight.git /usr/local/RedisInsight \
+#  && cd /usr/local/RedisInsight \
+#  && yarn install \
+#  && yarn add -D webpack-cli \
+#  && yarn --cwd redisinsight/api/ 
+# RUN npm install --save-dev 
+# RUN npm install --save-dev node-gyp -g
+# RUN npm install --save-dev webpack webpack-cli webpack-dev-server -g \
+#  && npm install --save-dev cross-env -get 
+# RUN npm install --save-dev electron@16.2.8 node-sass@4.14.1
+# RUN yarn install \
+#  && yarn add -D webpack-cli \
+#  && yarn add -D web \
+#  && cd $HOME
+#############################
+#          Neo4j            #
+#############################
+USER root
+RUN wget -O - https://debian.neo4j.com/neotechnology.gpg.key | apt-key add - \
+ && echo 'deb https://debian.neo4j.com stable latest' | tee /etc/apt/sources.list.d/neo4j.list \
+ && apt update
+RUN apt install -y neo4j=1:4.4.6
+RUN wget https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/4.4.0.6/apoc-4.4.0.6-all.jar \
+ && cp apoc-4.4.0.6-all.jar /var/lib/neo4j/plugins/ \
+ && chown neo4j:neo4j /var/lib/neo4j/plugins/apoc-4.4.0.6-all.jar
+COPY neo4j.config /etc/neo4j/neo4j.config
 
 ##############################
 # For PrimeHub Job Submission#
