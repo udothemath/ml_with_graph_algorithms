@@ -2,13 +2,15 @@
 |主題|分享人|說明|資料源|備註|  
 |--|--|--|--|--|  
 |電話撥打以及應用程式使用情況的相關性關聯分析|甫璋|摘要說明:顧客電話通訊以及APP應用程式的使用行為及關聯分析。預期產出:</br>1. 使用圖篩選語法分類客群</br>2. 使用圖關聯模型定義客群|whoscall提供|討論中的POC合作案| 
-|..|..|..|..|..|
+|Graph-based recommendation system|崇爾|預期產出:<br> 1. 建置圖資料庫並存放歷史互動資料 <br>2. 建置推薦模型<br>3. 使用Neo4j視覺化人-物關係| |References:https://towardsdatascience.com/exploring-practical-recommendation-engines-in-neo4j-ff09fe767782 <br>![alt text](https://dist.neo4j.com/wp-content/uploads/20220104122129/GDS_1-1024x369.png)
+|
+
 
 ## 目標(As of 2022/6/30) 
 在 python 開發環境(vs code)使用 cypher 語法執行 neo4j，結果呈現於瀏覽器上，並可於瀏覽器頁面上執行 neo4j 的互動式操作。
 
 ## 開發看板：
-[Link](https://github.com/udothemath/ml_with_graph_algorithms/projects?type=beta)
+[Link]([https://github.com/udothemath/ml_with_graph_algorithms/projects?type=beta](https://dist.neo4j.com/wp-content/uploads/20220104122129/GDS_1-1024x369.png))
 
 ## 開發內容：
 - 將資料儲存於圖資料庫中
