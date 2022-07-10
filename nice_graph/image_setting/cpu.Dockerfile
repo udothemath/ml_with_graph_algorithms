@@ -203,7 +203,6 @@ RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
  && add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable" \
  && apt-get update \
  && apt-get install -y --no-install-recommends docker-ce-cli
- 
 #############################
 #       RPA Package         #
 #############################
@@ -233,28 +232,6 @@ RUN curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/
  && apt-get update \
  && apt-get install -y redis-stack-server \
  && pip install redis-server
-#############################
-#       RedisInsight        #
-#############################
-RUN curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
- && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
- && apt update \
- && apt install -y yarn
-RUN conda upgrade -c bkreider nodejs 
-RUN git clone https://github.com/RedisInsight/RedisInsight.git /usr/local/RedisInsight \
- && cd /usr/local/RedisInsight \
- && yarn install \
- && yarn add -D webpack-cli \
- && yarn --cwd redisinsight/api/ 
-RUN npm install --save-dev 
-RUN npm install --save-dev node-gyp -g
-RUN npm install --save-dev webpack webpack-cli webpack-dev-server -g \
- && npm install --save-dev cross-env -get 
-RUN npm install --save-dev electron@16.2.8 node-sass@4.14.1
-RUN yarn install \
- && yarn add -D webpack-cli \
- && yarn add -D web \
- && cd $HOME
 #############################
 #          Neo4j            #
 #############################
