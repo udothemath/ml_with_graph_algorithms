@@ -236,25 +236,25 @@ RUN curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/
 #############################
 #       RedisInsight        #
 #############################
-# RUN curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-#  && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
-#  && apt update \
-#  && apt install -y yarn
-# RUN conda upgrade -c bkreider nodejs 
-# RUN git clone https://github.com/RedisInsight/RedisInsight.git /usr/local/RedisInsight \
-#  && cd /usr/local/RedisInsight \
-#  && yarn install \
-#  && yarn add -D webpack-cli \
-#  && yarn --cwd redisinsight/api/ 
-# RUN npm install --save-dev 
-# RUN npm install --save-dev node-gyp -g
-# RUN npm install --save-dev webpack webpack-cli webpack-dev-server -g \
-#  && npm install --save-dev cross-env -get 
-# RUN npm install --save-dev electron@16.2.8 node-sass@4.14.1
-# RUN yarn install \
-#  && yarn add -D webpack-cli \
-#  && yarn add -D web \
-#  && cd $HOME
+RUN curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+ && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+ && apt update \
+ && apt install -y yarn
+RUN conda upgrade -c bkreider nodejs 
+RUN git clone https://github.com/RedisInsight/RedisInsight.git /usr/local/RedisInsight \
+ && cd /usr/local/RedisInsight \
+ && yarn install \
+ && yarn add -D webpack-cli \
+ && yarn --cwd redisinsight/api/ 
+RUN npm install --save-dev 
+RUN npm install --save-dev node-gyp -g
+RUN npm install --save-dev webpack webpack-cli webpack-dev-server -g \
+ && npm install --save-dev cross-env -get 
+RUN npm install --save-dev electron@16.2.8 node-sass@4.14.1
+RUN yarn install \
+ && yarn add -D webpack-cli \
+ && yarn add -D web \
+ && cd $HOME
 #############################
 #          Neo4j            #
 #############################
@@ -266,7 +266,6 @@ RUN apt install -y neo4j=1:4.4.6
 RUN wget https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/4.4.0.6/apoc-4.4.0.6-all.jar \
  && cp apoc-4.4.0.6-all.jar /var/lib/neo4j/plugins/ \
  && chown neo4j:neo4j /var/lib/neo4j/plugins/apoc-4.4.0.6-all.jar
-COPY neo4j.config /etc/neo4j/neo4j.config
 
 ##############################
 # For PrimeHub Job Submission#
