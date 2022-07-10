@@ -135,38 +135,31 @@ RUN git clone --recursive https://github.com/ibayer/fastFM.git \
 #############################
 #   Jupyter Extension       #
 #############################
-# USER $NB_UID
+USER $NB_UID
+RUN jupyter nbextension install --py \
+        jupyter_dashboards \
+        --sys-prefix \
+ && jupyter nbextension enable --py jupyter_dashboards --sys-prefix \
+ && jupyter nbextension enable --py widgetsnbextension
+RUN jupyter labextension update --all
+RUN jupyter labextension install @jupyterlab/hub-extension
+RUN jupyter labextension install @jupyterlab/toc
+RUN jupyter labextension install @ryantam626/jupyterlab_sublime
+RUN jupyter labextension install jupyter-matplotlib
+RUN jupyter labextension install jupyter-cytoscape
+RUN jupyter labextension install jupyterlab-dash
+RUN jupyter labextension install jupyterlab-drawio
+RUN jupyter labextension install nbdime-jupyterlab
+RUN jupyter lab clean -y \
+ && npm cache clean --force \ 
+ && rm -rf /home/$NB_USER/.cache/yarn \
+ && rm -rf /home/$NB_USER/.node-gyp 
+RUN fix-permissions $CONDA_DIR \
+ && fix-permissions /home/$NB_USER
 
-# RUN jupyter nbextension install --py \
-#         jupyter_dashboards \
-#         --sys-prefix \
-#  && jupyter nbextension enable --py jupyter_dashboards --sys-prefix \
-#  && jupyter nbextension enable --py widgetsnbextension
-
-# RUN jupyter labextension install \
-#         @bokeh/jupyter_bokeh \
-#         @jupyter-widgets/jupyterlab-manager \
-#         @jupyterlab/hub-extension \
-#         @jupyterlab/toc \
-#         @ryantam626/jupyterlab_sublime \
-#         jupyter-matplotlib \
-#         jupyterlab_filetree \
-#         jupyterlab_tensorboard \
-#         jupyterlab-dash \
-#         jupyterlab-drawio \
-#         nbdime-jupyterlab \
-#         --no-build \
-#  && jupyter lab build -y \
-#  && jupyter lab clean -y \
-#  && npm cache clean --force \ 
-#  && rm -rf /home/$NB_USER/.cache/yarn \
-#  && rm -rf /home/$NB_USER/.node-gyp \
-#  && fix-permissions $CONDA_DIR \
-#  && fix-permissions /home/$NB_USER
-
-# RUN pip install --no-cache-dir nbresuse \
-#  && jupyter serverextension enable --py nbresuse \
-#  && jupyter lab clean -y
+RUN pip install --no-cache-dir nbresuse \
+ && jupyter serverextension enable --py nbresuse \
+ && jupyter lab clean -y
 
 #############################
 #   Julia                   #
@@ -201,14 +194,14 @@ RUN git clone --recursive https://github.com/ibayer/fastFM.git \
 #############################
 #   Tesseract Package       #
 #############################
-USER root
-RUN apt-get update \
- && apt-get install -y --no-install-recommends software-properties-common \
- && echo "deb http://ppa.launchpad.net/alex-p/tesseract-ocr/ubuntu bionic main" >> /etc/apt/source.list \
- && echo "deb-src http://ppa.launchpad.net/alex-p/tesseract-ocr/ubuntu bionic main" >> /etc/apt/source.list \
- && add-apt-repository --yes ppa:alex-p/tesseract-ocr \
- && apt-get update \
- && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-chi-tra
+# USER root
+# RUN apt-get update \
+#  && apt-get install -y --no-install-recommends software-properties-common \
+#  && echo "deb http://ppa.launchpad.net/alex-p/tesseract-ocr/ubuntu bionic main" >> /etc/apt/source.list \
+#  && echo "deb-src http://ppa.launchpad.net/alex-p/tesseract-ocr/ubuntu bionic main" >> /etc/apt/source.list \
+#  && add-apt-repository --yes ppa:alex-p/tesseract-ocr \
+#  && apt-get update \
+#  && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-chi-tra
 
 #########################
 #   Docker CLI          #
@@ -222,12 +215,49 @@ RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
 #############################
 #       RPA Package         #
 #############################
+# USER root
+# RUN wget https://chromedriver.storage.googleapis.com/87.0.4280.88/chromedriver_linux64.zip \
+#  && unzip chromedriver_linux64.zip \
+#  && chmod +x chromedriver \
+#  && mv chromedriver /usr/bin/ \
+#  && rm chromedriver_linux64.zip
+
+#############################
+#       Python3.8 & 3.6     #
+#############################
+USER root 
+RUN add-apt-repository -y ppa:deadsnakes/ppa \
+ && apt update 
+RUN apt install -y python3.8 \
+ && apt-get install -y python3.8-venv 
+RUN apt install -y python3.6 \
+ && apt-get install -y python3.6-venv
+#############################
+#    Redis Stack Server     #
+#############################
 USER root
-RUN wget https://chromedriver.storage.googleapis.com/87.0.4280.88/chromedriver_linux64.zip \
- && unzip chromedriver_linux64.zip \
- && chmod +x chromedriver \
- && mv chromedriver /usr/bin/ \
- && rm chromedriver_linux64.zip
+RUN curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg \
+ && echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/redis.list \
+ && apt-get update \
+ && apt-get install -y redis-stack-server \
+ && pip install redis-server
+#############################
+#          Neo4j            #
+#############################
+USER root
+RUN wget -O - https://debian.neo4j.com/neotechnology.gpg.key | apt-key add - \
+ && echo 'deb https://debian.neo4j.com stable latest' | tee /etc/apt/sources.list.d/neo4j.list \
+ && apt update
+RUN apt install -y neo4j=1:4.4.6
+RUN wget https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/4.4.0.6/apoc-4.4.0.6-all.jar \
+ && cp apoc-4.4.0.6-all.jar /var/lib/neo4j/plugins/ \
+ && chown neo4j:neo4j /var/lib/neo4j/plugins/apoc-4.4.0.6-all.jar
+#############################
+#   Pytorch GNN Libraries   #
+#############################
+RUN pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
+RUN pip install torch-scatter torch-sparse torch-cluster torch-spline-conv torch-geometric -f https://data.pyg.org/whl/torch-1.11.0+cu113.html
+RUN pip install dgl-cu113 dglgo -f https://data.dgl.ai/wheels/repo.html
 
 #############################
 # For PrimeHub Schedule Job #
