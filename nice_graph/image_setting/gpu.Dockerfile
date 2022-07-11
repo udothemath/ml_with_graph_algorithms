@@ -78,8 +78,7 @@ EXPOSE 22
 #############################
 #   Conda                   #
 #############################
-USER root
-# $NB_UID
+USER $NB_UID
 COPY requirement-conda.txt $HOME
 RUN conda update --all --yes
 RUN conda config --set channel_priority false
@@ -141,7 +140,7 @@ RUN jupyter nbextension install --py \
         --sys-prefix \
  && jupyter nbextension enable --py jupyter_dashboards --sys-prefix \
  && jupyter nbextension enable --py widgetsnbextension
-RUN jupyter labextension update --all
+# RUN jupyter labextension update --all
 RUN jupyter labextension install @jupyterlab/hub-extension
 RUN jupyter labextension install @jupyterlab/toc
 RUN jupyter labextension install @ryantam626/jupyterlab_sublime
@@ -207,6 +206,8 @@ RUN pip install --no-cache-dir nbresuse \
 #   Docker CLI          #
 #########################
 USER root
+RUN apt-get install -y software-properties-common
+RUN apt-get update
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - \
  && add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable" \
  && apt-get update \
@@ -255,6 +256,7 @@ RUN wget https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/downloa
 #############################
 #   Pytorch GNN Libraries   #
 #############################
+USER $NB_UID
 RUN pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu113
 RUN pip install torch-scatter torch-sparse torch-cluster torch-spline-conv torch-geometric -f https://data.pyg.org/whl/torch-1.11.0+cu113.html
 RUN pip install dgl-cu113 dglgo -f https://data.dgl.ai/wheels/repo.html

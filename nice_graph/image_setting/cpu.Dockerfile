@@ -75,10 +75,12 @@ EXPOSE 22
 #############################
 USER $NB_UID
 COPY requirement-conda.txt $HOME
+RUN conda update --all --yes
 RUN conda config --set channel_priority false
-RUN conda install --yes --file $HOME/requirement-conda.txt \
+RUN conda install --yes --debug --file $HOME/requirement-conda.txt \
  && conda clean -tipsy \
  && fix-permissions $CONDA_DIR
+
 
 
 #############################
@@ -90,7 +92,7 @@ RUN jupyter nbextension install --py \
         --sys-prefix \
  && jupyter nbextension enable --py jupyter_dashboards --sys-prefix \
  && jupyter nbextension enable --py widgetsnbextension
-RUN jupyter labextension update --all
+# RUN jupyter labextension update --all
 RUN jupyter labextension install @jupyterlab/hub-extension
 RUN jupyter labextension install @jupyterlab/toc
 RUN jupyter labextension install @ryantam626/jupyterlab_sublime
@@ -199,6 +201,8 @@ RUN apt-get update \
 #   Docker CLI          #
 #########################
 USER root
+RUN apt-get install software-properties-common
+RUN apt-get update
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - \
  && add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable" \
  && apt-get update \
@@ -243,6 +247,23 @@ RUN apt install -y neo4j=1:4.4.6
 RUN wget https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/4.4.0.6/apoc-4.4.0.6-all.jar \
  && cp apoc-4.4.0.6-all.jar /var/lib/neo4j/plugins/ \
  && chown neo4j:neo4j /var/lib/neo4j/plugins/apoc-4.4.0.6-all.jar
+
+#############################
+#       RedisInsight        #
+#############################
+USER root
+RUN conda update --all --yes
+RUN conda clean -tipsy
+RUN fix-permissions $CONDA_DIR
+RUN curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
+ && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+ && apt update \
+ && apt install -y yarn
+RUN git clone https://github.com/RedisInsight/RedisInsight.git 
+RUN cd $HOME/Redisinsight \
+ && yarn install --network-timeout 100000
+RUN cd $HOME/Redisinsight \
+ && yarn --cwd redisinsight/api/ 
 
 ##############################
 # For PrimeHub Job Submission#
