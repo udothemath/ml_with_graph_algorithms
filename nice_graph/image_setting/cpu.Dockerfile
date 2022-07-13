@@ -74,7 +74,7 @@ EXPOSE 22
 USER $NB_UID
 
 COPY requirement-conda.txt $HOME
-
+RUN conda update --all
 RUN conda install --quiet --yes --file $HOME/requirement-conda.txt \
  && conda clean -tipsy \
  && fix-permissions $CONDA_DIR
@@ -114,98 +114,78 @@ RUN git clone --recursive https://github.com/ibayer/fastFM.git \
  && pip install fastFM/
 
 #############################
-#   Update                  #
-#############################
-RUN conda install --update-specs --yes\
-        mako==1.1.2
-
-RUN pip install --upgrade \
-        matplotlib==3.0.2 \
-        urllib3
-
-#############################
 #   Jupyter Extension       #
 #############################
 USER $NB_UID
-
 RUN jupyter nbextension install --py \
         jupyter_dashboards \
         --sys-prefix \
  && jupyter nbextension enable --py jupyter_dashboards --sys-prefix \
  && jupyter nbextension enable --py widgetsnbextension
-
-RUN jupyter labextension install \
-        @bokeh/jupyter_bokeh \
-        @jupyterlab/hub-extension \
-        @jupyterlab/toc \
-        @ryantam626/jupyterlab_sublime \
-        jupyter-matplotlib \
-        jupyterlab_filetree \
-        jupyterlab_tensorboard \
-        jupyterlab-dash \
-        jupyterlab-drawio \
-        nbdime-jupyterlab \
-        --no-build \
- && jupyter lab build -y \
- && jupyter lab clean -y \
+RUN jupyter labextension install @jupyterlab/hub-extension
+RUN jupyter labextension install @jupyterlab/toc
+RUN jupyter labextension install @ryantam626/jupyterlab_sublime
+RUN jupyter labextension install jupyter-matplotlib
+RUN jupyter labextension install jupyter-cytoscape
+RUN jupyter labextension install jupyterlab-dash
+RUN jupyter labextension install jupyterlab-drawio
+RUN jupyter labextension install nbdime-jupyterlab
+RUN jupyter lab clean -y \
  && npm cache clean --force \ 
  && rm -rf /home/$NB_USER/.cache/yarn \
- && rm -rf /home/$NB_USER/.node-gyp \
- && fix-permissions $CONDA_DIR \
+ && rm -rf /home/$NB_USER/.node-gyp 
+RUN fix-permissions $CONDA_DIR \
  && fix-permissions /home/$NB_USER
 
 RUN pip install --no-cache-dir nbresuse \
  && jupyter serverextension enable --py nbresuse \
  && jupyter lab clean -y
 
-#############################
-#   Julia                   #
-#############################
-USER root
-
-RUN wget --directory-prefix=/usr/local/lib/ https://julialang-s3.julialang.org/bin/linux/x64/1.1/julia-1.1.0-linux-x86_64.tar.gz \
- && tar -xvf /usr/local/lib/julia-1.1.0-linux-x86_64.tar.gz -C /usr/local/lib/ \
- && rm /usr/local/lib/julia-1.1.0-linux-x86_64.tar.gz \
- && chown -R jovyan:users /usr/local/lib/julia-1.1.0/
-
-ENV PATH "/usr/local/lib/julia-1.1.0/bin:$PATH"
-ENV JULIA_DEPOT_PATH "/usr/local/lib/julia-1.1.0/"
-ENV JUPYTER "/opt/conda/bin/jupyter-labhub"
-
-RUN julia -e 'using Pkg; Pkg.add("PyPlot"); Pkg.build("PyPlot"); \
-        Pkg.add("IJulia"); Pkg.build("IJulia"); \
-        Pkg.add("NetCDF"); Pkg.build("NetCDF"); \
-        Pkg.add("MAT"); Pkg.build("MAT")' \
- && chown -R jovyan:users /usr/local/lib/julia-1.1.0/
-
-#############################
-#   Tesseract Package       #
-#############################
-RUN apt-get update \
- && apt-get install -y --no-install-recommends software-properties-common \
- && echo "deb http://ppa.launchpad.net/alex-p/tesseract-ocr/ubuntu bionic main" >> /etc/apt/source.list \
- && echo "deb-src http://ppa.launchpad.net/alex-p/tesseract-ocr/ubuntu bionic main" >> /etc/apt/source.list \
- && add-apt-repository --yes ppa:alex-p/tesseract-ocr \
- && apt-get update \
- && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-chi-tra
-
 #########################
 #   Docker CLI          #
 #########################
+USER root
+RUN apt install -y software-properties-common \
+ && add-apt-repository ppa:libreoffice/ppa \
+ && apt update
 RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - \
  && add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable" \
  && apt-get update \
  && apt-get install -y --no-install-recommends docker-ce-cli
- 
-#############################
-#       RPA Package         #
-#############################
-RUN wget https://chromedriver.storage.googleapis.com/87.0.4280.88/chromedriver_linux64.zip \
- && unzip chromedriver_linux64.zip \
- && chmod +x chromedriver \
- && mv chromedriver /usr/bin/ \
- && rm chromedriver_linux64.zip
 
+#############################
+#       Python3.8 & 3.6     #
+#############################
+USER root 
+RUN add-apt-repository -y ppa:deadsnakes/ppa \
+ && apt update 
+RUN apt install -y python3.8 \
+ && apt-get install -y python3.8-venv 
+RUN apt install -y python3.6 \
+ && apt-get install -y python3.6-venv
+#############################
+#    Redis Stack Server     #
+#############################
+USER root
+RUN curl -fsSL https://packages.redis.io/gpg | sudo gpg --dearmor -o /usr/share/keyrings/redis-archive-keyring.gpg \
+ && echo "deb [signed-by=/usr/share/keyrings/redis-archive-keyring.gpg] https://packages.redis.io/deb $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/redis.list \
+ && apt-get update \
+ && apt-get install -y redis-stack-server \
+ && pip install redis-server
+#############################
+#          Neo4j            #
+#############################
+USER root
+RUN wget -O - https://debian.neo4j.com/neotechnology.gpg.key | apt-key add - \
+ && echo 'deb https://debian.neo4j.com stable latest' | tee /etc/apt/sources.list.d/neo4j.list \
+ && apt update
+RUN apt install -y neo4j=1:4.4.6
+RUN wget https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/download/4.4.0.6/apoc-4.4.0.6-all.jar \
+ && cp apoc-4.4.0.6-all.jar /var/lib/neo4j/plugins/ \
+ && chown neo4j:neo4j /var/lib/neo4j/plugins/apoc-4.4.0.6-all.jar
+USER $NB_UID
+RUN fix-permissions /var/lib/neo4j \
+ && fix-permissions /var/log/neo4j
 ##############################
 # For PrimeHub Job Submission#
 ##############################
