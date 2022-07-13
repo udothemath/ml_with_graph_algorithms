@@ -29,6 +29,10 @@ CONN_CNT = {}
 
 
 class ConnHandler(closing):
+    """
+    用來在開關connection的時候做logging的物件
+    """
+
     def __init__(self, thing):
         super(ConnHandler, self).__init__(thing)
         pid = os.getpid()
@@ -41,6 +45,10 @@ class ConnHandler(closing):
 
 
 class ETLBase:
+    """
+    預審框架的祖父物件
+    """
+
     def __init__(self):
         pass
 
@@ -57,42 +65,80 @@ class ETLBase:
             try:
                 cur = conn.cursor()
                 cur.execute(sql)
-                logging.info(f'EXECUTE SQL:\n{sql}')
+                logging.info(f'[execute_sql] EXECUTE SQL:\n{sql}')
                 conn.commit()
                 cur.close()
             except (Exception, psycopg2.DatabaseError) as error:
                 conn.rollback()
                 cur.close()
-                logging.info('EXECUTE SQL FAIL')
+                logging.info('[execute_sql] EXECUTE SQL FAIL')
                 raise error
-        logging.info('EXECUTE SQL SUCCESS')
+        logging.info('[execute_sql] EXECUTE SQL SUCCESS')
 
     def select_n_insert_tool(self, etlSQL, source_db,
                              target_schema, target_table):
-        with ConnHandler(self.get_conn(source_db, self.schema_name)) as source_conn, ConnHandler(self.get_conn('feature', self.schema_name)) as target_conn:
+        with ConnHandler(
+                self.get_conn(source_db, self.schema_name)) as source_conn, ConnHandler(
+                self.get_conn('feature', self.schema_name)) as target_conn:
             in_memory_file = io.BytesIO()
             source_copy_sql = """COPY (%s) TO STDOUT DELIMITER ',' CSV""" % etlSQL
             table_name = target_schema + "." + target_table
             copy_query = """COPY %s FROM STDIN WITH (FORMAT CSV, DELIMITER ',', HEADER FALSE)""" % table_name
-
             try:
                 with source_conn.cursor() as raw_cur:
-                    logging.info("Start getting data from source db")
+                    logging.info(
+                        "[select_n_insert_tool] Start getting data from source db")
                     raw_cur.copy_expert(source_copy_sql, in_memory_file)
                     in_memory_file.seek(0)
-                    logging.info("Done getting data")
+                    logging.info(
+                        "[select_n_insert_tool] Done getting data")
                     try:
                         with target_conn.cursor() as ftr_cur:
                             logging.info(
-                                "Start insert data into target (feature) db")
+                                "[select_n_insert_tool] Start insert data into target (feature) db")
                             ftr_cur.copy_expert(copy_query, in_memory_file)
                         target_conn.commit()
-                        logging.info("Done inserting data")
+                        logging.info(
+                            "[select_n_insert_tool] Done inserting data")
                     except Exception:
                         target_conn.rollback()
                         raise
             except Exception:
                 source_conn.rollback()
+                raise Exception
+
+    def select_n_insert_tool_binary(self, etlSQL, source_db,
+                                    target_schema, target_table):
+        with ConnHandler(
+            self.get_conn(source_db, self.schema_name)) as source_conn, ConnHandler(
+                self.get_conn('feature', self.schema_name)) as target_conn:
+            in_memory_file = io.BytesIO()
+            source_copy_sql = """COPY (%s) TO STDOUT WITH BINARY""" % etlSQL
+            table_name = target_schema + "." + target_table
+            copy_query = """COPY %s FROM STDIN (FORMAT BINARY)""" % table_name
+
+            try:
+                with source_conn.cursor() as raw_cur:
+                    logging.info(
+                        "[select_n_insert_tool_binary] Start getting data from source db")
+                    raw_cur.copy_expert(source_copy_sql, in_memory_file)
+                    in_memory_file.seek(0)
+                    logging.info(
+                        "[select_n_insert_tool_binary] Done getting data")
+                    try:
+                        with target_conn.cursor() as ftr_cur:
+                            logging.info(
+                                "[select_n_insert_tool_binary] Start insert data into target (feature) db")
+                            ftr_cur.copy_expert(copy_query, in_memory_file)
+                        target_conn.commit()
+                        logging.info(
+                            "[select_n_insert_tool_binary] Done inserting data")
+                    except Exception:
+                        target_conn.rollback()
+                        raise
+            except Exception:
+                source_conn.rollback()
+                logging.info("[select_n_insert_tool_binary] RUN FAIL")
                 raise Exception
 
     def select_table(self, db, sql):
@@ -142,6 +188,7 @@ class ETLBase:
                 self.close_conn()
 
     def select_table_fast(self, db, sql, encoding='utf-8', index=False):
+        logging.info(f'[select_table_fast] Start (index: {index})')
         in_memory_csv = StringIO()
         with ConnHandler(self.get_conn(db, self.schema_name)) as conn:
             cursor = conn.cursor()
@@ -251,7 +298,8 @@ class ETLBase:
             - in_memory_csv: StringIO object
         """
         if VERBOSE:
-            logging.info('[string_io_generator] Initialize StringIO')
+            logging.info(
+                f'[string_io_generator] Initialize StringIO (index: {index})')
         in_memory_csv = StringIO()
         for i, df in enumerate(result_gen):
             if VERBOSE:
