@@ -1,66 +1,79 @@
-"""
-- TODO:
-- [X] 讓insert可以累積一段的行數以後，再存進DB裡面。
-    - [X] 研究StringIO是否可以一直累加上去 -> 可以
-    - [X] run裡面的insert map，看怎麼樣能夠在吃了一定筆數時，
-            可以去統整出一批的行為StringIO中的CSV，再存進DB中。
-        - [X] 有一個map專門產出StringIO (蒐集多個Pandas的CSV於內存)
-        - [X] 有一個map專門把StringIO中的CSV從內存送到DB。
-    - [X] 放置研究結果於reference。
-    - [X] 從DEVELOP checkout出來實作此方法。
-"""
+"""ETL basic utilities."""
 import pandas as pd
 import psycopg2
 import io
-from io import StringIO
+from io import StringIO, IOBase
 from src import config
 from contextlib import closing
 import logging
 import os
 import gc
+
+from typing import Any, Dict, Iterable, List
+from psycopg2.extensions import connection
+
 # from mlaas_tools.config_build import config_set
 # config_set()
 # remove the above two lines once config.ini is generated
 VERBOSE = False
 CLOSE_ON_DEL = False
 NUM_BATCH_PER_CONN = 10
-PROCESS_CONN = {}
-CONN_CNT = {}
+PROCESS_CONN: Dict[int, connection] = {}
+CONN_CNT: Dict[int, int] = {}
 
 
 class ConnHandler(closing):
-    """
-    用來在開關connection的時候做logging的物件
-    """
+    """DB connection handler.
 
-    def __init__(self, thing):
+    `thing` will be any DB connection object needed to be closed
+    whether the corresponding DB operation succeeds or not to ensure
+    that the resources can be released.
+
+    For information about `closing`, please see:
+        https://github.com/python/cpython/blob/main/Lib/contextlib.py
+
+    Parameters:
+        thing: database connection object
+    """
+    
+    thing: connection
+
+    def __init__(self, thing: connection):
         super(ConnHandler, self).__init__(thing)
         pid = os.getpid()
         logging.info(f'[ConnHandler ({pid})] OPEN')
 
-    def __exit__(self, *exc_info):
+    def __exit__(self, *exc_info: Any) -> None:
         self.thing.close()
         pid = os.getpid()
         logging.info(f'[ConnHandler ({pid})] CLOSE')
 
 
 class ETLBase:
-    """
-    預審框架的祖父物件
-    """
+    """Base class for advanced ETL operations."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     @property
-    def db_users(self):
+    def db_users(self) -> List[str]:
         return config.DB_USERS
 
     @property
-    def schema_name(self):
+    def schema_name(self) -> str:
         return config.SCHEMA_NAME
 
-    def execute_sql(self, db, sql):
+    def execute_sql(self, db: str, sql: str,) -> None:
+        """Execute pre-defined SQL logic.
+
+        Parameters:
+            db: the database name, the choices are as follows:
+                {"rawdata", "feature"}
+            sql: SQL logic
+        
+        Return:
+            None
+        """
         with ConnHandler(self.get_conn(db, self.schema_name)) as conn:
             try:
                 cur = conn.cursor()
@@ -75,8 +88,25 @@ class ETLBase:
                 raise error
         logging.info('[execute_sql] EXECUTE SQL SUCCESS')
 
-    def select_n_insert_tool(self, etlSQL, source_db,
-                             target_schema, target_table):
+    def select_n_insert_tool(
+        self,
+        etlSQL: str,
+        source_db: str,
+        target_schema: str,
+        target_table: str,
+    ) -> None:
+        """Read SQL query or source table into target table via
+        in-memory buffer.
+        
+        Parameters:
+            etlSQL: SQL logic
+            source_db: the source database name
+            target_schema: the target schema name
+            target_table: the target table name
+        
+        Return:
+            None
+        """
         with ConnHandler(
                 self.get_conn(source_db, self.schema_name)) as source_conn, ConnHandler(
                 self.get_conn('feature', self.schema_name)) as target_conn:
@@ -107,8 +137,25 @@ class ETLBase:
                 source_conn.rollback()
                 raise Exception
 
-    def select_n_insert_tool_binary(self, etlSQL, source_db,
-                                    target_schema, target_table):
+    def select_n_insert_tool_binary(
+        self,
+        etlSQL: str,
+        source_db: str,
+        target_schema: str,
+        target_table: str,
+    ) -> None:
+        """Read SQL query or source table into target table via
+        in-memory buffer using binary data format.
+        
+        Parameters:
+            etlSQL: SQL logic
+            source_db: the source database name
+            target_schema: the target schema name
+            target_table: the target table name
+        
+        Return:
+            None
+        """
         with ConnHandler(
             self.get_conn(source_db, self.schema_name)) as source_conn, ConnHandler(
                 self.get_conn('feature', self.schema_name)) as target_conn:
@@ -141,12 +188,34 @@ class ETLBase:
                 logging.info("[select_n_insert_tool_binary] RUN FAIL")
                 raise Exception
 
-    def select_table(self, db, sql):
+    def select_table(self, db: str, sql: str) -> pd.DataFrame:
+        """Read SQL query or table into a DataFrame.
+
+        Parameters:
+            db: the database name, the choices are as follows:
+                {"rawdata", "feature"}
+            sql: SQL logic
+
+        Return:
+            df: retrieved DataFrame
+        """
         with ConnHandler(self.get_conn(db, self.schema_name)) as conn:
             df = pd.read_sql(sql, conn)
         return df
 
-    def open_conn(self, db):
+    def open_conn(self, db: str) -> connection:
+        """Return DB connection object.
+        
+        Note that a new DB connection is created only if the current
+        process doesn't have one.
+        
+        Parameters:
+            db: the database name, the choices are as follows:
+                {"rawdata", "feature"}
+        
+        Return:
+            conn: database connection object
+        """
         global PROCESS_CONN
         global CONN_CNT
         pid = os.getpid()
@@ -164,7 +233,12 @@ class ETLBase:
             CONN_CNT[pid] = 1
         return conn
 
-    def close_conn(self):
+    def close_conn(self) -> None:
+        """Close DB connection in the current process.
+        
+        Return:
+            None
+        """
         global PROCESS_CONN
         pid = os.getpid()
         if pid in PROCESS_CONN:
@@ -175,7 +249,7 @@ class ETLBase:
             logging.info(
                 f'[close_conn ({pid})] NOTHING TO CLOSE: {PROCESS_CONN}')
 
-    def __del__(self):
+    def __del__(self) -> None:
         global CONN_CNT
         global CLOSE_ON_DEL
         if CLOSE_ON_DEL:
@@ -186,8 +260,27 @@ class ETLBase:
                 )
             ):
                 self.close_conn()
+                
+    def select_table_fast(
+        self,
+        db: str,
+        sql: str,
+        encoding: str = 'utf-8',
+        index: bool = False,
+    ) -> pd.DataFrame:
+        """Read SQL query or table into a DataFrame via in-memory
+        buffer.
 
-    def select_table_fast(self, db, sql, encoding='utf-8', index=False):
+        Parameters:
+            db: the database name, the choices are as follows:
+                {"rawdata", "feature"}
+            sql: SQL logic
+            encoding: encoding
+            index: always ignored
+
+        Return:
+            df: retrieved DataFrame
+        """
         logging.info(f'[select_table_fast] Start (index: {index})')
         in_memory_csv = StringIO()
         with ConnHandler(self.get_conn(db, self.schema_name)) as conn:
@@ -204,10 +297,21 @@ class ETLBase:
                 encoding=encoding)
         return result
 
-    def insert_table(self, df, schema_name, table_name):
-        """
-        Using cursor.mogrify() to build the bulk insert query
-        then cursor.execute() to execute the query
+    def insert_table(
+        self,
+        df: pd.DataFrame,
+        schema_name: str,
+        table_name: str,
+    ) -> None:
+        """Insert DataFrame into target table.
+
+        Parameters:
+            df: input DataFrame
+            schema_name: the target schema name
+            table_name: the target table name
+
+        Return:
+            None
         """
         with ConnHandler(self.get_conn('feature', schema_name)) as conn:
             table = f'{schema_name}.{table_name}'
@@ -241,13 +345,23 @@ class ETLBase:
                 cursor.close()
                 logging.info('[insert_table] CURSOR CLOSE')
 
-    def insert_table_fast(self, df, table_name, encoding='utf-8', index=False):
-        """
-        Args:
-            - df: pandas dataframe to be insert to db.
-            - table_name: the name of the table to be inserted
-            - encoding: utf-8 by default
-            - index: False by default
+    def insert_table_fast(
+        self,
+        df: pd.DataFrame,
+        table_name: str,
+        encoding: str = 'utf-8',
+        index: bool = False,
+    ) -> None:
+        """Insert DataFrame into target table via in-memory buffer.
+
+        Parameters:
+            df: input DataFrame
+            table_name: the target table name
+            encoding: encoding
+            index: write row names
+
+        Return:
+            None
         """
         in_memory_csv = StringIO()
         df.to_csv(
@@ -288,14 +402,25 @@ class ETLBase:
                 logging.info('[insert_table_fast] CONN/CURSOR CLOSE')
 
     def string_io_generator(
-            self, result_gen, num_batch_per_insert, encoding='utf-8', index=False):
-        """
-        Args:
-            - result_gen: generator that generate results processed by run_partially
-            - num_batch_per_insert: number of batches aggregated into one StringIO object
-                (to avoid too many insert transaction)
+        self,
+        result_gen: Iterable[pd.DataFrame],
+        num_batch_per_insert: int,
+        encoding: str = 'utf-8',
+        index: bool = False,
+    ) -> Iterable[IOBase]:
+        """Return full in-memory buffer.
+
+        Parameters:
+            result_gen: generator that generates results processed by
+                `run_partially`
+            num_batch_per_insert: number of batches aggregated into one
+                StringIO object
+                *Note: Avoid processing too many insert transactions
+            encoding: encoding
+            index: always ignored
+
         Yeilds:
-            - in_memory_csv: StringIO object
+            in_memory_csv: in-memory buffer
         """
         if VERBOSE:
             logging.info(
@@ -322,7 +447,24 @@ class ETLBase:
                 in_memory_csv = StringIO()
         yield in_memory_csv
 
-    def __df_to_csv(self, df, in_memory_csv, encoding='utf-8', index=False):
+    def __df_to_csv(
+        self,
+        df: pd.DataFrame,
+        in_memory_csv: IOBase,
+        encoding: str = 'utf-8',
+        index: bool = False,
+    ) -> None:
+        """Write DataFrame to in-memory buffer.
+        
+        Parameters:
+            df: input DataFrame
+            in_memory_csv: in-memory buffer
+            encoding: encoding
+            index: write row names
+        
+        Return:
+            None
+        """
         df.to_csv(
             in_memory_csv,
             sep=',',
@@ -330,13 +472,19 @@ class ETLBase:
             encoding=encoding,
             index=index)
 
-    def insert_table_from_string_io(self, in_memory_csv, table_name):
-        """
-        Args:
-            - in_memory_csv: StringIO object which aggregate the csv rows in memory.
-            - table_name: the name of the table to be inserted
-            - encoding: utf-8 by default
-            - index: False by default
+    def insert_table_from_string_io(
+        self,
+        in_memory_csv: IOBase,
+        table_name: str,
+    ) -> None:
+        """Insert DataFrame into target table via in-memory buffer.
+
+        Parameters:
+            in_memory_csv: in-memory buffer
+            table_name: the target table name
+
+        Return:
+            None
         """
         in_memory_csv.seek(0)
         if VERBOSE:
@@ -369,10 +517,23 @@ class ETLBase:
             if VERBOSE:
                 logging.info('[insert_table_from_string_io] CONN/CURSOR CLOSE')
 
-    def get_conn(self, db_name, schema_name, connection=config.CONNECTION):
-        """
-        get DB connection
-        (connection == mlaas_tool or airflow)
+    def get_conn(
+        self,
+        db_name: str,
+        schema_name: str,
+        connection: str = config.CONNECTION,
+    ) -> connection:
+        """Create and return DB connection object.
+
+        Parameters:
+            db_name: the database name, the choices are as follows:
+                {"rawdata", "feature"}
+            schema_name: the schema name
+            connection: connection channel, the choices are as follows:
+                {"airflow", "mlaas_tool"}
+
+        Return:
+            postgres_conn: database connection object
         """
         try:
             if connection == 'airflow':
