@@ -10,7 +10,9 @@ from typing import Any, Dict, Iterable, List
 import pandas as pd
 import psycopg2
 from psycopg2.extensions import connection
-from src import config
+
+# from src import config
+import config_local as config
 
 # from mlaas_tools.config_build import config_set
 # config_set()
@@ -65,196 +67,56 @@ class ETLBase:
 
     def execute_sql(
         self,
-        db: str,
+        db_name: str,
         sql: str,
     ) -> None:
         """Execute pre-defined SQL logic.
 
         Parameters:
-            db: the database name, the choices are as follows:
+            db_name: the database name, the choices are as follows:
                 {"rawdata", "feature"}
             sql: SQL logic
 
         Return:
             None
         """
-        with ConnHandler(self.get_conn(db, self.schema_name)) as conn:
+        with ConnHandler(self.get_conn(db_name, self.schema_name)) as conn:
             try:
                 cur = conn.cursor()
                 cur.execute(sql)
                 logging.info(f"[execute_sql] EXECUTE SQL:\n{sql}")
                 conn.commit()
-                cur.close()
             except (Exception, psycopg2.DatabaseError) as error:
                 conn.rollback()
-                cur.close()
-                logging.info("[execute_sql] EXECUTE SQL FAIL")
+                logging.exception("[execute_sql] EXECUTE SQL FAIL")
                 raise error
+            finally:
+                cur.close()
+                logging.info("[execute_sql] CURSOR CLOSE")
+
         logging.info("[execute_sql] EXECUTE SQL SUCCESS")
 
-    def select_n_insert_tool(
-        self,
-        etlSQL: str,
-        source_db: str,
-        target_schema: str,
-        target_table: str,
-    ) -> None:
-        """Read SQL query or source table into target table via
-        in-memory buffer.
-
-        Parameters:
-            etlSQL: SQL logic
-            source_db: the source database name
-            target_schema: the target schema name
-            target_table: the target table name
-
-        Return:
-            None
-        """
-        with ConnHandler(self.get_conn(source_db, self.schema_name)) as source_conn, ConnHandler(
-            self.get_conn("feature", self.schema_name)
-        ) as target_conn:
-            in_memory_file = io.BytesIO()
-            source_copy_sql = """COPY (%s) TO STDOUT DELIMITER ',' CSV""" % etlSQL
-            table_name = target_schema + "." + target_table
-            copy_query = """COPY %s FROM STDIN WITH (FORMAT CSV, DELIMITER ',', HEADER FALSE)""" % table_name
-            try:
-                with source_conn.cursor() as raw_cur:
-                    logging.info("[select_n_insert_tool] Start getting data from source db")
-                    raw_cur.copy_expert(source_copy_sql, in_memory_file)
-                    in_memory_file.seek(0)
-                    logging.info("[select_n_insert_tool] Done getting data")
-                    try:
-                        with target_conn.cursor() as ftr_cur:
-                            logging.info("[select_n_insert_tool] Start insert data into target (feature) db")
-                            ftr_cur.copy_expert(copy_query, in_memory_file)
-                        target_conn.commit()
-                        logging.info("[select_n_insert_tool] Done inserting data")
-                    except Exception:
-                        target_conn.rollback()
-                        raise
-            except Exception:
-                source_conn.rollback()
-                raise Exception
-
-    def select_n_insert_tool_binary(
-        self,
-        etlSQL: str,
-        source_db: str,
-        target_schema: str,
-        target_table: str,
-    ) -> None:
-        """Read SQL query or source table into target table via
-        in-memory buffer using binary data format.
-
-        Parameters:
-            etlSQL: SQL logic
-            source_db: the source database name
-            target_schema: the target schema name
-            target_table: the target table name
-
-        Return:
-            None
-        """
-        with ConnHandler(self.get_conn(source_db, self.schema_name)) as source_conn, ConnHandler(
-            self.get_conn("feature", self.schema_name)
-        ) as target_conn:
-            in_memory_file = io.BytesIO()
-            source_copy_sql = """COPY (%s) TO STDOUT WITH BINARY""" % etlSQL
-            table_name = target_schema + "." + target_table
-            copy_query = """COPY %s FROM STDIN (FORMAT BINARY)""" % table_name
-
-            try:
-                with source_conn.cursor() as raw_cur:
-                    logging.info("[select_n_insert_tool_binary] Start getting data from source db")
-                    raw_cur.copy_expert(source_copy_sql, in_memory_file)
-                    in_memory_file.seek(0)
-                    logging.info("[select_n_insert_tool_binary] Done getting data")
-                    try:
-                        with target_conn.cursor() as ftr_cur:
-                            logging.info("[select_n_insert_tool_binary] Start insert data into target (feature) db")
-                            ftr_cur.copy_expert(copy_query, in_memory_file)
-                        target_conn.commit()
-                        logging.info("[select_n_insert_tool_binary] Done inserting data")
-                    except Exception:
-                        target_conn.rollback()
-                        raise
-            except Exception:
-                source_conn.rollback()
-                logging.info("[select_n_insert_tool_binary] RUN FAIL")
-                raise Exception
-
-    def select_table(self, db: str, sql: str) -> pd.DataFrame:
+    def select_table(self, db_name: str, sql: str) -> pd.DataFrame:
         """Read SQL query or table into a DataFrame.
 
         Parameters:
-            db: the database name, the choices are as follows:
+            db_name: the database name, the choices are as follows:
                 {"rawdata", "feature"}
             sql: SQL logic
 
         Return:
             df: retrieved DataFrame
         """
-        with ConnHandler(self.get_conn(db, self.schema_name)) as conn:
+        with ConnHandler(self.get_conn(db_name, self.schema_name)) as conn:
             df = pd.read_sql(sql, conn)
+            logging.info(f"[select_table] EXECUTE SQL:\n{sql}")
+
+        logging.info("[select_table] EXECUTE SQL SUCCESS")
         return df
-
-    def open_conn(self, db: str) -> connection:
-        """Return DB connection object.
-
-        Note that a new DB connection is created only if the current
-        process doesn't have one.
-
-        Parameters:
-            db: the database name, the choices are as follows:
-                {"rawdata", "feature"}
-
-        Return:
-            conn: database connection object
-        """
-        global PROCESS_CONN
-        global CONN_CNT
-        pid = os.getpid()
-        if pid in PROCESS_CONN:
-            conn = PROCESS_CONN[pid]
-            if VERBOSE:
-                logging.info(f"[open_conn ({pid})] GET")
-        else:
-            conn = self.get_conn(db, self.schema_name)
-            logging.info(f"[open_conn ({pid})] OPEN")
-            PROCESS_CONN[pid] = conn
-        if pid in CONN_CNT:
-            CONN_CNT[pid] += 1
-        else:
-            CONN_CNT[pid] = 1
-        return conn
-
-    def close_conn(self) -> None:
-        """Close DB connection in the current process.
-
-        Return:
-            None
-        """
-        global PROCESS_CONN
-        pid = os.getpid()
-        if pid in PROCESS_CONN:
-            PROCESS_CONN[pid].close()
-            del PROCESS_CONN[pid]
-            logging.info(f"[close_conn ({pid})] DONE")
-        else:
-            logging.info(f"[close_conn ({pid})] NOTHING TO CLOSE: {PROCESS_CONN}")
-
-    def __del__(self) -> None:
-        global CONN_CNT
-        global CLOSE_ON_DEL
-        if CLOSE_ON_DEL:
-            pid = os.getpid()
-            if (pid in CONN_CNT) and (CONN_CNT[pid] % NUM_BATCH_PER_CONN == (NUM_BATCH_PER_CONN - 1)):
-                self.close_conn()
 
     def select_table_fast(
         self,
-        db: str,
+        db_name: str,
         sql: str,
         encoding: str = "utf-8",
         index: bool = False,
@@ -263,7 +125,7 @@ class ETLBase:
         buffer.
 
         Parameters:
-            db: the database name, the choices are as follows:
+            db_name: the database name, the choices are as follows:
                 {"rawdata", "feature"}
             sql: SQL logic
             encoding: encoding
@@ -272,64 +134,71 @@ class ETLBase:
         Return:
             df: retrieved DataFrame
         """
-        logging.info(f"[select_table_fast] Start (index: {index})")
-        in_memory_csv = StringIO()
-        with ConnHandler(self.get_conn(db, self.schema_name)) as conn:
-            cursor = conn.cursor()
-            cursor.copy_expert(f"COPY ({sql}) TO STDOUT DELIMITER ',' CSV HEADER", in_memory_csv)
-            in_memory_csv.seek(0)
-            conn.commit()
-            cursor.close()
-            result = pd.read_csv(in_memory_csv, sep=",", header="infer", encoding=encoding)
-        return result
+        df: pd.DataFrame = None
 
-    def insert_table(
-        self,
-        df: pd.DataFrame,
-        schema_name: str,
-        table_name: str,
-    ) -> None:
+        logging.info(f"[select_table_fast] Initialize StringIO (index: {index})")
+        in_memory_csv = StringIO()
+
+        with ConnHandler(self.get_conn(db_name, self.schema_name)) as conn:
+            sql = f"COPY ({sql}) TO STDOUT WITH (FORMAT CSV, DELIMITER ',', HEADER)"
+
+            try:
+                cur = conn.cursor()
+                cur.copy_expert(sql, in_memory_csv)
+                logging.info(f"[select_table_fast] EXECUTE SQL:\n{sql}")
+                conn.commit()
+                in_memory_csv.seek(0)
+                df = pd.read_csv(in_memory_csv, sep=",", encoding=encoding)
+            except (Exception, psycopg2.DatabaseError) as error:
+                conn.rollback()
+                df = None
+                logging.exception("[select_table_fast] EXECUTE SQL FAIL")
+                raise error
+            finally:
+                cur.close()
+                logging.info("[select_table_fast] CURSOR CLOSE")
+
+        logging.info("[select_table_fast] EXECUTE SQL SUCCESS")
+        assert df is not None, "[select_table_fast] Query result isn't assigned properly."
+        return df
+
+    def insert_table(self, df: pd.DataFrame, table_name: str) -> None:
         """Insert DataFrame into target table.
 
         Parameters:
             df: input DataFrame
-            schema_name: the target schema name
             table_name: the target table name
 
         Return:
             None
         """
-        with ConnHandler(self.get_conn("feature", schema_name)) as conn:
-            table = f"{schema_name}.{table_name}"
-            # Create a list of tupples from the dataframe values
-            tuples = [tuple(x) for x in df.to_numpy()]
-            # Comma-separated dataframe columns
-            cols = ",".join(list(df.columns))
-            # SQL quert to execute
-            cursor = conn.cursor()
-            mogrify_str = ",".join(["%s"] * len(df.columns))
-            values = [cursor.mogrify(f"({mogrify_str})", tup).decode("utf8") for tup in tuples]
-            query = (
-                "INSERT INTO %s(%s) VALUES " % (table, cols)
-                + ",".join(values)
-                + """
-            """
-            )
-            logging.info("[insert_table] Before SQL Execute")
+        tuples = [tuple(x) for x in df.to_numpy()]
+        cols = ",".join(list(df.columns))
+
+        table = f"{self.schema_name}.{table_name}"
+
+        with ConnHandler(self.get_conn("feature", self.schema_name)) as conn:
+            cur = conn.cursor()
+            placeholders = ",".join(["%s"] * len(df.columns))
+            values = [cur.mogrify(f"({placeholders})", tup).decode("utf8") for tup in tuples]
+            sql = f"INSERT INTO {table}({cols}) VALUES " + ",".join(values) + ";"
+
             try:
-                cursor.execute(query, tuples)
+                cur.execute(sql, tuples)
+                logging.info(f"[insert_table] EXECUTE SQL:\n{sql}")
                 conn.commit()
-                logging.info("[insert_table] SQL Execute SUCCESS")
             except (Exception, psycopg2.DatabaseError) as error:
                 conn.rollback()
                 error_message = (
-                    "[insert_table] SQL Execute FAIL \n" + f" df of size {len(df)}: \n" + f"{df.head().to_string()} \n"
+                    "[insert_table] EXECUTE SQL FAIL \n" + f" df of size {len(df)}: \n" + f"{df.head().to_string()} \n"
                 )
                 logging.exception(error_message)
                 raise error
             finally:
-                cursor.close()
+                cur.close()
                 logging.info("[insert_table] CURSOR CLOSE")
+
+        logging.info("[insert_table] EXECUTE SQL SUCCESS")
 
     def insert_table_fast(
         self,
@@ -349,37 +218,35 @@ class ETLBase:
         Return:
             None
         """
+        logging.info(f"[insert_table_fast] Initialize StringIO (index: {index})")
         in_memory_csv = StringIO()
         df.to_csv(in_memory_csv, sep=",", header=False, encoding=encoding, index=index)
         in_memory_csv.seek(0)
-        if VERBOSE:
-            logging.info("[insert_table_fast] Before CONN BUILT")
+
+        table = f"{self.schema_name}.{table_name}"
+
         with ConnHandler(self.get_conn("feature", self.schema_name)) as conn:
-            if VERBOSE:
-                logging.info("[insert_table_fast] Before SQL Execute")
+            sql = f"COPY {table} FROM STDIN WITH (FORMAT CSV, DELIMITER ',')"
+
             try:
-                cursor = conn.cursor()
-                schema_tablename = '"{}"."{}"'.format(self.schema_name, table_name)
-                cursor.copy_expert(
-                    "COPY " + schema_tablename + " FROM STDIN WITH (FORMAT CSV)" "",
-                    in_memory_csv,
-                )
+                cur = conn.cursor()
+                cur.copy_expert(sql, in_memory_csv)
+                logging.info(f"[insert_table_fast] EXECUTE SQL:\n{sql}")
                 conn.commit()
-                if VERBOSE:
-                    logging.info("[insert_table_fast] SQL Execute SUCCESS")
-            except Exception as error:
+            except (Exception, psycopg2.DatabaseError) as error:
                 conn.rollback()
                 error_message = (
-                    "[insert_table_fast] SQL Execute FAIL \n"
+                    "[insert_table_fast] EXECUTE SQL FAIL \n"
                     + f" df of size {len(df)}: \n"
                     + f"{df.head().to_string()} \n"
                 )
                 logging.exception(error_message)
                 raise error
             finally:
-                cursor.close()
-            if VERBOSE:
-                logging.info("[insert_table_fast] CONN/CURSOR CLOSE")
+                cur.close()
+                logging.info("[insert_table_fast] CURSOR CLOSE")
+
+        logging.info("[insert_table_fast] EXECUTE SQL SUCCESS")
 
     def string_io_generator(
         self,
@@ -405,16 +272,17 @@ class ETLBase:
         if VERBOSE:
             logging.info(f"[string_io_generator] Initialize StringIO (index: {index})")
         in_memory_csv = StringIO()
+
         for i, df in enumerate(result_gen):
             if VERBOSE:
                 logging.info("[string_io_generator] Aggregate CSV files in StringIO")
-
             self.__df_to_csv(df, in_memory_csv)
 
             if VERBOSE:
                 logging.info("[string_io_generator] Clean up the DF")
             del df
             gc.collect()
+
             if i % num_batch_per_insert == (num_batch_per_insert - 1):
                 if VERBOSE:
                     logging.info("[string_io_generator] Yield StringIO")
@@ -459,30 +327,164 @@ class ETLBase:
             None
         """
         in_memory_csv.seek(0)
-        if VERBOSE:
-            logging.info("[insert_table_from_string_io] Before CONN BUILT")
+
+        table = f"{self.schema_name}.{table_name}"
+
         with ConnHandler(self.get_conn("feature", self.schema_name)) as conn:
-            if VERBOSE:
-                logging.info("[insert_table_from_string_io] Before SQL Execute")
+            sql = f"COPY {table} FROM STDIN WITH (FORMAT CSV, DELIMITER ',')"
+
             try:
-                cursor = conn.cursor()
-                schema_tablename = '"{}"."{}"'.format(self.schema_name, table_name)
-                cursor.copy_expert(
-                    "COPY " + schema_tablename + " FROM STDIN WITH (FORMAT CSV)" "",
-                    in_memory_csv,
-                )
-                conn.commit()
+                cur = conn.cursor()
+                cur.copy_expert(sql, in_memory_csv)
                 if VERBOSE:
-                    logging.info("[insert_table_from_string_io] SQL Execute SUCCESS")
-            except Exception as error:
+                    logging.info(f"[insert_table_from_string_io] EXECUTE SQL:\n{sql}")
+                conn.commit()
+            except (Exception, psycopg2.DatabaseError) as error:
                 conn.rollback()
-                error_message = "[insert_table_from_string_io] SQL Execute FAIL"
-                logging.exception(error_message)
+                if VERBOSE:
+                    logging.exception("[insert_table_from_string_io] EXECUTE SQL FAIL")
                 raise error
             finally:
-                cursor.close()
+                cur.close()
+                if VERBOSE:
+                    logging.info("[insert_table_from_string_io] CURSOR CLOSE")
+
+        if VERBOSE:
+            logging.info("[insert_table_from_string_io] EXECUTE SQL SUCCESS")
+
+    def select_n_insert_tool(
+        self,
+        etlSQL: str,
+        source_db: str,
+        target_schema: str,
+        target_table: str,
+        data_format: str = "csv",
+    ) -> None:
+        """Read SQL query or source table into target table via
+        in-memory buffer.
+
+        Parameters:
+            etlSQL: SQL logic
+            source_db: the source database name
+            target_schema: the target schema name
+            target_table: the target table name
+            data_format: data format to be read or written, the choices
+                are as follows:
+                    {"csv", "binary"}
+
+        Return:
+            None
+        """
+
+        def _get_sql_option_by_data_format(etl_mode: str) -> str:
+            """Return SQL option suffix determined by data format.
+
+            Parameters:
+                etl_mode: ETL mode, the choices are as follows:
+                    {"read", "write"}
+
+            Return:
+                sql_option: SQL option suffix
+            """
+            if data_format == "binary":
+                sql_option = "WITH (FORMAT BINARY)"
+            elif data_format == "csv":
+                sql_option = "WITH (FORMAT CSV, DELIMITER ',')"
+                if etl_mode == "write":
+                    sql_option = sql_option[:-1] + ", HEADER FALSE)"
+
+            return sql_option
+
+        logging.info("[select_n_insert_tool] Initialize BytesIO")
+        in_memory_file = io.BytesIO()
+
+        target_table = f"{target_schema}.{target_table}"
+
+        with ConnHandler(self.get_conn(source_db, self.schema_name)) as source_conn, ConnHandler(
+            self.get_conn("feature", self.schema_name)
+        ) as target_conn:
+            source_copy_sql = f"COPY ({etlSQL}) TO STDOUT " + _get_sql_option_by_data_format(etl_mode="read")
+            target_copy_sql = f"COPY {target_table} FROM STDIN " + _get_sql_option_by_data_format(etl_mode="write")
+
+            try:
+                src_cur = source_conn.cursor()
+                src_cur.copy_expert(source_copy_sql, in_memory_file)
+                logging.info(f"[select_n_insert_tool] EXECUTE SOURCE SQL:\n{source_copy_sql}")
+                # commit
+                in_memory_file.seek(0)
+
+                try:
+                    tgt_cur = target_conn.cursor()
+                    tgt_cur.copy_expert(target_copy_sql, in_memory_file)
+                    logging.info(f"[select_n_insert_tool] EXECUTE TARGET SQL:\n{target_copy_sql}")
+                    target_conn.commit()
+                except Exception:
+                    target_conn.rollback()
+                    raise
+            except Exception as error:
+                source_conn.rollback()
+                logging.exception("[select_n_insert_tool] EXECUTE SQL FAIL")
+                raise error
+            finally:
+                src_cur.close()
+                logging.info("SOURCE CURSOR CLOSE")
+                tgt_cur.close()
+                logging.info("TARGET CURSOR CLOSE")
+
+        logging.info("[select_n_insert_tool] EXECUTE SQL SUCCESS")
+
+    def open_conn(self, db_name: str) -> connection:
+        """Return DB connection object.
+
+        Note that a new DB connection is created only if the current
+        process doesn't have one.
+
+        Parameters:
+            db_name: the database name, the choices are as follows:
+                {"rawdata", "feature"}
+
+        Return:
+            conn: database connection object
+        """
+        global PROCESS_CONN
+        global CONN_CNT
+        pid = os.getpid()
+        if pid in PROCESS_CONN:
+            conn = PROCESS_CONN[pid]
             if VERBOSE:
-                logging.info("[insert_table_from_string_io] CONN/CURSOR CLOSE")
+                logging.info(f"[open_conn ({pid})] GET")
+        else:
+            conn = self.get_conn(db_name, self.schema_name)
+            logging.info(f"[open_conn ({pid})] OPEN")
+            PROCESS_CONN[pid] = conn
+        if pid in CONN_CNT:
+            CONN_CNT[pid] += 1
+        else:
+            CONN_CNT[pid] = 1
+        return conn
+
+    def close_conn(self) -> None:
+        """Close DB connection in the current process.
+
+        Return:
+            None
+        """
+        global PROCESS_CONN
+        pid = os.getpid()
+        if pid in PROCESS_CONN:
+            PROCESS_CONN[pid].close()
+            del PROCESS_CONN[pid]
+            logging.info(f"[close_conn ({pid})] DONE")
+        else:
+            logging.info(f"[close_conn ({pid})] NOTHING TO CLOSE: {PROCESS_CONN}")
+
+    def __del__(self) -> None:
+        global CONN_CNT
+        global CLOSE_ON_DEL
+        if CLOSE_ON_DEL:
+            pid = os.getpid()
+            if (pid in CONN_CNT) and (CONN_CNT[pid] % NUM_BATCH_PER_CONN == (NUM_BATCH_PER_CONN - 1)):
+                self.close_conn()
 
     def get_conn(
         self,
@@ -526,6 +528,7 @@ class ETLBase:
                 elif db_name == "feature":
                     postgres_conn = conns.get_feature_db_conn()
                     postgres_conn.autocommit = False
+
             return postgres_conn
 
         except (Exception, psycopg2.Error) as error:
