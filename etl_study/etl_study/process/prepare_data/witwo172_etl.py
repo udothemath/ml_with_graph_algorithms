@@ -1,0 +1,68 @@
+from src.common.prepare_data.table_etl_base import TableETLBase
+
+
+class WITWO172ETL(TableETLBase):
+    @property
+    def source_table_name(self):
+        return "WITWO172"
+
+    @property
+    def tmp_column_types(self):
+        return {
+            'wm_cust': 'char(1)'
+        }
+
+    @property
+    def tmp_column_defaults(self):
+        return {
+            'wm_cust': "'N'"
+        }
+
+    def check_source(self):
+        sqlstring = f'''
+            SELECT
+            count(*)
+        FROM mlaas_rawdata.{self.source_table_name}
+        '''
+        row_count = self.select_table('rawdata', sqlstring)['count'].values[0]
+        assert row_count > 0
+
+    @property
+    def etlSQL(self):
+        """
+        【wm_cust】
+        1.篩選【會員等級 WM_CLUB_CLASS_CODE】為 "K","M","N","O"
+        2.依上述篩選後給予註記"Y"，其餘為"N"
+        """
+
+        sqlstring = f'''
+            SELECT cust_id cust_no,'Y' wm_cust
+            FROM mlaas_rawdata.{self.source_table_name}
+            WHERE wm_club_class_code in ('K','M','N','O')
+            GROUP BY cust_id
+        '''
+        return sqlstring
+
+    @property
+    def source_db(self):
+        """
+        來源表的DB: feature or rawdata
+        """
+        return 'rawdata'
+
+    def extract_pandas_df(self):
+        """
+        開發時，可執行此函數，以使用`etlSQL`從`source_db`所指定的DB，
+        將資料表選出為pandas.DataFrame。
+        """
+        return self.select_table(self.source_db, self.etlSQL)
+
+    def check_target_columns(self, target_table_name):
+        sqlstring = f'''
+            SELECT
+            cust_no,
+            wm_cust
+        FROM {self.schema_name}.{target_table_name}
+        '''
+        table = self.select_table('feature', sqlstring)
+        assert all(table.wm_cust.isin(['Y', 'N']))
