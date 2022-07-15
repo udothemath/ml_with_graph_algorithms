@@ -528,6 +528,9 @@ class ETLBase:
                 elif db_name == "feature":
                     postgres_conn = conns.get_feature_db_conn()
                     postgres_conn.autocommit = False
+            elif connection == "local":
+                postgres_conn = psycopg2.connect(dbname=db_name, user="abaowei")
+                postgres_conn.autocommit = False
 
             return postgres_conn
 
