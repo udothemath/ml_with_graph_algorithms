@@ -81,11 +81,15 @@ RUN curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
  && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
  && apt update \
  && apt install -y yarn
-RUN git clone https://github.com/RedisInsight/RedisInsight.git $HOME/Redisinsight
-RUN cd $HOME/Redisinsight \
+RUN git clone https://github.com/RedisInsight/RedisInsight.git $HOME/RedisInsight
+RUN cd $HOME/RedisInsight \
  && yarn install --network-timeout 100000
-RUN cd $HOME/Redisinsight \
+RUN cd $HOME/RedisInsight \
  && yarn --cwd redisinsight/api/
+RUN cd $HOME/RedisInsight \
+ && yarn build:statics \
+ && yarn build:web
+
 
 #############################
 #         Ssh server        #
@@ -122,10 +126,10 @@ EXPOSE 22
 #############################
 
 # 1) Open container: 
-# docker run -it -p 2222:22 -i e53f1cec4d43 bash
+# docker run -it -p 2222:22 -i 6a2e929812fa bash
 # service ssh start
 # redis-stack-server &
-# cd $HOME/RedisInsight
+# cd RedisInsight
 # yarn --cwd redisinsight/api/ start:dev &
 # yarn start:web
 
