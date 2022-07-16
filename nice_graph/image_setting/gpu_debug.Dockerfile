@@ -79,10 +79,10 @@ EXPOSE 22
 #   Conda                   #
 #############################
 USER $NB_UID
-COPY requirement-conda.txt $HOME
 RUN conda update --all --yes
 RUN conda config --set channel_priority false
-RUN conda install --yes --debug --file $HOME/requirement-conda.txt \
+COPY requirement-conda-gpu.txt $HOME
+RUN conda install  -c rapidsai -c conda-forge -c nvidia --yes --debug --file $HOME/requirement-conda-gpu.txt \
  && conda clean -tipsy \
  && fix-permissions $CONDA_DIR
 
@@ -179,11 +179,11 @@ RUN pip install dgl-cu113 dglgo -f https://data.dgl.ai/wheels/repo.html
 #############################
 #           RAPIDS          #
 #############################
-USER $NB_UID
-RUN conda create -n rapids-22.06 -c rapidsai -c nvidia -c conda-forge  \
- && rapids=22.06 python=3.8 cudatoolkit=11.0
-
-
+# USER $NB_UID
+# RUN conda create -n rapids -c rapidsai -c nvidia -c conda-forge  \
+#  && rapids=22.06 python=3.8 cudatoolkit=11.0
+# RUN conda activate rapids
+# RUN conda install -c nvidia -c rapidsai -c numba -c conda-forge -c defaults cudf
 # USER $NB_UID
 
 # ENV PATH $PATH:/opt/conda/bin
