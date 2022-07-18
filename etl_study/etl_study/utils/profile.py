@@ -2,6 +2,7 @@
 import logging
 import time
 from functools import wraps
+from typing import Any, Callable, Dict
 
 import pandas as pd
 from memory_profiler import memory_usage
@@ -16,9 +17,9 @@ class Profiler:
     def __init__(self) -> None:
         pass
     
-    def profile(func):
+    def profile(func: Callable) -> Any:
         @wraps(func)
-        def inner(*args, **kwargs):
+        def inner(*args: Any, **kwargs: Dict[Any, Any]) -> Any:
             # Configure monitored function prototype
             func_kwargs = []
             for k, v in kwargs.items():
@@ -42,6 +43,7 @@ class Profiler:
             
             # Log performace report
             logging.info(f"=====Profiling=====")
+            logging.info(f"Class: {args[0].__class__.__name__}")
             logging.info(f"Function: {func_prototype}")
             logging.info(f"Time: {t_elapsed:.4f} sec")
             logging.info(f"Peak memory: {peak_mem_usage:.4f} MiB")
