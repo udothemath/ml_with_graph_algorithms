@@ -45,7 +45,7 @@ docker save primehub.airgap:5000/[name]:Tagv1  | gzip > update-images-Tagv1.tar.
 ```
 E.g., 
 ```
-docker save primehub.airgap:5000/esun-notebook:20220609 | gzip > update-images-20220609.tar.gz
+docker save primehub.airgap:5000/rapids-notebook:20220720 | gzip > update-images-20220720.tar.gz
 ```
 
 NOTE:
