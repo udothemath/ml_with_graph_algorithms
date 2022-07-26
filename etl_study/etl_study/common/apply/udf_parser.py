@@ -38,7 +38,7 @@ class UDFParser:
         cls_method_trafo = ClassMethodTransformer()
         run_all_inner = cls_method_trafo.visit(udf_run_all_node)
 
-        # Build inner functions within numba kernel
+        # Build inner functions within numba kernel from the class methods used in run_all
         inner_fns = self.__build_inner_sub_logics(udf_logic_cls_node, cls_method_trafo.sub_logics_)
         inner_fns.append(run_all_inner)
 
