@@ -35,12 +35,8 @@ class UDFParser:
         # Get user-defined `run_all` output columns (returns)
         run_all_outputs = self.__get_udf_run_all_outputs(udf_run_all_node)
 
-        # Convert class method call to normal function call
-        run_all_inner = self.__cls_method_trafo.visit(udf_run_all_node)
-
-        # Build inner functions within numba kernel from the class methods used in run_all
-        inner_fns = self.__build_inner_sub_logics(udf_logic_cls_node, self.__cls_method_trafo.sub_logics_)
-        inner_fns.append(run_all_inner)
+        # Build inner `run_all` and sub-logics used in `run_all` numba kernel
+        inner_fns = self.__cls_method_trafo.transform(udf_run_all_node, udf_logic_cls_node)
 
         # Construct `run_all` numba kernel
         run_all_numba = self.__gen_run_all_numba_kernel(run_all_inputs, run_all_outputs, inner_fns)
@@ -91,26 +87,6 @@ class UDFParser:
                 run_all_outputs = node.value.elts
 
         return run_all_outputs
-
-    def __build_inner_sub_logics(
-        self, udf_logic_cls_node: ast.ClassDef, sub_logics: List[str]
-    ) -> List[ast.FunctionDef]:
-        """Return inner functions called in user-defined `run_all`.
-
-        Parameters:
-            udf_logic_cls_node: user-defined logic class node
-            sub_logics: sub-logics called in user-defined `run_all`
-
-        Return:
-            inner_fns: list of inner functions
-        """
-        inner_fns = []
-        for node in udf_logic_cls_node.body:
-            if isinstance(node, ast.FunctionDef) and node.name in sub_logics:
-                node.args.args.pop(0)  # Remove parameter `self`
-                inner_fns.append(node)
-
-        return inner_fns
 
     def __gen_run_all_numba_kernel(
         self, input_cols: List[ast.arg], output_cols: List[ast.Name], inner_fns: List[ast.FunctionDef]
@@ -264,23 +240,49 @@ class UDFParser:
 
 
 class ClassMethodTransformer(ast.NodeTransformer):
-    """Node transformer converting class method call to normal function
-    call.
+    """Build inner `run_all` and sub-logics used in `run_all` numba
+    kernel.
 
-    All class methods called in `run_all` are recorded for further
-    inner function reconstruction.
-
-    Attributes:
-        sub_logics_: sub-logics called in user-defined `run_all`
+    All class methods (sub-logics) called in `run_all` are recorded
+    for further inner function reconstruction.
     """
 
-    sub_logics_: List[str]
+    __sub_logics: List[str]  # Sub-logics called in user-defined `run_all`
 
     def __init__(self) -> None:
-        self.sub_logics_ = []
+        self.__sub_logics = []
 
+    def transform(
+        self,
+        udf_run_all_node: ast.FunctionDef,
+        udf_logic_cls_node: ast.ClassDef,
+    ) -> List[ast.FunctionDef]:
+        """Build inner `run_all` and sub-logics used in `run_all`
+        numba kernel.
+        
+        Parameters:
+            udf_run_all_node: user-defined `run_all` function node
+            udf_logic_cls_node: user-defined logic class node
+        
+        Return:
+            inner_fns: list of inner functions
+        """
+        # Convert in-class sub-logic call to normal function call and
+        # build inner `run_all` used in numba kernel
+        run_all_inner = self.visit(udf_run_all_node)
+
+        # Build inner functions within numba kernel from in-class sub-logics used in `run_all`
+        inner_fns = self.__build_inner_sub_logics(udf_logic_cls_node)
+        
+        inner_fns.append(run_all_inner)
+        
+        return inner_fns
+    
     def visit_Call(self, node: ast.Call) -> ast.Call:
         """Apply transformer to visited node.
+        
+        This transformer converts in-class sub-logic call to normal
+        function call.
 
         Parameters:
             node: visited node to transform
@@ -290,8 +292,8 @@ class ClassMethodTransformer(ast.NodeTransformer):
         """
         if node.func.value.id == "self":
             sub_logic_name = node.func.attr
-            if sub_logic_name not in self.sub_logics_:
-                self.sub_logics_.append(sub_logic_name)
+            if sub_logic_name not in self.__sub_logics:
+                self.__sub_logics.append(sub_logic_name)
 
         node_trans = ast.copy_location(
             ast.Call(
@@ -306,3 +308,21 @@ class ClassMethodTransformer(ast.NodeTransformer):
         )
 
         return node_trans
+    
+    def __build_inner_sub_logics(self, udf_logic_cls_node: ast.ClassDef) -> List[ast.FunctionDef]:
+        """Return inner functions (sub-logics) called in user-defined
+        `run_all`.
+
+        Parameters:
+            udf_logic_cls_node: user-defined logic class node
+
+        Return:
+            inner_fns: list of inner functions (sub-logics)
+        """
+        inner_fns = []
+        for node in udf_logic_cls_node.body:
+            if isinstance(node, ast.FunctionDef) and node.name in self.__sub_logics:
+                node.args.args.pop(0)  # Remove parameter `self`
+                inner_fns.append(node)
+
+        return inner_fns
