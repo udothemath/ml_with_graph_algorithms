@@ -15,6 +15,7 @@ class UDFParser:
 
     def __init__(self, udf_logic_cls_path: str):
         self.udf_logic_cls_path = udf_logic_cls_path
+        self.__cls_method_trafo = ClassMethodTransformer()
 
     def parse_run_all(self) -> ast.FunctionDef:
         """Parse user-defined `run_all` and construct corresponding
@@ -35,11 +36,10 @@ class UDFParser:
         run_all_outputs = self.__get_udf_run_all_outputs(udf_run_all_node)
 
         # Convert class method call to normal function call
-        cls_method_trafo = ClassMethodTransformer()
-        run_all_inner = cls_method_trafo.visit(udf_run_all_node)
+        run_all_inner = self.__cls_method_trafo.visit(udf_run_all_node)
 
         # Build inner functions within numba kernel from the class methods used in run_all
-        inner_fns = self.__build_inner_sub_logics(udf_logic_cls_node, cls_method_trafo.sub_logics_)
+        inner_fns = self.__build_inner_sub_logics(udf_logic_cls_node, self.__cls_method_trafo.sub_logics_)
         inner_fns.append(run_all_inner)
 
         # Construct `run_all` numba kernel
