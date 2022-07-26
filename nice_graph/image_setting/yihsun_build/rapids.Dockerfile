@@ -29,10 +29,6 @@ RUN echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg ma
  && apt-get clean \
  && apt-get autoclean
 
-# RUN apt-get update \
-#  && apt-get install -y --no-install-recommends \
-#       fonts-powerline \
-#       powerline
 #----powerline
 COPY .bash_profile /etc/profile.d/bashrc.sh
 
@@ -48,76 +44,7 @@ RUN echo 'jovyan:esun@1313' | chpasswd
 # RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd 
 RUN echo "export VISIBLE=now" >> /etc/profile 
 RUN echo "PermitUserEnvironment yes" >> /etc/ssh/sshd_config
- 
 EXPOSE 22
-
-#############################
-#   Conda                   #
-#############################
-# USER $NB_UID
-
-# COPY requirement-conda.txt $HOME
-# RUN conda update --all
-# RUN conda install --quiet --yes --file $HOME/requirement-conda.txt \
-#  && conda clean -tipsy \
-#  && fix-permissions $CONDA_DIR
-
-#############################
-#   Update Python Package   #
-#############################
-# USER $NB_UID
-
-# RUN conda config --set pip_interop_enabled true
-
-# RUN conda list --name base | \
-#     grep "^[^#;]" | \
-#     grep -v -P "(^|\s)\Kpython(?=\s|$)" | \
-#     grep -v "^jupyter" | \
-#     awk '{print $1}' | \
-#     xargs conda update --yes \
-#  && conda clean -tipsy \
-#  && fix-permissions $CONDA_DIR
-
-# RUN pip install pipupgrade \
-#  && pipupgrade  --ignore-error --yes
-
-#############################
-#   Pypi                    #
-#############################
-# USER root
-
-# COPY requirement-pip.txt $HOME
-
-# RUN pip --default-timeout=10000 install --no-cache-dir -r $HOME/requirement-pip.txt
-
-#############################
-#   Jupyter Extension       #
-#############################
-# USER $NB_UID
-# RUN jupyter nbextension install --py \
-#         jupyter_dashboards \
-#         --sys-prefix \
-#  && jupyter nbextension enable --py jupyter_dashboards --sys-prefix \
-#  && jupyter nbextension enable --py widgetsnbextension 
-# RUN jupyter labextension install @jupyterlab/hub-extension \
-#  && jupyter labextension install @jupyterlab/toc \
-#  && jupyter labextension install @ryantam626/jupyterlab_sublime \
-#  && jupyter labextension install jupyter-matplotlib \
-#  && jupyter labextension install jupyter-cytoscape \
-#  && jupyter labextension install jupyterlab-dash \
-#  && jupyter labextension install jupyterlab-drawio \
-#  && jupyter labextension install nbdime-jupyterlab 
-# RUN jupyter lab clean -y \
-#  && npm cache clean --force \ 
-#  && rm -rf /home/$NB_USER/.cache/yarn \
-#  && rm -rf /home/$NB_USER/.node-gyp 
-# RUN fix-permissions $CONDA_DIR \
-#  && fix-permissions /home/$NB_USER
-
-# RUN pip install --no-cache-dir nbresuse \
-#  && jupyter serverextension enable --py nbresuse \
-#  && jupyter lab clean -y
-
 #########################
 #   Docker CLI          #
 #########################
