@@ -6,7 +6,6 @@ ENV JUPYTER_ENABLE_LAB=""
 #############################
 USER root
 COPY requirement-apt.txt $HOME
-RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3BF863CC
 RUN apt-get update \
  && cat $HOME/requirement-apt.txt | xargs apt-get install -y --upgrade --no-install-recommends \
  && apt-get clean \
@@ -26,6 +25,18 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends \
         postgresql-12 \
         postgresql-client-12 \
+ && apt-get clean \
+ && apt-get autoclean
+
+# For CUDA 11.2
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys A4B469963BF863CC
+RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub \
+ && sh -c 'echo "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64 /" > /etc/apt/sources.list.d/cuda.list' \
+ && apt-get update \
+ && apt-get --yes install cuda-toolkit-11-2 \
+ && sh -c 'echo "deb http://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu2004/x86_64 /" > /etc/apt/sources.list.d/nvidia-machine-learning.list' \
+ && apt-get update \
+ && apt-get install --yes --no-install-recommends cuda-11-2 libcudnn8=8.1.0.77-1+cuda11.2 libcudnn8-dev=8.1.0.77-1+cuda11.2 \ 
  && apt-get clean \
  && apt-get autoclean
 
@@ -50,26 +61,27 @@ RUN mkdir -p /vat/run/sshd \
  
 EXPOSE 22
 
-#############################
-#   RAPIDS TOOLS            #
-#############################
-USER $NB_UID
-RUN conda create -n rapids-22.06 -c rapidsai -c nvidia -c conda-forge  \
-    rapids=22.06 python=3.8 cudatoolkit=11.2 \
-    dask-sql
-RUN conda clean -tipsy \
- && fix-permissions $CONDA_DIR
+RUN conda install -c conda-forge mamba
 
 #############################
 #   Conda                   #
 #############################
-USER $NB_UID
+USER root
 
 COPY requirement-conda.txt $HOME
-RUN conda update --all
-RUN conda install --quiet --yes --file $HOME/requirement-conda.txt \
- && conda clean -tipsy \
- && fix-permissions $CONDA_DIR
+RUN mamba update --all
+RUN mamba install --quiet -c anaconda -c conda-forge --yes --file $HOME/requirement-conda.txt 
+RUN mamba clean --all --yes 
+RUN fix-permissions $CONDA_DIR
+
+#############################
+#   RAPIDS TOOLS            #
+#############################
+USER root
+RUN mamba create -n rapids-22.06 -c rapidsai -c nvidia -c conda-forge rapidsai:rapids python=3.8 cudatoolkit=11.2 dask-sql graphistry dash dask-sql tensorflow pytorch
+RUN mamba clean --all --yes 
+RUN fix-permissions $CONDA_DIR
+
 
 #############################
 #   Update Python Package   #
@@ -171,17 +183,18 @@ RUN wget https://github.com/neo4j-contrib/neo4j-apoc-procedures/releases/downloa
  && chown neo4j:neo4j /var/lib/neo4j/plugins/apoc-4.4.0.6-all.jar
 RUN fix-permissions /var/lib/neo4j \
  && fix-permissions /var/log/neo4j
+RUN echo fs.inotify.max_user_watches=1048576 | tee -a /etc/sysctl.conf && sysctl -p
 #############################
 #   Pytorch GNN Libraries   #
 #############################
 USER $NB_UID
-# RUN pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu111
+RUN pip install torch==1.10.2 torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu111
 RUN pip install torch-scatter torch-sparse torch-cluster torch-spline-conv torch-geometric -f https://data.pyg.org/whl/torch-1.10.2+cu111.html
 RUN pip install dgl-cu111 dglgo -f https://data.dgl.ai/wheels/repo.html
 
-##############################
-# For PrimeHub Job Submission#
-##############################
+###############################
+# For PrimeHub Job Submission #
+###############################
 USER $NB_UID
 
 ENV PATH $PATH:/opt/conda/bin
