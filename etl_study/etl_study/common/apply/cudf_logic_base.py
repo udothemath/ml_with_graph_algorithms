@@ -4,7 +4,6 @@ from typing import Any, Callable, Dict, List, Tuple, Union
 
 import astunparse
 import cudf
-import pandas as pd
 
 from common.apply.logic_base import LogicBase
 from common.apply.udf_parser import UDFParser
@@ -73,7 +72,7 @@ class CUDFLogicBase(LogicBase):
         columns."""
         pass
 
-    def process_df(self, input_table: pd.DataFrame) -> cudf.DataFrame:
+    def process_df(self, input_table: cudf.DataFrame) -> cudf.DataFrame:
         """Apply user-defined logic to input table.
 
         Parameters:
@@ -82,7 +81,6 @@ class CUDFLogicBase(LogicBase):
         Return:
             result_table: processed table
         """
-        input_table = cudf.DataFrame(input_table)
         result_table = input_table.apply_rows(
             self.run_all_boost,
             incols=self.input_column_names,
