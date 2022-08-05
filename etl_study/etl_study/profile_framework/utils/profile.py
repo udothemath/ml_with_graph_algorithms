@@ -5,7 +5,14 @@ import time
 from functools import wraps
 from typing import Any, Callable, Dict, Optional, Tuple, Union
 
+from codecarbon import OfflineEmissionsTracker
 from memory_profiler import memory_usage
+
+emission_tracker = OfflineEmissionsTracker(
+    country_iso_code="TWN",
+    measure_power_secs=30,
+    tracking_mode="process",
+)
 
 
 class Profiler:
@@ -28,11 +35,15 @@ class Profiler:
                 func_kwargs = ", ".join(func_kwargs)
                 func_prototype = f"{func.__name__}({func_kwargs})"
 
-                # Monitor time and memory usage of the function under test
+                # Monitor time, memory usage and energy consumption of
+                # the function under test
+                emission_tracker.start()
                 t_start = time.perf_counter()
                 mem, result = memory_usage((func, args, kwargs), retval=True, timeout=200, interval=1e-7)
+                emission_tracker.stop()
                 t_elapsed = time.perf_counter() - t_start
                 peak_mem_usage = max(mem) - min(mem)
+                emission_summary = emission_tracker.final_emissions_data
 
                 # Log performace report
                 logging.info("=====Profiling=====")
@@ -41,6 +52,9 @@ class Profiler:
                 logging.info(f"Function: {func_prototype}")
                 logging.info(f"Time: {t_elapsed:.4f} sec")
                 logging.info(f"Peak memory: {peak_mem_usage:.4f} MiB")
+                logging.info(f"CPU power: {emission_summary.cpu_power:.4f} W")
+                logging.info(f"GPU power: {emission_summary.gpu_power:.4f} W")
+                logging.info(f"RAM power: {emission_summary.ram_power:.4f} W")
                 logging.info("======End of Profiling=====\n")
 
                 if return_prf:
