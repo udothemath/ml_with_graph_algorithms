@@ -7,9 +7,6 @@ from typing import Any, Callable, Dict, Optional, Tuple, Union
 
 from memory_profiler import memory_usage
 
-# Configure standard output logger (DeprecationWarning)
-logging.basicConfig(level=logging.INFO)
-
 
 class Profiler:
     """Profiler providing function decorator for performance report."""

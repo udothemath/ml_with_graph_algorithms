@@ -1,4 +1,5 @@
 """ETL operation profiler."""
+import logging
 import sys
 from importlib import import_module
 from typing import Any, Callable, Dict, List, Tuple, Union
@@ -40,6 +41,7 @@ class ETLProfiler:
         self.mode = mode
         self.n_profiles = n_profiles
 
+        self._log_meta()
         self._setup()
 
     def run(self) -> None:
@@ -54,12 +56,25 @@ class ETLProfiler:
 
     #         self._summarize()
 
+    def _log_meta(self) -> None:
+        """Log profiling metadata.
+
+        Return:
+            None
+        """
+        logging.info("=====Welcome to Profiling World=====")
+        logging.info(f"Query: {self.query}")
+        logging.info(f"Mode: {self.mode}")
+        logging.info(f"Profiling runs for {self.n_profiles} rounds...\n")
+
     def _setup(self) -> None:
         """Setup ETL profiler.
 
         The setup process includes configuring execution mode with the
         corresponding library, and initialize query parser and general
         profiler.
+
+        See also https://stackoverflow.com/questions/20096499.
 
         Return:
             None
@@ -193,7 +208,10 @@ class QueryParser:
 
 
 class ETLOpZoo:
-    """ETL operation zoo."""
+    """ETL operation zoo.
+
+    See also www.learncodewithmike.com/2020/01/python-method.html.
+    """
 
     @staticmethod
     @Profiler.profile_factory(return_prf=True)

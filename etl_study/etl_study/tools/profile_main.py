@@ -3,6 +3,9 @@ from argparse import Namespace
 
 from engine.defaults import BaseArgParser
 from profile_framework.etl_profiler import ETLProfiler
+from utils.logger import Logger
+
+logger = Logger("INFO", "./profile.log").get_logger()
 
 
 class ETLProfileArgParser(BaseArgParser):
