@@ -1,10 +1,18 @@
 """ETL operation profiler."""
 import logging
 import sys
+from collections import namedtuple
 from importlib import import_module
 from typing import Any, Callable, Dict, List, Tuple, Union
 
+import numpy as np
+
 from profile_framework.utils.profile import Profiler
+
+# Define ETL operation profiling result schema
+ETLProfileResult = namedtuple(
+    "ETLProfileResult", ["t_elapsed", "peak_mem_usage", "cpu_power", "gpu_power", "ram_power"]
+)
 
 
 class ETLProfiler:
@@ -22,12 +30,17 @@ class ETLProfiler:
     - `n_profiles`: number of profilings to run
 
     **Attributes**:
-    - `t_elapsed_`: time consumption
-    - `peak_mem_usage_`: peak memory usage
+    - `etl_profile_result_`: ETL operation profiling result
     """
 
-    t_elapsed_: List[float] = []
-    peak_mem_usage_: List[float] = []
+    etl_profile_result_: ETLProfileResult = None
+
+    # Trackers to track profiling result round-by-round
+    _t_elapsed: List[float] = []
+    _peak_mem_usage: List[float] = []
+    _cpu_power: List[float] = []
+    _gpu_power: List[float] = []
+    _ram_power: List[float] = []
 
     def __init__(
         self,
@@ -53,8 +66,8 @@ class ETLProfiler:
         df = self._load_data()
 
         self._profile(etl_func, df, **kwargs)
-
-    #         self._summarize()
+        self._summarize()
+        self._log_summary()
 
     def _log_meta(self) -> None:
         """Log profiling metadata.
@@ -64,6 +77,7 @@ class ETLProfiler:
         """
         logging.info("=====Welcome to Profiling World=====")
         logging.info(f"Query: {self.query}")
+        logging.info(f"Input file: {self.input_file}")
         logging.info(f"Mode: {self.mode}")
         logging.info(f"Profiling runs for {self.n_profiles} rounds...\n")
 
@@ -119,13 +133,59 @@ class ETLProfiler:
             None
         """
         for i in range(self.n_profiles):
-            etl_result, (t_elapsed, peak_mem_usage) = etl_func(df=df, **kwargs)
-            self.t_elapsed_.append(t_elapsed)
-            self.peak_mem_usage_.append(peak_mem_usage)
+            etl_result, profile_result = etl_func(df=df, **kwargs)
+            assert profile_result is not None, "Please enable `return_prf` for decorated operation in `ETLOpZoo`."
+
+            # Record profiling result in the current round
+            self._t_elapsed.append(profile_result.t_elapsed)
+            self._peak_mem_usage.append(profile_result.peak_mem_usage)
+            self._cpu_power.append(profile_result.emission_summary.cpu_power)
+            self._gpu_power.append(profile_result.emission_summary.gpu_power)
+            self._ram_power.append(profile_result.emission_summary.ram_power)
 
     def _summarize(self) -> None:
-        """Summarize profiling performance."""
-        pass
+        """Summarize ETL operation profiling results.
+
+        Return:
+            None
+        """
+
+        def summarize(prf_indicators: List[float]) -> Dict[str, float]:
+            """Derive average and standard deviation of performance
+            indicators from different profiling rounds.
+
+            Parameters:
+                prf_indicators: performance recorded round-by-round
+
+            Return:
+                prf_summary: average and standard deviation of
+                    performance indicators
+            """
+            prf_summary = {
+                "avg": np.mean(prf_indicators),
+                "std": np.std(prf_indicators),
+            }
+
+            return prf_summary
+
+        t_elapsed = summarize(self._t_elapsed)
+        peak_mem_usage = summarize(self._peak_mem_usage)
+        cpu_power = summarize(self._cpu_power)
+        gpu_power = summarize(self._gpu_power)
+        ram_power = summarize(self._ram_power)
+        self.etl_profile_result_ = ETLProfileResult(t_elapsed, peak_mem_usage, cpu_power, gpu_power, ram_power)
+
+    def _log_summary(self) -> None:
+        """Log profiling summary.
+
+        Return:
+            None
+        """
+        logging.info("=====Summary=====")
+        for prf_ind, unit in zip(self.etl_profile_result_._fields, ["sec", "MiB", "W", "W", "W"]):
+            prf = getattr(self.etl_profile_result_, prf_ind)
+            logging.info(f"{prf_ind}: {prf['avg']:.4f} ± {prf['std']:.4f} {unit}")
+        logging.info("=====Profiling Success=====")
 
 
 class QueryParser:

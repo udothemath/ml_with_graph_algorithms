@@ -2,11 +2,17 @@
 import inspect
 import logging
 import time
+from collections import namedtuple
 from functools import wraps
-from typing import Any, Callable, Dict, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Optional, Tuple
 
 from codecarbon import OfflineEmissionsTracker
+
+# from codecarbon.output import EmissionsData
 from memory_profiler import memory_usage
+
+# Define profiling result schema
+ProfileResult = namedtuple("ProfileResult", ["t_elapsed", "peak_mem_usage", "emission_summary"])
 
 emission_tracker = OfflineEmissionsTracker(
     country_iso_code="TWN",
@@ -24,7 +30,7 @@ class Profiler:
     def profile_factory(return_prf: bool) -> Any:
         def profile(func: Callable) -> Any:
             @wraps(func)
-            def inner(*args: Any, **kwargs: Dict[Any, Any]) -> Union[Tuple[Optional[Any], Tuple[float, float]]]:
+            def inner(*args: Any, **kwargs: Dict[str, Any]) -> Tuple[Any, Optional[ProfileResult]]:
                 # Configure monitored function prototype
                 func_kwargs = []
                 for k, v in kwargs.items():
@@ -58,9 +64,9 @@ class Profiler:
                 logging.info("======End of Profiling=====\n")
 
                 if return_prf:
-                    return result, (t_elapsed, peak_mem_usage)
+                    return result, ProfileResult(t_elapsed, peak_mem_usage, emission_summary)
                 else:
-                    return result
+                    return result, None
 
             return inner
 
