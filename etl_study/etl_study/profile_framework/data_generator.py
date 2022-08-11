@@ -117,5 +117,6 @@ class DataGenerator:
             feat_col = np.random.randint(0, int(1e6), size=(self.n_samples, 1), dtype=np.int32)
         elif dtype == "float":
             feat_col = np.random.rand(self.n_samples, 1).astype(np.float32)
+        feat_col = np.squeeze(feat_col, axis=1)
 
         return feat_col
