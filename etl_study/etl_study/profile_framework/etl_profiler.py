@@ -64,6 +64,9 @@ class ETLProfiler:
         """
         etl_func, kwargs = self._query_parser.parse(self.query)
         df = self._load_data()
+        if etl_func.__name__ == "join":
+            df_rhs = self._load_data_rhs(kwargs["on"])
+            kwargs = {"df_rhs": df_rhs, **kwargs}
 
         self._profile(etl_func, df, **kwargs)
         self._summarize()
@@ -116,6 +119,23 @@ class ETLProfiler:
 
         return df
 
+    def _load_data_rhs(self, on: str) -> Any:
+        """Load dataset on right-hand side for `join` operation.
+
+        Parameters:
+            on: column to join on
+
+        Return:
+            df_rhs: dataset on right-hand side
+        """
+        input_file_rhs = self.input_file.replace("lhs", f"rhs_{on.split('_')[-1]}")
+        if self.mode == "vaex":
+            df_rhs = self._pd.open(input_file_rhs)
+        else:
+            df_rhs = self._pd.read_parquet(input_file_rhs)
+
+        return df_rhs
+
     def _profile(
         self,
         etl_func: Callable,
@@ -133,7 +153,7 @@ class ETLProfiler:
             None
         """
         for i in range(self.n_profiles):
-            etl_result, profile_result = etl_func(df=df, **kwargs)
+            etl_result, profile_result = etl_func(df=df, mode=self.mode, **kwargs)
             assert profile_result is not None, "Please enable `return_prf` for decorated operation in `ETLOpZoo`."
 
             # Record profiling result in the current round
@@ -263,8 +283,29 @@ class QueryParser:
     def _parse_rolling(self) -> None:
         pass
 
-    def _parse_join(self) -> None:
-        pass
+    def _parse_join(
+        self,
+        op_body: List[str],
+    ) -> Tuple[Callable, Dict[str, str]]:
+        """Parse `join` operation body.
+
+        Parameters:
+            op_body: ETL operation body
+
+        Return:
+            etl_func: join operation function
+            how: type of `join` to perform
+            on: column to join on
+        """
+        etl_func = ETLOpZoo.join
+        kwargs: Dict[str, Any] = {}
+
+        kwargs = {
+            "how": op_body[0],
+            "on": op_body[2],
+        }
+
+        return etl_func, kwargs
 
 
 class ETLOpZoo:
@@ -277,10 +318,30 @@ class ETLOpZoo:
     @Profiler.profile_factory(return_prf=True)
     def groupby(
         df: Any,
+        mode: str,
         groupby_keys: List[str],
         stats_dict: Dict[str, List[str]],
     ) -> Any:
         """Group samples and derive stats for each group."""
         etl_result = df.groupby(groupby_keys).agg(stats_dict)
+
+        return etl_result
+
+    @staticmethod
+    @Profiler.profile_factory(return_prf=True)
+    def join(
+        df: Any,
+        mode: str,
+        df_rhs: Any,
+        how: str,
+        on: str,
+    ) -> Any:
+        """Join datasets on left-hand and right-hand sides."""
+        if mode in ["pandas", "cudf", "modin"]:
+            etl_result = df.merge(df_rhs, how=how, on=on)
+        elif mode == "polars":
+            etl_result = df.join(df_rhs, how=how, on=on)
+        else:
+            etl_result = df.join(df_rhs, how=how, on=on, rsuffix="_rhs")
 
         return etl_result
