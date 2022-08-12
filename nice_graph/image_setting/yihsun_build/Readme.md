@@ -62,3 +62,27 @@ NOTE:
 # COPY ai-cloud-pip.config /etc/python/pip.config
 ```
 - When port forwarding fail, check if the reference solve the problem: https://github.com/microsoft/vscode-remote-release/issues/764#issuecomment-506983759 (set serving host from localhost to 0.0.0.0 in container)
+
+# Nvidia Driver Installation: 
+
+## 問題描述: 
+
+下`nvidia-smi`以後會出現`Failed to initialize NVML: Driver/library version mismatch`
+下`python` / `import cudf`則會出現: `system has unsupported display driver / cuda driver combination`
+
+## 分析: 
+
+### 相關解法:
+
+https://stackoverflow.com/questions/43022843/nvidia-nvml-driver-library-version-mismatch
+https://forums.developer.nvidia.com/t/failed-to-initialize-nvml-driver-library-version-mismatch/190421/4
+
+cat /proc/driver/nvidia/version
+>> 470.42.01
+
+dkms status
+>> nvidia, 515.48.07: added
+
+Try: 
+apt purge nvidia* libnvidia*
+apt install nvidia-driver-470
