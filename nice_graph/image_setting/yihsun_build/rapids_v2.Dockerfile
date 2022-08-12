@@ -176,8 +176,19 @@ RUN pip install swifter
 #############################
 USER root
 RUN apt update
-RUN apt install -y git 
-RUN apt install -y vim
+RUN apt install -y git vim lsof dkms aptitude
+RUN dkms status
+#############################
+# Downgrade Nvidia-driver   #
+#############################
+RUN apt -y autoremove --purge nvidia-driver-515 \
+ && apt -y clean \
+ && add-apt-repository ppa:graphics-drivers/ppa \
+ && apt update 
+RUN aptitude install -y nvidia-driver-470 nvidia-dkms-470 \
+ && aptitude install -y nvidia-driver-470=470.42.01-0ubuntu1 \
+ && aptitude install -y nvidia-dkms-470=470.42.01-0ubuntu1
+RUN dkms status
 ###############################
 # For PrimeHub Job Submission #
 ###############################
