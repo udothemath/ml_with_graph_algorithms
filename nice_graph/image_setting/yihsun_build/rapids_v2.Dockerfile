@@ -163,7 +163,7 @@ RUN pip install --no-cache-dir dgl-cu111 dglgo -f https://data.dgl.ai/wheels/rep
 RUN mamba install -c rapidsai -c nvidia -c conda-forge cudf=22.06 cuml=22.06 cugraph=22.06 \
  && cuspatial=22.06 cuxfilter=22.06 cusignal=22.06 cucim=22.06
 RUN mamba install -c rapidsai -c nvidia -c conda-forge cudatoolkit=11.2
-RUN export LD_LIBRARY_PATH=/usr/local/cuda/lib
+RUN export LD_LIBRARY_PATH=/usr/local/cuda/lib64
 RUN export PATH=$PATH:/usr/local/cuda/bin
 #############################
 #   Other ETL tools         #
@@ -182,13 +182,16 @@ RUN dkms status
 # Downgrade Nvidia-driver   #
 #############################
 RUN apt -y autoremove --purge nvidia-driver-515 \
- && apt -y clean \
- && add-apt-repository ppa:graphics-drivers/ppa \
+ && apt -y clean 
+RUN add-apt-repository ppa:graphics-drivers/ppa \
  && apt update 
 RUN aptitude install -y nvidia-driver-470 nvidia-dkms-470 \
  && aptitude install -y nvidia-driver-470=470.42.01-0ubuntu1 \
  && aptitude install -y nvidia-dkms-470=470.42.01-0ubuntu1
 RUN dkms status
+ENV PATH=$PATH:/usr/local/cuda/bin
+ENV LD_LIBRARY_PATH=/usr/local/cuda/lib64
+RUN nvcc --version
 ###############################
 # For PrimeHub Job Submission #
 ###############################
