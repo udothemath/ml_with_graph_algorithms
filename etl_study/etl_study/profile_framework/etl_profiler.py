@@ -35,13 +35,6 @@ class ETLProfiler:
 
     etl_profile_result_: ETLProfileResult = None
 
-    # Trackers to track profiling result round-by-round
-    _t_elapsed: List[float] = []
-    _peak_mem_usage: List[float] = []
-    _cpu_power: List[float] = []
-    _gpu_power: List[float] = []
-    _ram_power: List[float] = []
-
     def __init__(
         self,
         query: str,
@@ -56,7 +49,7 @@ class ETLProfiler:
 
         self._log_meta()
         self._setup()
-        
+
     def _log_meta(self) -> None:
         """Log profiling metadata.
 
@@ -101,11 +94,9 @@ class ETLProfiler:
             df_rhs = self._load_data_rhs(kwargs["on"])
             kwargs = {"df_rhs": df_rhs, **kwargs}
 
-        self._profile(etl_func, df, **kwargs)
-        self._summarize()
+        profile_results = self._profile(etl_func, df, **kwargs)
+        self._summarize(profile_results)
         self._log_summary()
-
-    
 
     def _load_data(self) -> Any:  # Tmp workaround for type annotation
         """Load and return dataset for profiling.
@@ -142,7 +133,7 @@ class ETLProfiler:
         etl_func: Callable,
         df: Any,  # Tmp workaround for type annotation
         **kwargs: Dict[str, Any],
-    ) -> None:
+    ) -> Dict[str, List[float]]:
         """Profile ETL operation for `n_profiles` rounds.
 
         Parameters:
@@ -151,50 +142,62 @@ class ETLProfiler:
             kwargs: arguments passed to ETL operation function
 
         Return:
-            None
+            profile_results: performance recorded round-by-round
         """
+        profile_results: Dict[str, List[float]] = {
+            "t_elapsed": [],
+            "peak_mem_usage": [],
+            "cpu_power": [],
+            "gpu_power": [],
+            "ram_power": [],
+        }
+
         for i in range(self.n_profiles):
             etl_result, profile_result = etl_func(df=df, mode=self.mode, **kwargs)
             assert profile_result is not None, "Please enable `return_prf` for decorated operation in `ETLOpZoo`."
 
             # Record profiling result in the current round
-            self._t_elapsed.append(profile_result.t_elapsed)
-            self._peak_mem_usage.append(profile_result.peak_mem_usage)
-            self._cpu_power.append(profile_result.emission_summary.cpu_power)
-            self._gpu_power.append(profile_result.emission_summary.gpu_power)
-            self._ram_power.append(profile_result.emission_summary.ram_power)
+            profile_results["t_elapsed"].append(profile_result.t_elapsed)
+            profile_results["peak_mem_usage"].append(profile_result.peak_mem_usage)
+            profile_results["cpu_power"].append(profile_result.emission_summary.cpu_power)
+            profile_results["gpu_power"].append(profile_result.emission_summary.gpu_power)
+            profile_results["ram_power"].append(profile_result.emission_summary.ram_power)
 
-    def _summarize(self) -> None:
+        return profile_results
+
+    def _summarize(self, profile_results: Dict[str, List[float]]) -> None:
         """Summarize ETL operation profiling results.
+
+        Parameters:
+            profile_results: performance recorded round-by-round
 
         Return:
             None
         """
 
-        def summarize(prf_indicators: List[float]) -> Dict[str, float]:
+        def summarize(prf_vals: List[float]) -> Dict[str, float]:
             """Derive average and standard deviation of performance
-            indicators from different profiling rounds.
+            values from different profiling rounds.
 
             Parameters:
-                prf_indicators: performance recorded round-by-round
+                prf_vals: performance values of a single indicator
 
             Return:
-                prf_summary: average and standard deviation of
-                    performance indicators
+                prf_stats: average and standard deviation of
+                    performance values
             """
-            prf_summary = {
-                "avg": np.mean(prf_indicators),
-                "std": np.std(prf_indicators),
+            prf_stats = {
+                "avg": np.mean(prf_vals),
+                "std": np.std(prf_vals),
             }
 
-            return prf_summary
+            return prf_stats
 
-        t_elapsed = summarize(self._t_elapsed)
-        peak_mem_usage = summarize(self._peak_mem_usage)
-        cpu_power = summarize(self._cpu_power)
-        gpu_power = summarize(self._gpu_power)
-        ram_power = summarize(self._ram_power)
-        self.etl_profile_result_ = ETLProfileResult(t_elapsed, peak_mem_usage, cpu_power, gpu_power, ram_power)
+        prf_summary = {}
+        for prf_ind_name, prf_vals in profile_results.items():
+            prf_summary[prf_ind_name] = summarize(prf_vals)
+
+        self.etl_profile_result_ = ETLProfileResult(**prf_summary)
 
     def _log_summary(self) -> None:
         """Log profiling summary.
@@ -283,22 +286,19 @@ class QueryParser:
 
     def _parse_rolling(self) -> None:
         """Parse `rolling` operation body.
-        
+
         Parameters:
             op_body: ETL operation body
-            
+
         Return:
             etl_func: rolling operation function
-        
+
         """
         etl_func = ETLOpZoo.rolling
         kwargs: Dict[str, Any] = {}
-        
-        
-        
-        kwargs = {
-        }
-        
+
+        kwargs = {}
+
         return etl_func, kwargs
 
     def _parse_join(
@@ -344,16 +344,14 @@ class ETLOpZoo:
         etl_result = df.groupby(groupby_keys).agg(stats_dict)
 
         return etl_result
-    
+
     @staticmethod
     @Profiler.profile_factory(return_prf=True)
     def rolling(
         df: Any,
         mode: str,
-        
     ) -> Any:
         """Derive rolling stats."""
-        
         if mode in ["pandas", "cudf", "modin"]:
             etl_result = df.merge(df_rhs, how=how, on=on)
         elif mode == "polars":
@@ -362,7 +360,6 @@ class ETLOpZoo:
             etl_result = df.join(df_rhs, how=how, on=on, rsuffix="_rhs")
 
         return etl_result
-    
 
     @staticmethod
     @Profiler.profile_factory(return_prf=True)
