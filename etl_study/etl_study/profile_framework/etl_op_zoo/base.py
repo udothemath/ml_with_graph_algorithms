@@ -1,5 +1,7 @@
 """Base class of ETL operation zoo."""
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
+
+import pandas as pd
 
 
 class BaseETLOpZoo:
@@ -7,6 +9,16 @@ class BaseETLOpZoo:
 
     See also www.learncodewithmike.com/2020/01/python-method.html.
     """
+
+    @staticmethod
+    def read_parquet(
+        input_file: str,
+        df: Optional[Any] = None,
+    ) -> pd.DataFrame:
+        """Read and return input file with .parquet extension."""
+        df = pd.read_parquet(input_file)
+
+        return df
 
     @staticmethod
     def groupby(

@@ -167,11 +167,7 @@ class ETLProfiler:
             df: dataset for profiling
         """
         input_file = input_file if input_file is not None else self.input_file
-
-        if self.mode == "vaex":
-            df = self._pd.open(self.input_file)
-        else:
-            df = self._pd.read_parquet(self.input_file)
+        df = self._etl_op_zoo.read_parquet(input_file)
 
         return df
 
