@@ -1,8 +1,6 @@
 """Base class of ETL operation zoo."""
 from typing import Any, Dict, List
 
-from profile_framework.utils.profile import Profiler
-
 
 class BaseETLOpZoo:
     """Base class of ETL operation zoo.
@@ -11,7 +9,6 @@ class BaseETLOpZoo:
     """
 
     @staticmethod
-    @Profiler.profile_factory(return_prf=True)
     def groupby(
         df: Any,
         groupby_keys: List[str],
@@ -23,7 +20,6 @@ class BaseETLOpZoo:
         return etl_result
 
     @staticmethod
-    @Profiler.profile_factory(return_prf=True)
     def rolling(
         df: Any,
     ) -> Any:
@@ -32,7 +28,6 @@ class BaseETLOpZoo:
         return etl_result
 
     @staticmethod
-    @Profiler.profile_factory(return_prf=True)
     def join(
         df: Any,
         df_rhs: Any,

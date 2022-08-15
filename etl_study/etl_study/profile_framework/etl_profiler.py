@@ -11,6 +11,7 @@ import numpy as np
 import pandas as pd
 
 from profile_framework.query_parser import QueryParser
+from profile_framework.utils.profile import Profiler
 
 # Define ETL operation profiling result schema
 ETLProfileResult = namedtuple(
@@ -199,7 +200,7 @@ class ETLProfiler:
         }
 
         for i in range(self.n_profiles):
-            etl_result, profile_result = etl_func(df=df, **kwargs)
+            etl_result, profile_result = Profiler.profile_factory(return_prf=True)(etl_func)(df=df, **kwargs)
             assert profile_result is not None, "Please enable `return_prf` for decorated operation in `ETLOpZoo`."
 
             # Record profiling result in the current round
