@@ -56,22 +56,7 @@ class ETLProfiler:
 
         self._log_meta()
         self._setup()
-
-    def run(self) -> None:
-        """Run ETL operation profiling process.
-
-        **Return**: None
-        """
-        etl_func, kwargs = self._query_parser.parse(self.query)
-        df = self._load_data()
-        if etl_func.__name__ == "join":
-            df_rhs = self._load_data_rhs(kwargs["on"])
-            kwargs = {"df_rhs": df_rhs, **kwargs}
-
-        self._profile(etl_func, df, **kwargs)
-        self._summarize()
-        self._log_summary()
-
+        
     def _log_meta(self) -> None:
         """Log profiling metadata.
 
@@ -104,7 +89,23 @@ class ETLProfiler:
             sys.exit(1)
 
         self._query_parser = QueryParser()
-        self._profiler = Profiler()
+
+    def run(self) -> None:
+        """Run ETL operation profiling process.
+
+        **Return**: None
+        """
+        etl_func, kwargs = self._query_parser.parse(self.query)
+        df = self._load_data()
+        if etl_func.__name__ == "join":
+            df_rhs = self._load_data_rhs(kwargs["on"])
+            kwargs = {"df_rhs": df_rhs, **kwargs}
+
+        self._profile(etl_func, df, **kwargs)
+        self._summarize()
+        self._log_summary()
+
+    
 
     def _load_data(self) -> Any:  # Tmp workaround for type annotation
         """Load and return dataset for profiling.
@@ -281,7 +282,24 @@ class QueryParser:
         return etl_func, kwargs
 
     def _parse_rolling(self) -> None:
-        pass
+        """Parse `rolling` operation body.
+        
+        Parameters:
+            op_body: ETL operation body
+            
+        Return:
+            etl_func: rolling operation function
+        
+        """
+        etl_func = ETLOpZoo.rolling
+        kwargs: Dict[str, Any] = {}
+        
+        
+        
+        kwargs = {
+        }
+        
+        return etl_func, kwargs
 
     def _parse_join(
         self,
@@ -326,6 +344,25 @@ class ETLOpZoo:
         etl_result = df.groupby(groupby_keys).agg(stats_dict)
 
         return etl_result
+    
+    @staticmethod
+    @Profiler.profile_factory(return_prf=True)
+    def rolling(
+        df: Any,
+        mode: str,
+        
+    ) -> Any:
+        """Derive rolling stats."""
+        
+        if mode in ["pandas", "cudf", "modin"]:
+            etl_result = df.merge(df_rhs, how=how, on=on)
+        elif mode == "polars":
+            etl_result = df.join(df_rhs, how=how, on=on)
+        else:
+            etl_result = df.join(df_rhs, how=how, on=on, rsuffix="_rhs")
+
+        return etl_result
+    
 
     @staticmethod
     @Profiler.profile_factory(return_prf=True)
