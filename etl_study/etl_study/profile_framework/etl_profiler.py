@@ -5,12 +5,12 @@ import os
 import sys
 from collections import namedtuple
 from importlib import import_module
-from typing import Any, Callable, Dict, List, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional
 
 import numpy as np
 import pandas as pd
 
-from profile_framework.utils.profile import Profiler
+from profile_framework.query_parser import QueryParser
 
 # Define ETL operation profiling result schema
 ETLProfileResult = namedtuple(
@@ -84,7 +84,11 @@ class ETLProfiler:
             print(f"Mode {mode} isn't supported in the current environment.")
             sys.exit(1)
 
-        self._query_parser = QueryParser()
+        if self.mode == "pandas":
+            self._etl_op_zoo = import_module("profile_framework.etl_op_zoo.base").BaseETLOpZoo
+        else:
+            self._etl_op_zoo = import_module(f"profile_framework.etl_op_zoo.{self.mode}").ETLOpZoo
+        self._query_parser = QueryParser(self._etl_op_zoo)
 
     def run(self) -> None:
         """Run ETL operation profiling process.
@@ -94,7 +98,8 @@ class ETLProfiler:
         etl_func, kwargs = self._query_parser.parse(self.query)
         df = self._load_data()
         if etl_func.__name__ == "join":
-            df_rhs = self._load_data_rhs(kwargs["on"])
+            input_file_rhs = self.input_file.replace("lhs", f"rhs_{kwargs['on'].split('_')[-1]}")
+            df_rhs = self._load_data(input_file_rhs)
             kwargs = {"df_rhs": df_rhs, **kwargs}
 
         profile_results = self._profile(etl_func, df, **kwargs)
@@ -149,35 +154,25 @@ class ETLProfiler:
 
         berk.to_csv(berk_path, index=False)
 
-    def _load_data(self) -> Any:  # Tmp workaround for type annotation
+    def _load_data(self, input_file: Optional[str] = None) -> Any:  # Tmp workaround for type annotation
         """Load and return dataset for profiling.
+
+        Parameters:
+            input_file: input file
+                *Note: `self.input_file` is used if this `input_file`
+                    is not specified
 
         Return:
             df: dataset for profiling
         """
+        input_file = input_file if input_file is not None else self.input_file
+
         if self.mode == "vaex":
             df = self._pd.open(self.input_file)
         else:
             df = self._pd.read_parquet(self.input_file)
 
         return df
-
-    def _load_data_rhs(self, on: str) -> Any:
-        """Load dataset on right-hand side for `join` operation.
-
-        Parameters:
-            on: column to join on
-
-        Return:
-            df_rhs: dataset on right-hand side
-        """
-        input_file_rhs = self.input_file.replace("lhs", f"rhs_{on.split('_')[-1]}")
-        if self.mode == "vaex":
-            df_rhs = self._pd.open(input_file_rhs)
-        else:
-            df_rhs = self._pd.read_parquet(input_file_rhs)
-
-        return df_rhs
 
     def _profile(
         self,
@@ -204,7 +199,7 @@ class ETLProfiler:
         }
 
         for i in range(self.n_profiles):
-            etl_result, profile_result = etl_func(df=df, mode=self.mode, **kwargs)
+            etl_result, profile_result = etl_func(df=df, **kwargs)
             assert profile_result is not None, "Please enable `return_prf` for decorated operation in `ETLOpZoo`."
 
             # Record profiling result in the current round
@@ -261,166 +256,3 @@ class ETLProfiler:
             prf = getattr(self.etl_profile_result_, prf_ind)
             logging.info(f"{prf_ind}: {prf['avg']:.4f} ± {prf['std']:.4f} {unit}")
         logging.info("=====Profiling Success=====")
-
-
-class QueryParser:
-    """ETL query parser."""
-
-    def __init__(self) -> None:
-        pass
-
-    def parse(self, query: str) -> Tuple[Callable, Dict[str, Any]]:
-        """Parse ETL operation query.
-
-        **Parameters**:
-        - `query`: ETL operation query
-
-        **Return**:
-        - `etl_func`: ETL operation function
-        - `kwargs`: arguments passed to ETL operation function
-        """
-        etl_op_name, *etl_op_body = query.split(" ")
-        etl_op_name = etl_op_name[1:-1]
-        parse_etl_op_body: Callable = None
-
-        if etl_op_name == "apply":
-            parse_etl_op_body = self._parse_apply
-        elif etl_op_name == "groupby":
-            parse_etl_op_body = self._parse_groupby
-        elif etl_op_name == "rolling":
-            parse_etl_op_body = self._parse_rolling
-        elif etl_op_name == "join":
-            parse_etl_op_body = self._parse_join
-
-        etl_func, kwargs = parse_etl_op_body(etl_op_body)
-
-        return etl_func, kwargs
-
-    def _parse_apply(self) -> None:
-        pass
-
-    def _parse_groupby(
-        self,
-        op_body: List[str],
-    ) -> Tuple[Callable, Dict[str, Union[List[str], Dict[str, List[str]]]]]:
-        """Parse `groupby` operation body.
-
-        Parameters:
-            op_body: ETL operation body
-
-        Return:
-            etl_func: groupby operation function
-            groupby_keys: keys to determine groups
-            stats_dict: stats to derive for each column
-        """
-        etl_func = ETLOpZoo.groupby
-        kwargs: Dict[str, Any] = {}
-
-        groupby_keys: List[str] = []
-        stats_dict: Dict[str, List[str]] = {}
-        for i, ele in enumerate(op_body):
-            if ele.startswith("int") or ele.startswith("float"):
-                col_name = ele
-                stats_dict[col_name] = []
-            elif ele == "by":
-                break
-            else:
-                stats_dict[col_name].append(ele.replace(",", ""))
-        groupby_keys = op_body[i + 1 :]
-
-        kwargs = {
-            "groupby_keys": groupby_keys,
-            "stats_dict": stats_dict,
-        }
-
-        return etl_func, kwargs
-
-    def _parse_rolling(self) -> Tuple[Callable, Dict[str, Any]]:
-        """Parse `rolling` operation body.
-
-        Parameters:
-            op_body: ETL operation body
-
-        Return:
-            etl_func: rolling operation function
-
-        """
-        etl_func = ETLOpZoo.rolling
-        kwargs: Dict[str, Any] = {}
-
-        kwargs = {}
-
-        return etl_func, kwargs
-
-    def _parse_join(
-        self,
-        op_body: List[str],
-    ) -> Tuple[Callable, Dict[str, str]]:
-        """Parse `join` operation body.
-
-        Parameters:
-            op_body: ETL operation body
-
-        Return:
-            etl_func: join operation function
-            how: type of `join` to perform
-            on: column to join on
-        """
-        etl_func = ETLOpZoo.join
-        kwargs: Dict[str, Any] = {}
-
-        kwargs = {
-            "how": op_body[0],
-            "on": op_body[2],
-        }
-
-        return etl_func, kwargs
-
-
-class ETLOpZoo:
-    """ETL operation zoo.
-
-    See also www.learncodewithmike.com/2020/01/python-method.html.
-    """
-
-    @staticmethod
-    @Profiler.profile_factory(return_prf=True)
-    def groupby(
-        df: Any,
-        mode: str,
-        groupby_keys: List[str],
-        stats_dict: Dict[str, List[str]],
-    ) -> Any:
-        """Group samples and derive stats for each group."""
-        etl_result = df.groupby(groupby_keys).agg(stats_dict)
-
-        return etl_result
-
-    @staticmethod
-    @Profiler.profile_factory(return_prf=True)
-    def rolling(
-        df: Any,
-        mode: str,
-    ) -> Any:
-        """Derive rolling stats."""
-        etl_result = None
-        return etl_result
-
-    @staticmethod
-    @Profiler.profile_factory(return_prf=True)
-    def join(
-        df: Any,
-        mode: str,
-        df_rhs: Any,
-        how: str,
-        on: str,
-    ) -> Any:
-        """Join datasets on left-hand and right-hand sides."""
-        if mode in ["pandas", "cudf", "modin"]:
-            etl_result = df.merge(df_rhs, how=how, on=on)
-        elif mode == "polars":
-            etl_result = df.join(df_rhs, how=how, on=on)
-        else:
-            etl_result = df.join(df_rhs, how=how, on=on, rsuffix="_rhs")
-
-        return etl_result
