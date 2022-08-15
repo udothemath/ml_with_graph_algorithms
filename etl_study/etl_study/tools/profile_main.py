@@ -1,13 +1,10 @@
 """Main script for profiling ETL opration."""
-import json
 import os
 from argparse import Namespace
 from datetime import datetime
 
-import pandas as pd
-
 from engine.defaults import BaseArgParser
-from profile_framework.etl_profiler import ETLProfiler, ETLProfileResult
+from profile_framework.etl_profiler import ETLProfiler
 from utils.logger import Logger
 
 
@@ -82,54 +79,6 @@ def _setup_logging_path(query: str) -> str:
     return logging_path
 
 
-def _dump_profile_result(etl_profile_result: ETLProfileResult, logging_path: str) -> None:
-    """Dump ETL operation profiling result.
-
-    Parameters:
-        etl_profile_result: ETL operation profiling result
-        logging_path: logging path
-
-    Return:
-        None
-    """
-    with open(os.path.join(logging_path, "prf.json"), "w") as f:
-        json.dump(etl_profile_result._asdict(), f)
-
-
-def _add_profile_result_to_berk(args: Namespace, etl_profile_result: ETLProfileResult) -> None:
-    """Append profiling result for further benchmarking.
-
-    Parameters:
-        args: arguments driving ETL operation profiling process
-        etl_profile_result: ETL operation profiling result
-
-    Return:
-        None
-    """
-    flatten = lambda x: {
-        f"{prf_ind_name}-{stats_name}": prf_val
-        for prf_ind_name, prf_summary in x._asdict().items()
-        for stats_name, prf_val in prf_summary.items()
-    }
-
-    etl_profile_result = flatten(etl_profile_result)
-    etl_profile_result = {
-        "query": args.query,
-        "input_file": args.input_file,
-        "mode": args.mode,
-        "n_profiles": args.n_profiles,
-        **etl_profile_result,
-    }
-    berk_new_row = pd.DataFrame(etl_profile_result, index=[0])
-    if os.path.exists("./berk.csv"):  # Tmp fixed
-        berk = pd.read_csv("./berk.csv")
-        berk = pd.concat([berk, berk_new_row], ignore_index=True)
-    else:
-        berk = berk_new_row
-
-    berk.to_csv("./berk.csv", index=False)
-
-
 def main(args: Namespace) -> None:
     """Run ETL operation profiling process.
 
@@ -156,11 +105,11 @@ def main(args: Namespace) -> None:
     etl_profiler.run()
 
     # Dump profiling result
-    _dump_profile_result(etl_profiler.etl_profile_result_, logging_path)
+    etl_profiler.dump_profile_result(logging_path)
 
     # Append profiling result for further benchmarking
     if args.to_benchmark:
-        _add_profile_result_to_berk(args, etl_profiler.etl_profile_result_)
+        etl_profiler.add_profile_result_to_berk(berk_path="./berks.csv")
 
 
 if __name__ == "__main__":

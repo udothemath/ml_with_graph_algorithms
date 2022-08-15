@@ -1,11 +1,14 @@
 """ETL operation profiler."""
+import json
 import logging
+import os
 import sys
 from collections import namedtuple
 from importlib import import_module
 from typing import Any, Callable, Dict, List, Tuple, Union
 
 import numpy as np
+import pandas as pd
 
 from profile_framework.utils.profile import Profiler
 
@@ -97,6 +100,54 @@ class ETLProfiler:
         profile_results = self._profile(etl_func, df, **kwargs)
         self._summarize(profile_results)
         self._log_summary()
+
+    def dump_profile_result(self, dump_path: str) -> None:
+        """Dump ETL operation profiling result.
+
+        **Parameters**:
+        - `dump_path`: path to dump profiling result
+
+        **Return**:
+            None
+        """
+        with open(os.path.join(dump_path, "prf.json"), "w") as f:
+            json.dump(self.etl_profile_result_._asdict(), f)
+
+    def add_profile_result_to_berk(self, berk_path: str) -> None:
+        """Record profiling result for further benchmarking.
+
+        `berk_path` records profiling results in different scenarios,
+        facilitating further benchmarking (e.g., performance ranking,
+        visualization).
+
+        **Parameters**:
+        - `berk_path`: path of the file recording profiling result
+
+        **Return**:
+            None
+        """
+        flatten = lambda x: {
+            f"{prf_ind_name}-{stats_name}": stats_val
+            for prf_ind_name, prf_stats in x._asdict().items()
+            for stats_name, stats_val in prf_stats.items()
+        }
+
+        etl_profile_result = flatten(self.etl_profile_result_)
+        etl_profile_result = {
+            "query": self.query,
+            "input_file": self.input_file,
+            "mode": self.mode,
+            "n_profiles": self.n_profiles,
+            **etl_profile_result,
+        }
+        berk_new_row = pd.DataFrame(etl_profile_result, index=[0])
+        if os.path.exists(berk_path):
+            berk = pd.read_csv(berk_path)
+            berk = pd.concat([berk, berk_new_row], ignore_index=True)
+        else:
+            berk = berk_new_row
+
+        berk.to_csv(berk_path, index=False)
 
     def _load_data(self) -> Any:  # Tmp workaround for type annotation
         """Load and return dataset for profiling.
@@ -284,7 +335,7 @@ class QueryParser:
 
         return etl_func, kwargs
 
-    def _parse_rolling(self) -> None:
+    def _parse_rolling(self) -> Tuple[Callable, Dict[str, Any]]:
         """Parse `rolling` operation body.
 
         Parameters:
@@ -352,13 +403,7 @@ class ETLOpZoo:
         mode: str,
     ) -> Any:
         """Derive rolling stats."""
-        if mode in ["pandas", "cudf", "modin"]:
-            etl_result = df.merge(df_rhs, how=how, on=on)
-        elif mode == "polars":
-            etl_result = df.join(df_rhs, how=how, on=on)
-        else:
-            etl_result = df.join(df_rhs, how=how, on=on, rsuffix="_rhs")
-
+        etl_result = None
         return etl_result
 
     @staticmethod
