@@ -1,3 +1,4 @@
+etl_study/etl_study/profile_result/*/profile.log
 etl_study/etl_study/data/raw/synthetic/*/*.parquet
 nice_graph/neo4j_api/workspace.code-workspace
 q6/q6_c/data/*
