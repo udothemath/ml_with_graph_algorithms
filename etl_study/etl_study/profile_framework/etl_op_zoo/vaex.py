@@ -13,7 +13,7 @@ class ETLOpZoo(BaseETLOpZoo):
     def read_parquet(
         input_file: str,
         df: Optional[Any] = None,
-    ) -> vaex.DataFrameLocal:
+    ) -> vaex.dataframe.DataFrameLocal:
         """Read and return input file with .parquet extension."""
         df = vaex.open(input_file)
 
