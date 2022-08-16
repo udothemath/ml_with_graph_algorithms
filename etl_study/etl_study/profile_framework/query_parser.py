@@ -36,6 +36,8 @@ class QueryParser:
             parse_etl_op_body = self._parse_rolling
         elif etl_op_name == "join":
             parse_etl_op_body = self._parse_join
+        elif etl_op_name == "read_parquet":
+            parse_etl_op_body = self._parse_read_parquet
 
         etl_func, kwargs = parse_etl_op_body(etl_op_body)
 
@@ -116,6 +118,28 @@ class QueryParser:
         kwargs = {
             "how": op_body[0],
             "on": op_body[2],
+        }
+
+        return etl_func, kwargs
+
+    def _parse_read_parquet(
+        self,
+        op_body: List[str],
+    ) -> Tuple[Callable, Dict[str, str]]:
+        """Parse `read_parquet` operation body.
+
+        Parameters:
+            op_body: ETL operation body
+
+        Return:
+            etl_func: read `.parquet` operation function
+            input_file: input file
+        """
+        etl_func = self._etl_op_zoo.read_parquet
+        kwargs: Dict[str, str] = {}
+
+        kwargs = {
+            "input_file": op_body[0],
         }
 
         return etl_func, kwargs

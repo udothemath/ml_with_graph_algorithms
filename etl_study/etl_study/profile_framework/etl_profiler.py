@@ -1,11 +1,12 @@
 """ETL operation profiler."""
+import gc
 import json
 import logging
 import os
 import sys
 from collections import namedtuple
 from importlib import import_module
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -97,13 +98,11 @@ class ETLProfiler:
         **Return**: None
         """
         etl_func, kwargs = self._query_parser.parse(self.query)
-        df = self._load_data()
-        if etl_func.__name__ == "join":
-            input_file_rhs = self.input_file.replace("lhs", f"rhs_{kwargs['on'].split('_')[-1]}")
-            df_rhs = self._load_data(input_file_rhs)
+        df_lhs, df_rhs = self._prepare_data(etl_func, **kwargs)
+        if df_rhs is not None:
             kwargs = {"df_rhs": df_rhs, **kwargs}
 
-        profile_results = self._profile(etl_func, df, **kwargs)
+        profile_results = self._profile(etl_func, df_lhs, **kwargs)
         self._summarize(profile_results)
         self._log_summary()
 
@@ -155,8 +154,37 @@ class ETLProfiler:
 
         berk.to_csv(berk_path, index=False)
 
+    def _prepare_data(
+        self,
+        etl_func: Callable,
+        **kwargs: Dict[str, Any],
+    ) -> Tuple[Optional[Any], Optional[Any]]:
+        """Prepare all the datasets needed for profiling.
+
+        Parameters:
+            etl_func: ETL operation function
+            kwargs: arguments passed to ETL operation function
+
+        Return:
+            df_lhs: dataset on left-hand side
+            df_rhs: dataset on right-hand side (only for `join`)
+        """
+        etl_func_name = etl_func.__name__
+        df_lhs, df_rhs = None, None
+
+        if not etl_func_name.startswith("read"):
+            df_lhs = self._load_data()
+
+            if etl_func_name == "join":
+                input_file_rhs = self.input_file.replace("lhs", f"rhs_{kwargs['on'].split('_')[-1]}")
+                df_rhs = self._load_data(input_file_rhs)
+        else:
+            logging.warning("Argument --input-file is ignored when profiled ETL operation is [read_<channel>].")
+
+        return df_lhs, df_rhs
+
     def _load_data(self, input_file: Optional[str] = None) -> Any:  # Tmp workaround for type annotation
-        """Load and return dataset for profiling.
+        """Load and return a single dataset for profiling.
 
         Parameters:
             input_file: input file
@@ -174,14 +202,14 @@ class ETLProfiler:
     def _profile(
         self,
         etl_func: Callable,
-        df: Any,  # Tmp workaround for type annotation
+        df_lhs: Optional[Any] = None,  # Tmp workaround for type annotation
         **kwargs: Dict[str, Any],
     ) -> Dict[str, List[float]]:
         """Profile ETL operation for `n_profiles` rounds.
 
         Parameters:
             etl_func: ETL operation function
-            df: dataset for profiling
+            df_lhs: dataset on left-hand side
             kwargs: arguments passed to ETL operation function
 
         Return:
@@ -196,7 +224,7 @@ class ETLProfiler:
         }
 
         for i in range(self.n_profiles):
-            etl_result, profile_result = Profiler.profile_factory(return_prf=True)(etl_func)(df=df, **kwargs)
+            etl_result, profile_result = Profiler.profile_factory(return_prf=True)(etl_func)(df=df_lhs, **kwargs)
             assert profile_result is not None, "Please enable `return_prf` for decorated operation in `ETLOpZoo`."
 
             # Record profiling result in the current round
@@ -205,6 +233,9 @@ class ETLProfiler:
             profile_results["cpu_power"].append(profile_result.emission_summary.cpu_power)
             profile_results["gpu_power"].append(profile_result.emission_summary.gpu_power)
             profile_results["ram_power"].append(profile_result.emission_summary.ram_power)
+
+            del etl_result, profile_result
+            gc.collect()
 
         return profile_results
 
