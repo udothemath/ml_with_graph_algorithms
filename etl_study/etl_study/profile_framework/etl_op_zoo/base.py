@@ -1,4 +1,5 @@
 """Base class of ETL operation zoo."""
+from io import IOBase
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
@@ -17,6 +18,17 @@ class BaseETLOpZoo:
     ) -> pd.DataFrame:
         """Read and return input file with .parquet extension."""
         df = pd.read_parquet(input_file)
+
+        return df
+
+    @staticmethod
+    def read_psql(
+        in_memory_csv: IOBase,
+        df: Optional[Any] = None,
+    ) -> pd.DataFrame:
+        """Read and return table in in-memory buffer."""
+        in_memory_csv.seek(0)
+        df = pd.read_csv(in_memory_csv)
 
         return df
 

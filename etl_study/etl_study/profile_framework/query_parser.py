@@ -1,5 +1,8 @@
 """ETL query parser."""
+from io import IOBase, StringIO
 from typing import Any, Callable, Dict, List, Tuple, Union
+
+import psycopg2
 
 from profile_framework.etl_op_zoo.base import BaseETLOpZoo
 
@@ -56,6 +59,8 @@ class QueryParser:
             parse_etl_op_body = self._parse_join
         elif etl_op_name == "read_parquet":
             parse_etl_op_body = self._parse_read_parquet
+        elif etl_op_name == "read_psql":
+            parse_etl_op_body = self._parse_read_psql
 
         etl_func_kwargs = parse_etl_op_body(etl_op_body)
 
@@ -129,7 +134,7 @@ class QueryParser:
             how: type of `join` to perform
             on: column to join on
         """
-        kwargs: Dict[str, Any] = {
+        kwargs: Dict[str, str] = {
             "how": op_body[0],
             "on": op_body[2],
         }
@@ -150,6 +155,48 @@ class QueryParser:
         """
         kwargs: Dict[str, str] = {
             "input_file": op_body[0],
+        }
+
+        return kwargs
+
+    def _parse_read_psql(
+        self,
+        op_body: List[str],
+    ) -> Dict[str, IOBase]:
+        """Parse `read_psql` operation body.
+
+        Parameters:
+            op_body: ETL operation body
+
+        Return:
+            in_memory_csv: in-memory buffer
+        """
+        kwargs: Dict[str, Any] = {}
+
+        db_name, schema_name, table_name = op_body
+
+        # Build DB connection
+        conn = psycopg2.connect(dbname=db_name, user="abaowei")
+        conn.autocommit = False
+
+        # Construct SQL logic
+        sql = f"COPY (SELECT * FROM {schema_name}.{table_name}) TO STDOUT " "WITH (FORMAT CSV, DELIMITER ',', HEADER)"
+
+        in_memory_csv = StringIO()
+        try:
+            cur = conn.cursor()
+            cur.copy_expert(sql, in_memory_csv)
+            conn.commit()
+            in_memory_csv.seek(0)
+        except (Exception, psycopg2.DatabaseError) as error:
+            conn.rollback()
+            raise error
+        finally:
+            cur.close()
+        conn.close()
+
+        kwargs = {
+            "in_memory_csv": in_memory_csv,
         }
 
         return kwargs
