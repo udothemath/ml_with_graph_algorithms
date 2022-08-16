@@ -1,0 +1,3 @@
+pyarrow==9.0.0
+codecarbon==2.1.3
+memory_profiler==0.60.0
