@@ -33,6 +33,15 @@ class BaseETLOpZoo:
         return df
 
     @staticmethod
+    def to_parquet(df: Any) -> None:
+        """Directly write input file to the output file with .parquet
+        extension.
+        """
+        df.to_parquet("tmp.parquet", index=False)
+
+        return None
+
+    @staticmethod
     def groupby(
         df: Any,
         groupby_keys: List[str],

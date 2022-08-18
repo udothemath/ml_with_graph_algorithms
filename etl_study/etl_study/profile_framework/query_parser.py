@@ -61,6 +61,8 @@ class QueryParser:
             parse_etl_op_body = self._parse_read_parquet
         elif etl_op_name == "read_psql":
             parse_etl_op_body = self._parse_read_psql
+        elif etl_op_name == "to_parquet":
+            parse_etl_op_body = self._parse_to_parquet
 
         etl_func_kwargs = parse_etl_op_body(etl_op_body)
 
@@ -198,5 +200,21 @@ class QueryParser:
         kwargs = {
             "in_memory_csv": in_memory_csv,
         }
+
+        return kwargs
+
+    def _parse_to_parquet(
+        self,
+        op_body: List[str],
+    ) -> Dict[str, Any]:
+        """Parse `to_parquet` operation body.
+
+        Parameters:
+            op_body: ETL operation body
+
+        Return:
+            kwargs: an empty parameter placeholder
+        """
+        kwargs: Dict[str, Any] = {}
 
         return kwargs
