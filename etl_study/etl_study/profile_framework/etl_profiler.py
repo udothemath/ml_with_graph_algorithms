@@ -80,11 +80,12 @@ class ETLProfiler:
             None
         """
         mode = "modin.pandas" if self.mode == "modin" else self.mode
-        try:
-            self._pd = import_module(mode)
-        except ImportError as e:
-            print(f"Mode {mode} isn't supported in the current environment.")
-            sys.exit(1)
+        if mode != "psql":
+            try:
+                self._pd = import_module(mode)
+            except ImportError as e:
+                print(f"Mode {mode} isn't supported in the current environment.")
+                sys.exit(1)
 
         if self.mode == "pandas":
             self._etl_op_zoo = import_module("profile_framework.etl_op_zoo.base").BaseETLOpZoo
@@ -101,6 +102,12 @@ class ETLProfiler:
         df_lhs, df_rhs = self._prepare_data(etl_func, **kwargs)
         if df_rhs is not None:
             kwargs = {"df_rhs": df_rhs, **kwargs}
+
+        # Temporary workaround for passing `table_name`
+        # Seems bad to get `table_name` from `self.input_file`
+        if self.mode == "psql":
+            table_name = self.input_file.split("/")[-1].split(".")[0]
+            kwargs = {"table_name": table_name, **kwargs}
 
         profile_results = self._profile(etl_func, df_lhs, **kwargs)
         self._summarize(profile_results)
@@ -172,7 +179,7 @@ class ETLProfiler:
         etl_func_name = etl_func.__name__
         df_lhs, df_rhs = None, None
 
-        if not etl_func_name.startswith("read"):
+        if (not etl_func_name.startswith("read")) and (self.mode != "psql"):
             df_lhs = self._load_data()
 
             if etl_func_name == "join":

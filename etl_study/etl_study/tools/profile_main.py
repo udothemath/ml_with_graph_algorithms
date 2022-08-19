@@ -31,7 +31,7 @@ class ETLProfileArgParser(BaseArgParser):
         self.argparser.add_argument(
             "--mode",
             type=str,
-            choices=["pandas", "cudf", "modin", "polars", "vaex"],
+            choices=["pandas", "cudf", "modin", "polars", "vaex", "psql"],
             default=None,
             help="execution mode",
         )

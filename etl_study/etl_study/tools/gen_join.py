@@ -103,8 +103,11 @@ def _gen_lhs_id(n_samples: int, join_key_common_ratio: float, output_path: str) 
         print(f"Generating the table on right-hand side with size '{rhs_size.upper()}'...")
         df_rhs_id = pd.DataFrame(ids_rhs, columns=[f"id_{rhs_size}"])
         df_rhs_val = DataGenerator(n_samples=id_n_unique, n_int_features=1).run()
+        df_rhs_val.columns = [f"{col}_rhs" for col in df_rhs_val.columns]
         df_rhs = pd.concat([df_rhs_id, df_rhs_val], axis=1)
-        df_rhs.to_parquet(os.path.join(output_path, f"join_{n_samples:.0e}_rhs_{rhs_size}.parquet"), index=False)
+        df_rhs.to_parquet(
+            os.path.join(output_path, f"join_{n_samples:.0e}_rhs_{rhs_size}.parquet".replace("+", "")), index=False
+        )
         print("Done.\n")
 
         del df_rhs
@@ -165,7 +168,7 @@ def main(args: Namespace) -> None:
     ).run()
     print("Done.")
     df_lhs = pd.concat([df_lhs_id, df_lhs_val], axis=1)
-    df_lhs.to_parquet(os.path.join(output_path, f"join_{n_samples:.0e}_lhs.parquet"), index=False)
+    df_lhs.to_parquet(os.path.join(output_path, f"join_{n_samples:.0e}_lhs.parquet".replace("+", "")), index=False)
 
 
 if __name__ == "__main__":

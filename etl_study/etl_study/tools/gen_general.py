@@ -98,7 +98,7 @@ def main(args: Namespace) -> None:
     print("Done.")
 
     # Dump synthetic data
-    dump_path = os.path.join(output_path, f"general_{n_samples:.0e}.parquet")
+    dump_path = os.path.join(output_path, f"general_{n_samples:.0e}.parquet".replace("+", ""))
     df.to_parquet(dump_path, index=False)
 
 
