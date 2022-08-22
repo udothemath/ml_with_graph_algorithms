@@ -13,9 +13,9 @@ class DataGenerator:
 
     Following is the data type information of the synthetic data:
     - String identifier column: `str`
-    - Integer identifier column: `np.int32`
-    - Integer feature column: `np.int32`
-    - Floating-point feature column: `np.float32`
+    - Integer identifier column: `np.int64`
+    - Integer feature column: `np.int64`
+    - Floating-point feature column: `np.float64`
 
     In order to profile ETL operations based on identifier column with
     different cardinalities, high-cardinality identifier column is

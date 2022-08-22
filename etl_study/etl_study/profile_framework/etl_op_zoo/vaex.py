@@ -46,7 +46,7 @@ class ETLOpZoo(BaseETLOpZoo):
         df_rhs: Any,
         how: str,
         on: str,
-    ) -> Any:
+    ) -> vaex.dataframe.DataFrameLocal:
         """Join datasets on left-hand and right-hand sides."""
         etl_result = df.join(df_rhs, how=how, on=on, rsuffix="_rhs")
 

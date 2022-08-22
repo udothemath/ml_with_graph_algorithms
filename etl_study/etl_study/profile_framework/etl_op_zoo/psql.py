@@ -38,7 +38,7 @@ class ETLOpZoo:
     @staticmethod
     def rolling(
         df: Any,
-    ) -> Any:
+    ) -> None:
         """Derive rolling stats."""
         etl_result = None
         return etl_result
@@ -50,7 +50,7 @@ class ETLOpZoo:
         on: str,
         df: Optional[Any] = None,
         df_rhs: Optional[Any] = None,
-    ) -> Any:
+    ) -> None:
         """Join datasets on left-hand and right-hand sides."""
         join_sql = sql_ctor.construct(
             etl_op_name=inspect.currentframe().f_code.co_name,
