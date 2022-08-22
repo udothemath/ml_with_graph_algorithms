@@ -14,6 +14,10 @@ import pandas as pd
 from profile_framework.query_parser import QueryParser
 from profile_framework.utils.profile import Profiler
 
+__all__ = [
+    "ETLProfiler",
+]
+
 # Define ETL operation profiling result schema
 ETLProfileResult = namedtuple(
     "ETLProfileResult", ["t_elapsed", "peak_mem_usage", "cpu_power", "gpu_power", "ram_power"]
@@ -129,7 +133,7 @@ class ETLProfiler:
         """Record profiling result for further benchmarking.
 
         `berk_path` records profiling results in different scenarios,
-        facilitating further benchmarking (e.g., performance ranking,
+        facilitating further benchmarking (*e.g.*, performance ranking,
         visualization).
 
         **Parameters**:
@@ -164,7 +168,7 @@ class ETLProfiler:
     def _prepare_data(
         self,
         etl_func: Callable,
-        **kwargs: Dict[str, Any],
+        **kwargs: Any,
     ) -> Tuple[Optional[Any], Optional[Any]]:
         """Prepare all the datasets needed for profiling.
 
@@ -210,7 +214,7 @@ class ETLProfiler:
         self,
         etl_func: Callable,
         df_lhs: Optional[Any] = None,  # Tmp workaround for type annotation
-        **kwargs: Dict[str, Any],
+        **kwargs: Any,
     ) -> Dict[str, List[float]]:
         """Profile ETL operation for `n_profiles` rounds.
 
