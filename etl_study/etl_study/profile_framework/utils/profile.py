@@ -4,12 +4,14 @@ import logging
 import time
 from collections import namedtuple
 from functools import wraps
-from typing import Any, Callable, Dict, Optional, Tuple
+from typing import Any, Callable, Optional, Tuple
 
 from codecarbon import OfflineEmissionsTracker
-
-# from codecarbon.output import EmissionsData
 from memory_profiler import memory_usage
+
+__all__ = [
+    "Profiler",
+]
 
 # Define profiling result schema
 ProfileResult = namedtuple("ProfileResult", ["t_elapsed", "peak_mem_usage", "emission_summary"])
@@ -30,7 +32,7 @@ class Profiler:
     def profile_factory(return_prf: bool) -> Any:
         def profile(func: Callable) -> Any:
             @wraps(func)
-            def inner(*args: Any, **kwargs: Dict[str, Any]) -> Tuple[Any, Optional[ProfileResult]]:
+            def inner(*args: Any, **kwargs: Any) -> Tuple[Any, Optional[ProfileResult]]:
                 # Configure monitored function prototype
                 func_kwargs = []
                 for k, v in kwargs.items():
@@ -77,7 +79,7 @@ class Profiler:
         self,
         func: Callable,
         *args: Any,
-        **kwargs: Dict[str, Any],
+        **kwargs: Any,
     ) -> Tuple[Optional[Any], Tuple[float, float]]:
         """Run profiling and return performance report."""
         assert callable(func), "Function to profile must be callable."

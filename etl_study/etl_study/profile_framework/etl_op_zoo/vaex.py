@@ -32,12 +32,21 @@ class ETLOpZoo(BaseETLOpZoo):
         return df
 
     @staticmethod
+    def to_parquet(df: vaex.dataframe.DataFrameLocal) -> None:
+        """Directly write input file to the output file with .parquet
+        extension.
+        """
+        df.export("tmp.parquet")
+
+        return None
+
+    @staticmethod
     def join(
         df: Any,
         df_rhs: Any,
         how: str,
         on: str,
-    ) -> Any:
+    ) -> vaex.dataframe.DataFrameLocal:
         """Join datasets on left-hand and right-hand sides."""
         etl_result = df.join(df_rhs, how=how, on=on, rsuffix="_rhs")
 

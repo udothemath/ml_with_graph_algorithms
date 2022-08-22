@@ -13,9 +13,9 @@ class DataGenerator:
 
     Following is the data type information of the synthetic data:
     - String identifier column: `str`
-    - Integer identifier column: `np.int32`
-    - Integer feature column: `np.int32`
-    - Floating-point feature column: `np.float32`
+    - Integer identifier column: `np.int64`
+    - Integer feature column: `np.int64`
+    - Floating-point feature column: `np.float64`
 
     In order to profile ETL operations based on identifier column with
     different cardinalities, high-cardinality identifier column is
@@ -98,7 +98,7 @@ class DataGenerator:
         if dtype == "str":
             id_base = np.array([f"c{i}" for i in range(n_clusts_per_id)])
         elif dtype == "int":
-            id_base = np.arange(n_clusts_per_id, dtype=np.int32)
+            id_base = np.arange(n_clusts_per_id, dtype=np.int64)
 
         id_col = np.random.choice(id_base, self.n_samples)
 
@@ -114,9 +114,9 @@ class DataGenerator:
             feat: generated feature column
         """
         if dtype == "int":
-            feat_col = np.random.randint(0, int(1e6), size=(self.n_samples, 1), dtype=np.int32)
+            feat_col = np.random.randint(0, int(1e3), size=(self.n_samples, 1), dtype=np.int64)
         elif dtype == "float":
-            feat_col = np.random.rand(self.n_samples, 1).astype(np.float32)
+            feat_col = np.random.rand(self.n_samples, 1).astype(np.float64)
         feat_col = np.squeeze(feat_col, axis=1)
 
         return feat_col

@@ -3,6 +3,64 @@
 Annotation:
 - LHS: the table on left-hand side
 - RHS: the table on right-hand side
+
+Note:
+In the profile framework, .parquet file name is the same as the table
+name in PostgreSQL database. Because "+" character can't exist in the
+table name in PostgreSQL, "+" in the scientific notation is removed
+before the generated dataset is dumped.
+
+Example:
+python -m tools.gen_join
+       --n-samples 10000000
+       --n-int-features 1
+       --n-float-features 1
+       --join-key-common-ratio 0.9
+       --random-state 42
+       --output-path ./data/raw/synthetic/join/
+
+After running the command above, the synthetic datasets are generated
+with the following appearance:
+
+`join_1e07_lhs.parquet`
+| id_l    | id_m | id_s | int_f0 | float_f0 |
+| ------- | ---- | ---- | ------ | -------- |
+| 5500567 | 4585 | 4    | 984    | 0.392675 |
+| 2913422 | 331  | 5    | 430    | 0.372806 |
+                    .
+                    .
+                    .
+          10000000 rows in total
+
+`join_1e07_rhs_l.parquet`
+| id_l    | int_f0_rhs |
+| ------- | ---------- |
+| 5500567 | 102        |
+| 2913422 | 435        |
+            .
+            .
+            .
+  10000000 rows in total
+
+`join_1e07_rhs_m.parquet`
+| id_m  | int_f0_rhs |
+| ----- | ---------- |
+| 10747 | 102        |
+| 5985  | 435        |
+         .
+         .
+         .
+ 10000 rows in total
+
+`join_1e07_rhs_s.parquet`
+| id_s  | int_f0_rhs |
+| ----- | ---------- |
+| 2     | 102        |
+| 4     | 435        |
+         .
+         .
+         .
+  10 rows in total
 """
 import gc
 import os
@@ -103,8 +161,11 @@ def _gen_lhs_id(n_samples: int, join_key_common_ratio: float, output_path: str) 
         print(f"Generating the table on right-hand side with size '{rhs_size.upper()}'...")
         df_rhs_id = pd.DataFrame(ids_rhs, columns=[f"id_{rhs_size}"])
         df_rhs_val = DataGenerator(n_samples=id_n_unique, n_int_features=1).run()
+        df_rhs_val.columns = [f"{col}_rhs" for col in df_rhs_val.columns]
         df_rhs = pd.concat([df_rhs_id, df_rhs_val], axis=1)
-        df_rhs.to_parquet(os.path.join(output_path, f"join_{n_samples:.0e}_rhs_{rhs_size}.parquet"), index=False)
+        df_rhs.to_parquet(
+            os.path.join(output_path, f"join_{n_samples:.0e}_rhs_{rhs_size}.parquet".replace("+", "")), index=False
+        )
         print("Done.\n")
 
         del df_rhs
@@ -165,7 +226,7 @@ def main(args: Namespace) -> None:
     ).run()
     print("Done.")
     df_lhs = pd.concat([df_lhs_id, df_lhs_val], axis=1)
-    df_lhs.to_parquet(os.path.join(output_path, f"join_{n_samples:.0e}_lhs.parquet"), index=False)
+    df_lhs.to_parquet(os.path.join(output_path, f"join_{n_samples:.0e}_lhs.parquet".replace("+", "")), index=False)
 
 
 if __name__ == "__main__":
