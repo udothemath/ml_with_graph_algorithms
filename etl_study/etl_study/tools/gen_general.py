@@ -1,7 +1,37 @@
 """Main script for generating synthetic dataset for general operations.
 
-General operations include some of the commonly used APIs (e.g., join,
+General operations include some of the commonly used APIs (e.g., apply,
 groupby, rolling).
+
+Note:
+In the profile framework, .parquet file name is the same as the table
+name in PostgreSQL database. Because "+" character can't exist in the
+table name in PostgreSQL, "+" in the scientific notation is removed
+before the generated dataset is dumped.
+
+Example:
+python -m tools.gen_general
+       --n-samples 10000000
+       --n-str-ids 2
+       --n-int-ids 2
+       --n-clusts-per-id 100
+       --n-int-features 1
+       --n-float-features 1
+       --random-state 42
+       --output-path ./data/raw/synthetic/general/
+
+After running the command above, the synthetic dataset is generated
+with the following appearance:
+
+`general_1e7.parquet`
+| str_id0 | str_id_hc | int_id0 | int_id_hc | int_f0 | float_f0 |
+| ------- | --------- | ------- | --------- | ------ | -------- |
+| c62     | c7663     | 16      | 44890     | 448    | 0.696174 |
+| c33     | c98918    | 39      | 79923     | 215    | 0.675639 |
+                                .
+                                .
+                                .
+                      10000000 rows in total
 """
 import os
 from argparse import Namespace
