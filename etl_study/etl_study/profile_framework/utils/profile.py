@@ -1,4 +1,5 @@
 """Profiler."""
+import gc
 import inspect
 import logging
 import time
@@ -43,15 +44,24 @@ class Profiler:
                 func_kwargs = ", ".join(func_kwargs)
                 func_prototype = f"{func.__name__}({func_kwargs})"
 
-                # Monitor time, memory usage and energy consumption of
-                # the function under test
+                # Monitor time and energy consumption of the function
+                # under test
                 emission_tracker.start()
                 t_start = time.perf_counter()
-                mem, result = memory_usage((func, args, kwargs), retval=True, timeout=200, interval=1e-7)
-                emission_tracker.stop()
+                result = func(*args, **kwargs)
                 t_elapsed = time.perf_counter() - t_start
-                peak_mem_usage = max(mem) - min(mem)
+                emission_tracker.stop()
                 emission_summary = emission_tracker.final_emissions_data
+
+                # Free memory
+                del result
+                _ = gc.collect()
+
+                # Monitor memory usage of the function under test
+                mem, result = memory_usage(
+                    (func, args, kwargs), retval=True, timeout=200, interval=1e-7, include_children=True
+                )
+                peak_mem_usage = max(mem) - min(mem)
 
                 # Log performace report
                 logging.info("=====Profiling=====")
