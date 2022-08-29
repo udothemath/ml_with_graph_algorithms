@@ -7,11 +7,12 @@ import pandas as pd
 from neo4j import GraphDatabase
 from tqdm import tqdm
 
-from src.cypher_code import cypher_clean, cypher_csv_cnt, cypher_csv_limit
+from src.cypher_code import (cypher_clean, cypher_conf, cypher_csv_cnt,
+                             cypher_csv_limit)
 from src.neo4j_conn import Neo4jConnection
 
-%load_ext autoreload
-%autoreload 2
+# %load_ext autoreload
+# %autoreload 2
 PATH_BOLT = "bolt://localhost:7687"
 USER = "neo4j"
 PASSWORD = "1234"
@@ -19,9 +20,9 @@ PASSWORD = "1234"
 conn = Neo4jConnection(uri=PATH_BOLT, user=USER, pwd=PASSWORD)
 
 
-# print(conn.query(cypher_clean))
-print(conn.query(cypher_csv_cnt))
-print(conn.query(cypher_csv_limit))
+print(conn.query(cypher_conf))
+# print(conn.query(cypher_csv_limit))
+# print(conn.query(cypher_csv_cnt))
 
 
 # %%

@@ -14,7 +14,8 @@ __pycache__/
 *.zip
 *.eps
 *.h5
-*.csv 
+.problem_set/q1/data/*
+# *.csv 
 *.feather
 *.json
 *.pyc
