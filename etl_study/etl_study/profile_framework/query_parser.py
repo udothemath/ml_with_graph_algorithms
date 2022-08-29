@@ -5,7 +5,7 @@ from typing import Any, Callable, Dict, List, Tuple, Union
 import psycopg2
 
 from profile_framework.etl_op_zoo.base import BaseETLOpZoo
-
+from profile_framework.aicloud_db_tools import get_conn
 
 class QueryParser:
     """ETL query parser.
@@ -195,8 +195,11 @@ class QueryParser:
         db_name, schema_name, table_name = op_body
 
         # Build DB connection
-        conn = psycopg2.connect(dbname=db_name, user="abaowei")
-        conn.autocommit = False
+        try:
+            conn = psycopg2.connect(dbname=db_name, user="abaowei")
+            conn.autocommit = False
+        except:
+            conn = get_conn(schema_name)
 
         # Construct SQL logic
         sql = f"COPY (SELECT * FROM {schema_name}.{table_name}) TO STDOUT " "WITH (FORMAT CSV, DELIMITER ',', HEADER)"
