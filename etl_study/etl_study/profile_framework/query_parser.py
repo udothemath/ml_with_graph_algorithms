@@ -1,11 +1,11 @@
 """ETL query parser."""
-from io import IOBase, StringIO
+from io import BytesIO, IOBase, StringIO
 from typing import Any, Callable, Dict, List, Tuple, Union
 
 import psycopg2
 
 from profile_framework.etl_op_zoo.base import BaseETLOpZoo
-
+from profile_framework.aicloud_db_tools import get_conn
 
 class QueryParser:
     """ETL query parser.
@@ -61,6 +61,8 @@ class QueryParser:
             parse_etl_op_body = self._parse_read_parquet
         elif etl_op_name == "read_psql":
             parse_etl_op_body = self._parse_read_psql
+        elif etl_op_name == "read_psql_advanced":
+            parse_etl_op_body = self._parse_read_psql_advanced
         elif etl_op_name == "to_parquet":
             parse_etl_op_body = self._parse_to_parquet
 
@@ -161,9 +163,24 @@ class QueryParser:
 
         return kwargs
 
+    def _parse_read_psql_advanced(
+        self,
+        op_body: List[str],
+    ) -> Dict[str, IOBase]:
+        """Parse `read_psql_advanced` operation body.
+
+        Parameters:
+            op_body: ETL operation body
+
+        Return:
+            in_memory_buff: in-memory buffer
+        """
+        return self._parse_read_psql(op_body, advanced=True)
+
     def _parse_read_psql(
         self,
         op_body: List[str],
+        advanced: bool = False,
     ) -> Dict[str, IOBase]:
         """Parse `read_psql` operation body.
 
@@ -171,25 +188,28 @@ class QueryParser:
             op_body: ETL operation body
 
         Return:
-            in_memory_csv: in-memory buffer
+            in_memory_buff: in-memory buffer
         """
         kwargs: Dict[str, Any] = {}
 
         db_name, schema_name, table_name = op_body
 
         # Build DB connection
-        conn = psycopg2.connect(dbname=db_name, user="abaowei")
-        conn.autocommit = False
+        try:
+            conn = psycopg2.connect(dbname=db_name, user="abaowei")
+            conn.autocommit = False
+        except:
+            conn = get_conn(schema_name)
 
         # Construct SQL logic
         sql = f"COPY (SELECT * FROM {schema_name}.{table_name}) TO STDOUT " "WITH (FORMAT CSV, DELIMITER ',', HEADER)"
 
-        in_memory_csv = StringIO()
+        in_memory_buff = BytesIO() if advanced else StringIO()
         try:
             cur = conn.cursor()
-            cur.copy_expert(sql, in_memory_csv)
+            cur.copy_expert(sql, in_memory_buff)
             conn.commit()
-            in_memory_csv.seek(0)
+            in_memory_buff.seek(0)
         except (Exception, psycopg2.DatabaseError) as error:
             conn.rollback()
             raise error
@@ -198,7 +218,7 @@ class QueryParser:
         conn.close()
 
         kwargs = {
-            "in_memory_csv": in_memory_csv,
+            "in_memory_buff": in_memory_buff,
         }
 
         return kwargs

@@ -2,6 +2,9 @@
 
 [API Documentation](http://localhost)
 
+REFERENCE: https://hackmd.io/WKkHFLv5Tj-ieFXadQTM8A?both
+
+
 ## Environment Setup
 
 ```linux
@@ -32,3 +35,17 @@ python -m tools.profile_main --query '[join] inner on id_l' --input-file ./data/
 4. 檢查結果: 
 
 結果會append於`berks.csv`
+
+
+
+# Aicloud Fitting TODO: 
+
+## [read_psql] rawdata tmp general_1e07
+
+- [X] 要改connection建立的方法 -> DONE: "python -m tools.profile_main --query '[read_psql] feature wm_aiget dummy' --mode polars --n-profiles 5 --to-benchmark True"
+- [ ] 要手動把.parquet檔放進DB
+
+## xxx  mode = modin
+
+- [ ] 要試試看記憶體size更大的情況
+

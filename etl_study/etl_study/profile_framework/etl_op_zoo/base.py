@@ -3,6 +3,7 @@ from io import IOBase
 from typing import Any, Dict, List, Optional
 
 import pandas as pd
+from pyarrow import csv as pa_csv
 
 
 class BaseETLOpZoo:
@@ -23,12 +24,23 @@ class BaseETLOpZoo:
 
     @staticmethod
     def read_psql(
-        in_memory_csv: IOBase,
+        in_memory_buff: IOBase,
         df: Optional[Any] = None,
     ) -> pd.DataFrame:
         """Read and return table in in-memory buffer."""
-        in_memory_csv.seek(0)
-        df = pd.read_csv(in_memory_csv)
+        in_memory_buff.seek(0)
+        df = pd.read_csv(in_memory_buff)
+
+        return df
+
+    @staticmethod
+    def read_psql_advanced(
+        in_memory_buff: IOBase,
+        df: Optional[Any] = None,
+    ) -> pd.DataFrame:
+        """Read and return table converted from in-memory arrow table."""
+        in_memory_buff.seek(0)
+        df = pa_csv.read_csv(in_memory_buff).to_pandas()
 
         return df
 
