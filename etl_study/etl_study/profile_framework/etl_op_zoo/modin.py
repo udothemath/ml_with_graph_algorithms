@@ -7,6 +7,8 @@ from pyarrow import csv as pa_csv
 
 from profile_framework.etl_op_zoo.base import BaseETLOpZoo
 
+import ray
+ray.init(object_store_memory=100*10**9)
 
 class ETLOpZoo(BaseETLOpZoo):
     """Modin ETL operation zoo."""
