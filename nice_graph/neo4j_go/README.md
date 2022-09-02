@@ -18,17 +18,18 @@
     >>> $ Call dbms.listConfig() YIELD name, value
              WHERE name='dbms.directories.import'
              RETURN name, value;
-    >>> Return: /var/lib/neo4j/import
+    >>> Default: /var/lib/neo4j/import
 
     >>> $ Call dbms.listConfig() YIELD name, value
              WHERE name='dbms.security.allow_csv_import_from_file_urls'
              RETURN name, value;
-    >>> Return: true
-    Note: Ensure comment out "dbms.directories.import" setting in neo4j.conf to import data from directory
+    >>> Default: true
+    Note: Ensure comment out "dbms.directories.import" setting in neo4j.conf to import csv data from directory
 
-4. Load csv file from import directory
+4. Load csv file 
+    - from import directory
     >>> $ load csv with headers from 'file:///artists.csv' as row return count(row);
+    - from preferred directory
     >>> $ load csv with headers from 'file:////home/jovyan/ml_with_graph_algorithms/nice_graph/neo4j_go/artists_with_header.csv' as row return count(row);
-5. Question to be solve: what if we shut down the server, the data will be gone.
  
  
