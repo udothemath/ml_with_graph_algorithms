@@ -8,21 +8,22 @@ from neo4j import GraphDatabase
 from tqdm import tqdm
 
 from src.cypher_code import (cypher_clean, cypher_conf,
-                             cypher_csv_cnt_from_dir, cypher_csv_cnt_import)
+                             cypher_csv_cnt_from_pro, cypher_csv_cnt_import)
 from src.neo4j_conn import Neo4jConnection
 
 # %load_ext autoreload
 # %autoreload 2
 PATH_BOLT = "bolt://localhost:7687"
 USER = "neo4j"
-PASSWORD = "1234"
+PASSWORD = "1239994"
 
 conn = Neo4jConnection(uri=PATH_BOLT, user=USER, pwd=PASSWORD)
 
 
 # print(conn.query(cypher_conf))
+
+print(conn.query(cypher_csv_cnt_from_pro))
 # print(conn.query(cypher_csv_cnt_import))
-print(conn.query(cypher_csv_cnt_import))
 
 
 # %%

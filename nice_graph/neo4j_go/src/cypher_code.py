@@ -18,8 +18,8 @@ FILENAME = 'artists_with_header.csv'
 # https://neo4j.com/docs/cypher-manual/current/clauses/load-csv/#load-csv-import-data-from-a-csv-file
 
 
-cypher_csv_cnt_from_dir = f'''
-LOAD CSV WITH HEADERS FROM 'file:///Users/pro/Documents/ml_with_graph_algorithms/nice_graph/neo4j_go/artists.csv' AS row 
+cypher_csv_cnt_from_pro = f'''
+LOAD CSV WITH HEADERS FROM 'file:///Users/pro/Documents/ml_with_graph_algorithms/nice_graph/neo4j_go/artists_with_header.csv' AS row 
 RETURN count(row);
 '''
 
