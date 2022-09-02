@@ -24,10 +24,11 @@
              WHERE name='dbms.security.allow_csv_import_from_file_urls'
              RETURN name, value;
     >>> Return: true
-    Note: Even thought from_file_urls is true, it has no effect since dbms.directories.import is on
+    Note: Ensure comment out "dbms.directories.import" setting in neo4j.conf to import data from directory
 
 4. Load csv file from import directory
     >>> $ load csv with headers from 'file:///artists.csv' as row return count(row);
-    >>> $ load csv with headers from 'file:////home/jovyan/graph_playground/artists_test.csv' as row return count(row);
+    >>> $ load csv with headers from 'file:////home/jovyan/ml_with_graph_algorithms/nice_graph/neo4j_go/artists_with_header.csv' as row return count(row);
 5. Question to be solve: what if we shut down the server, the data will be gone.
+ 
  
