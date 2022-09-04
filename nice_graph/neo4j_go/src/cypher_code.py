@@ -11,12 +11,15 @@ cypher_clean = '''
 MATCH (n) DETACH DELETE n
 '''
 
+cypher_node = '''MATCH (n) return count(n) '''
+
 DIR_DATA='Users/pro/Documents/ml_with_graph_algorithms/nice_graph/neo4j_go/data'
-FILENAME = 'artists.csv'
+FILENAME = 'artists_with_header.csv'
+
+load_csv_as_row = f'''LOAD CSV WITH HEADERS FROM 'file:///{DIR_DATA}/{FILENAME}' AS row '''
 
 cypher_csv_cnt_from_pro = f'''
-LOAD CSV WITH HEADERS FROM 'file:///{DIR_DATA}/{FILENAME}' AS row 
-RETURN count(row);
+{load_csv_as_row} RETURN count(row);
 '''
 
 # cypher_csv_create_from_pro = f'''
