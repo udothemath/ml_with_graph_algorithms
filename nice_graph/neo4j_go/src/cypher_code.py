@@ -16,6 +16,12 @@ cypher_node = '''MATCH (n) return count(n) '''
 DIR_DATA='Users/pro/Documents/ml_with_graph_algorithms/nice_graph/neo4j_go/data'
 FILENAME = 'artists_with_header.csv'
 
+HTML_CSV = 'https://gist.githubusercontent.com/jvilledieu/c3afe5bc21da28880a30/raw/a344034b82a11433ba6f149afa47e57567d4a18f/Companies.csv'
+
+cypher_html_csv = f'''
+LOAD CSV WITH HEADERS FROM '{HTML_CSV}' AS row Return count(row);
+'''
+
 load_csv_as_row = f'''LOAD CSV WITH HEADERS FROM 'file:///{DIR_DATA}/{FILENAME}' AS row '''
 
 cypher_csv_cnt_from_pro = f'''
