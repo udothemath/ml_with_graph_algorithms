@@ -18,11 +18,13 @@ conn = Neo4jConnection(uri=PATH_BOLT, user=NEO4J_USER, pwd=NEO4J_PASSWORD)
 def main():
     # print(conn.query(cypher_conf))
     print(conn.query(cypher_csv_cnt_from_pro))
-    # print(conn.query(cypher_csv_cnt_import))
+    try:   
+        print(conn.query(cypher_csv_create_from_pro))
+    except:
+        print('U don\'t have cypher_csv_create_from_pro')
+    print('done')
 
 if __name__=="__main__":
     print(f"{'-'*20}")
     main()
     print(f"{'-'*20}")
-
-# %%
