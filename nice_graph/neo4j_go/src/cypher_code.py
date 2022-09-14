@@ -7,6 +7,10 @@ ORDER BY name
 LIMIT 3;
 '''
 
+cypher_info = '''
+CALL dbms.listConnections() YIELD connectionId, connectTime, connector, username, userAgent, clientAddress
+'''
+
 cypher_clean = '''
 MATCH (n) DETACH DELETE n
 '''
@@ -28,10 +32,10 @@ cypher_csv_cnt_from_pro = f'''
 {load_csv_as_row} RETURN count(row);
 '''
 
-# cypher_csv_create_from_pro = f'''
-# LOAD CSV FROM 'file:///{DIR_DATA}/{FILENAME}' AS row 
-# CREATE (:Artist {name: row[1], year: toInteger(row[2])})
-# '''
+cypher_csv_create_from_pro = f'''
+LOAD CSV FROM 'file:///{DIR_DATA}/{FILENAME}' AS row 
+CREATE (:Artist {{name: row[1], year: toInteger(row[2])}})
+'''
 
 
 cypher_csv_cnt_import = f'''
