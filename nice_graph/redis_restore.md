@@ -2,7 +2,7 @@
 
 NOTE: please do the following experiment at graph-notebook! 
 
-## (1) Setup redisgraph with code graph data
+## (1) Setup redis-stack-server with code graph data
 1. Terminal 1: start redis-stack-server
 ```bash
 redis-stack-server
@@ -10,7 +10,7 @@ redis-stack-server
 2. Terminal 2: Install pycograph 
 ```bash
 python3.8 -m venv py38
-source py38/bin/activate
+source ~/py38/bin/activate
 pip install pycograph
 ```
 3.  Terminal 2: loading code graph to redis-stack-server
