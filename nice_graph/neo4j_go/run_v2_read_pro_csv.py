@@ -114,7 +114,7 @@ def main():
             WHERE a.info_yp_categ = b.info_yp_categ
             AND a <> b
             CREATE (a)-[r:YP_CATEG]->(b)
-            RETURN count(r)
+            RETURN count(r) as cnt
         ''' 
         print(driver.query(cypher_csv_create_rel))
         # print(driver.query(cypher_html_csv))
