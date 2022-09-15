@@ -66,7 +66,7 @@ def main():
     with Neo4jConnection(uri=PATH_BOLT, user=NEO4J_USER, pwd=NEO4J_PASSWORD) as driver:
         print(driver.query(cypher_conf))
         print(driver.query(cypher_csv_cnt_from_pro))
-        print(driver.query(cypher_html_csv))
+        # print(driver.query(cypher_html_csv))
 
 if __name__=="__main__":
     print(f"{'-'*20}")
