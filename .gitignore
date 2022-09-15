@@ -1,3 +1,7 @@
+nice_graph/neo4j_go/data/*
+nice_graph/neo4j_go/data/data_sub*
+nice_graph/neo4j_go/.vs_graph_neo4j.code-workspace
+nice_graph/neo4j_go/venv/*
 .my_work.code-workspace
 */q6/q6_c/data/*
 */q5/q5_c/pytorch-GAT/*
@@ -14,7 +18,8 @@ __pycache__/
 *.zip
 *.eps
 *.h5
-*.csv 
+.problem_set/q1/data/*
+# *.csv 
 *.feather
 *.json
 *.pyc
