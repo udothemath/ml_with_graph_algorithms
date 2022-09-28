@@ -1,3 +1,4 @@
+*.log
 .my_work.code-workspace
 */q6/q6_c/data/*
 */q5/q5_c/pytorch-GAT/*
