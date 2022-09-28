@@ -14,8 +14,7 @@
 __pycache__/
 *.zip
 *.eps
-*.h5
-*.csv 
+*.h5 
 *.feather
 *.json
 *.pyc

@@ -1,0 +1,3 @@
+:ID(User), name:STRING, rank:INT
+0, "Jeffrey", 5
+1, "Filipe", 8
