@@ -14,11 +14,32 @@ class Neo4jConnection:
         try:
             self.__driver = GraphDatabase.driver(
                 self.__uri, auth=(self.__user, self.__pwd))
-            print("You have established the connection")
+            print("Driver exists")
         except Exception as e:
             print("Failed to create the driver:", e)
 
-    def close(self):
+    def __enter__(self):
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self._close()
+
+    def _check_conn(self):
+        cypher_info_check = '''
+        CALL dbms.listConnections() YIELD connectionId, connectTime, connector, username, userAgent, clientAddress
+        '''
+        return self.query(cypher_info_check)
+
+    def _kill_conn(self, list_of_conn_id=['bolt-386', 'bolt-394', 'bolt-384']):
+        cypher_conn_id='CALL dbms.listConnections() YIELD connectionId'
+        print(self.query(cypher_conn_id))
+        # curr_conn_id=self.query()
+        cypher_kill=f'''
+        CALL dbms.killConnections({list_of_conn_id})
+        '''
+        return self.query(cypher_kill)
+
+    def _close(self):
         if self.__driver is not None:
             self.__driver.close()
 
