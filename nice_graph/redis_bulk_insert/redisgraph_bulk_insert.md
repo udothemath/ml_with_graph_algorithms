@@ -165,3 +165,18 @@ Cached execution: 1.0
 internal execution time: 2.791477
 Update of graph 'TourGraph' complete in 0.012179 seconds
 ```
+
+## Using redisinsight to query the graph:
+
+### Query Nodes: 
+```
+GRAPH.QUERY TourGraph "MATCH (a) RETURN a"
+```
+### Query Nodes & Edges 1:
+```
+GRAPH.QUERY TourGraph "MATCH (a)-[b]-() RETURN a, b"
+```
+### Query Nodes & Edges 2:
+```
+GRAPH.QUERY TourGraph "MATCH p=()-[]-() RETURN p"
+```
