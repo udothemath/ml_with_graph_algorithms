@@ -4,6 +4,16 @@ Describe how edge list csv can be bulk insert to redisgraph.
 
 Basically, we follow the usage of redisgraph-bulk-loader: https://github.com/RedisGraph/redisgraph-bulk-loader.
 
+Two approaches: 
+
+1. Approach I - Bulk Insert: CSV with Cypher-HEADER + One time insert for both all edges and nodes command.
+
+> 如果有空值，並且希望redisgraph吃進特定型態的property，要用Approch I。對於空值的欄位該Node會直接忽略該欄位作為node的property。
+
+2. Approach II - Bulk Update: CSV without Cypher-HEADER + Node-by-Node-Edge-by-Edge insert with Cypher command.
+     
+> 如果有空值，Approach I 在塞值的時候可能會出錯，要解這個問題可能要搭配特殊的cypher語法來解決。
+
 # Installation
 
 pip install redisgraph-bulk-loader
@@ -41,7 +51,7 @@ redis-stack-server
               `-.__.-'                                               
 
 ```
-## 2) Bulk Insert DEMO
+## 2) Approach 1: Bulk Insert 
 
 目標: 創建由USERS和FOLLOWS組成的SOCIAL network
 
@@ -74,7 +84,7 @@ FOLLOWS  [####################################]  100%
 Construction of graph 'SocialGraph' complete: 2 nodes created, 2 relations created in 0.010385 seconds
 ```
 
-## 3) Bulk Update DEMO
+## 3) Approach 2: Bulk Update 
 
 ### 3.1) Update nodes using cypher 
 ```bash
