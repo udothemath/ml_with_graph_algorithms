@@ -190,3 +190,39 @@ GRAPH.QUERY TourGraph "MATCH (a)-[b]-() RETURN a, b"
 ```
 GRAPH.QUERY TourGraph "MATCH p=()-[]-() RETURN p"
 ```
+
+# 5) 存入AVM Graph
+
+## 5.1) 將AVM的一百萬筆還沒有合併上opendata/poi的交易資料csv (41個欄位) 進行Header的改寫
+
+```python
+import pandas as pd
+table = pd.read_parquet('df1_before_opendata_added.parquet')
+mapping_of_pandas_type_to_cypher_type = {
+    'str': 'STRING',
+    'int64': 'INT',
+    'float64': 'Float',
+    'Timestamp': 'DateTime'
+}
+
+header_cols = []
+for i, col in enumerate(table.columns):
+    header_str = f'{col}:{mapping_of_pandas_type_to_cypher_type[type(table[col].iloc[0]).__name__]}'
+    header_cols.append(header_str)
+    print(col, '->', header_str)
+header_cols[0] = ':ID(House)'
+table.columns = header_cols
+table.to_csv('avm_node_table.csv', index=False)
+```
+
+## 5.2) 用bulk insert指令把csv資料存進去
+```bash
+redisgraph-bulk-insert AVMGraph --enforce-schema --nodes /home/jovyan/if-graph-ml/esb21375/data/avm_node_table.csv
+```
+>>
+```
+avm_node_table  [####################################]  100%          
+959656 nodes created with label 'avm_node_table'
+Construction of graph 'AVMGraph' complete: 959656 nodes created, 0 relations created in 94.030649 seconds
+```
+- 會發現用掉了1.2Gb的RAM，轉成dump.rds是0.7Gb
