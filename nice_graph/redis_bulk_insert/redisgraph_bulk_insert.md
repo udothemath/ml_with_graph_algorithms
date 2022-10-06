@@ -251,6 +251,7 @@ GRAPH.QUERY AVMGraph "MATCH (a) MATCH (b) WHERE a.VILLNAME = '\xe5\x8c\x97\xe6\x
    3) "Query internal execution time: 50248.657546 milliseconds"
 (50.25s)
 
+
 ## 6.4 查詢完整的edges
 ```
 GRAPH.QUERY AVMGraph "MATCH (a)-[r]->(b) WHERE a.VILLNAME = '\xe5\x8c\x97\xe6\x96\x97\xe6\x9d\x91' RETURN a, r, b"
@@ -261,3 +262,18 @@ GRAPH.QUERY AVMGraph "MATCH (a)-[r]->(b) WHERE a.VILLNAME = '\xe5\x8c\x97\xe6\x9
 ```
 GRAPH.QUERY AVMGraph "MATCH ()-[r]->() DELETE r"
 ```
+
+## 6.6 Questions: 
+- [X] 如果nodes不去存VILLANAME / xx / yy / 時間之外的點，速度會不會更快一點? 會! 快28秒
+
+```
+redisgraph-bulk-insert AVMGraph --enforce-schema --nodes /home/jovyan/if-graph-ml/esb21375/data/avm_node_table_small.csv
+redis-cli
+> GRAPH.QUERY AVMGraph "MATCH (a) MATCH (b) WHERE a.VILLNAME = '\xe5\x8c\x97\xe6\x96\x97\xe6\x9d\x91' AND b.VILLNAME = '\xe5\x8c\x97\xe6\x96\x97\xe6\x9d\x91' AND id(a) <> id(b) AND (a.xx-b.xx)^2+(a.yy-b.yy)^2 < 100 CREATE (a)-[:IS_NEAR]->(b)"
+> 1) 1) "Relationships created: 608"
+   2) "Cached execution: 0"
+   3) "Query internal execution time: 22071.491293 milliseconds"
+(22.07s)
+```
+- [ ] 直接先用relational database來做出edges list以後透過bulk insert灌到redisgraph裡面，這樣的速度會不會比較快? 
+- [ ] data time 從原始的appraisedate和real_estate col8去抓出，抓出來以後可以用來放到node properties裡面用來建edges
