@@ -255,3 +255,8 @@ GRAPH.QUERY AVMGraph "MATCH (a) MATCH (b) WHERE a.VILLNAME = '\xe5\x8c\x97\xe6\x
 ```
 GRAPH.QUERY AVMGraph "MATCH (a)-[r]->(b) WHERE a.VILLNAME = '\xe5\x8c\x97\xe6\x96\x97\xe6\x9d\x91' RETURN a, r, b"
 ```
+
+## 6.5 刪除edges
+```
+GRAPH.QUERY AVMGraph "MATCH ()-[r]->() DELETE r"
+```
