@@ -57,8 +57,6 @@ redis-stack-server
 
 ## 2.1) 準備nodes, edges資料
 
-
-
 Users.csv
 ```csv
 :ID(User), name:STRING, rank:INT
@@ -83,6 +81,8 @@ FOLLOWS  [####################################]  100%
 2 relations created for type 'FOLLOWS'
 Construction of graph 'SocialGraph' complete: 2 nodes created, 2 relations created in 0.010385 seconds
 ```
+
+NOTE: :ID(User)這個欄位若是給string，會被自動加上編號!!該編號是一個以0,1,2..往下的編號
 
 ## 3) Approach 2: Bulk Update 
 
@@ -226,3 +226,31 @@ avm_node_table  [####################################]  100%
 Construction of graph 'AVMGraph' complete: 959656 nodes created, 0 relations created in 94.030649 seconds
 ```
 - 會發現用掉了1.2Gb的RAM，轉成dump.rds是0.7Gb
+
+# 6. 依據業務邏輯建立edges再刪掉
+
+## 6.1 先啟動redis-cli:
+
+> 127.0.0.1:6379> [] 
+
+## 6.2 篩選點出來看
+
+```
+GRAPH.QUERY AVMGraph "MATCH (n) RETURN n LIMIT 10"
+```
+
+## 6.3 在距離相距為10內的點之間建立edges
+
+只先看南門里的部分: 南門里 - '\xe5\x8c\x97\xe6\x96\x97\xe6\x9d\x91' (共228個點)
+```
+GRAPH.QUERY AVMGraph "MATCH (a) MATCH (b) WHERE a.VILLNAME = '\xe5\x8c\x97\xe6\x96\x97\xe6\x9d\x91' AND b.VILLNAME = '\xe5\x8c\x97\xe6\x96\x97\xe6\x9d\x91' AND id(a) > id(b) AND (a.xx-b.xx)^2+(a.yy-b.yy)^2 < 100 CREATE (a)-[:IS_NEAR]->(b)"
+```
+>> 1) 1) "Relationships created: 304"
+   2) "Cached execution: 0"
+   3) "Query internal execution time: 51356.542058 milliseconds"
+(50s)
+
+## 6.4 查詢完整的edges
+```
+GRAPH.QUERY AVMGraph "MATCH (a)-[r]->(b) WHERE a.VILLNAME = '\xe5\x8c\x97\xe6\x96\x97\xe6\x9d\x91' RETURN a, r, b LIMIT 30"
+```
