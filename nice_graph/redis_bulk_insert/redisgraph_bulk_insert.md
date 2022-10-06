@@ -243,14 +243,15 @@ GRAPH.QUERY AVMGraph "MATCH (n) RETURN n LIMIT 10"
 
 只先看南門里的部分: 南門里 - '\xe5\x8c\x97\xe6\x96\x97\xe6\x9d\x91' (共228個點)
 ```
-GRAPH.QUERY AVMGraph "MATCH (a) MATCH (b) WHERE a.VILLNAME = '\xe5\x8c\x97\xe6\x96\x97\xe6\x9d\x91' AND b.VILLNAME = '\xe5\x8c\x97\xe6\x96\x97\xe6\x9d\x91' AND id(a) > id(b) AND (a.xx-b.xx)^2+(a.yy-b.yy)^2 < 100 CREATE (a)-[:IS_NEAR]->(b)"
+GRAPH.QUERY AVMGraph "MATCH (a) MATCH (b) WHERE a.VILLNAME = '\xe5\x8c\x97\xe6\x96\x97\xe6\x9d\x91' AND b.VILLNAME = '\xe5\x8c\x97\xe6\x96\x97\xe6\x9d\x91' AND id(a) <> id(b) AND (a.xx-b.xx)^2+(a.yy-b.yy)^2 < 100 CREATE (a)-[:IS_NEAR]->(b)"
 ```
->> 1) 1) "Relationships created: 304"
+>>
+1) 1) "Relationships created: 608"
    2) "Cached execution: 0"
-   3) "Query internal execution time: 51356.542058 milliseconds"
-(50s)
+   3) "Query internal execution time: 50248.657546 milliseconds"
+(50.25s)
 
 ## 6.4 查詢完整的edges
 ```
-GRAPH.QUERY AVMGraph "MATCH (a)-[r]->(b) WHERE a.VILLNAME = '\xe5\x8c\x97\xe6\x96\x97\xe6\x9d\x91' RETURN a, r, b LIMIT 30"
+GRAPH.QUERY AVMGraph "MATCH (a)-[r]->(b) WHERE a.VILLNAME = '\xe5\x8c\x97\xe6\x96\x97\xe6\x9d\x91' RETURN a, r, b"
 ```
