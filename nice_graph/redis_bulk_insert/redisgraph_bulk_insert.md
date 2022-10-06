@@ -255,3 +255,5 @@ GRAPH.QUERY AVMGraph "MATCH (a) MATCH (b) WHERE a.VILLNAME = '\xe5\x8c\x97\xe6\x
 ```
 GRAPH.QUERY AVMGraph "MATCH (a)-[r]->(b) WHERE a.VILLNAME = '\xe5\x8c\x97\xe6\x96\x97\xe6\x9d\x91' RETURN a, r, b"
 ```
+
+<img width="392" alt="擷取" src="https://user-images.githubusercontent.com/6816755/194280727-3788a3dd-793b-4a49-82ff-92ec33f32979.PNG">
