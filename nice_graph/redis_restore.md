@@ -47,4 +47,3 @@ redis-stack-server
 redis-cli
 > GRAPH.QUERY src "MATCH (n) RETURN n"
 ```
-
