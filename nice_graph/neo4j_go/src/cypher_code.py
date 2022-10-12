@@ -1,3 +1,8 @@
+cypher_clean = '''
+MATCH (n) DETACH DELETE n
+'''
+
+
 cypher_conf = '''
 CALL dbms.listConfig()
 YIELD name, value
@@ -11,13 +16,10 @@ cypher_info = '''
 CALL dbms.listConnections() YIELD connectionId, connectTime, connector, username, userAgent, clientAddress
 '''
 
-cypher_clean = '''
-MATCH (n) DETACH DELETE n
-'''
 
 cypher_node = '''MATCH (n) return count(n) '''
 
-DIR_DATA='Users/pro/Documents/ml_with_graph_algorithms/nice_graph/neo4j_go/data'
+DIR_DATA = 'Users/pro/Documents/ml_with_graph_algorithms/nice_graph/neo4j_go/data'
 FILENAME = 'artists_with_header.csv'
 
 HTML_CSV = 'https://gist.githubusercontent.com/jvilledieu/c3afe5bc21da28880a30/raw/a344034b82a11433ba6f149afa47e57567d4a18f/Companies.csv'
