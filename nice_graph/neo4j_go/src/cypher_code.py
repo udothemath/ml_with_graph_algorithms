@@ -49,5 +49,26 @@ cypher_csv_limit_import = f'''
 LOAD CSV WITH HEADERS FROM 'file:///{FILENAME}' AS row WITH row LIMIT 3 RETURN row;
 '''
 
+# MATCH (a:USER), (b:USER)
+# WHERE a.num_hash = row.num_hash
+# CREATE (:USER {prop: row.ind_cluster_life_car_trading_total_count_in_1m})
+# RETURN count(*) as cnt
+
+#     MATCH (a:NUM_ID), (b:NUM_ID)
+#     WHERE a.info_yp_categ = b.info_yp_categ
+#     AND a <> b
+#     CREATE (a)-[r:YP_CATEG]->(b)
+#     RETURN count(r) as cnt
+
+# query = '''
+#     UNWIND $rows as row
+#     MERGE (:Ind_v2 {
+#         num:row.num_hash,
+#         ind_ct_total:row.ind_cluster_life_car_trading_total_count_in_1m,
+#         ind_ct_qc: row.ind_cluster_life_car_trading_qc_count_in_1m})
+#     return count(*)
+# '''
+
+
 # https://neo4j.com/developer/desktop-csv-import/
 # https://neo4j.com/docs/cypher-manual/current/clauses/load-csv/#load-csv-import-data-from-a-csv-file
