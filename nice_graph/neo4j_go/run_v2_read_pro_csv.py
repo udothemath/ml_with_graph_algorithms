@@ -2,7 +2,7 @@
 import json
 import time
 from asyncore import read
-from var import col_var
+from var import col_var, col_var_one
 import numpy as np
 import pandas as pd
 from IPython.display import display
@@ -68,12 +68,12 @@ def check_data(sample_size: int = 1000, file_name: str = FILE_NAME):
     # save_df_to_csv(df_keep, to_filename='test_df_v2')
 
 
-def gen_cypher():
+def gen_cypher(file_name: str = FILE_NAME):
 
     data_path = f"{file_name}"
     cypher_csv_create_from_pro = f'''
         LOAD CSV FROM 'file:///{data_path}' AS row
-        CREATE (:ID {{num_hash: row[0], search_dt: row[1]}})
+        CREATE (:USER {{num_hash: row[0], search_dt: row[1]}})
     '''
     print(cypher_csv_create_from_pro)
     return cypher_csv_create_from_pro
@@ -134,29 +134,88 @@ def main():
 
 # df = check_data(file_name=FILE_NAME)
 
+
+def df_for_relation(df):
+    print(df.shape)
+    display(df[:3])
+
+    # def add_ind(df):
+    col_keep = ['num_hash']
+    for curr_i in col_var_one:
+        # col_check = 'cluster_life_car_trading_total_count_in_1m'
+        var_mean = df[curr_i].mean(axis=0)
+        curr_i_ind = f'ind_{curr_i}'
+        col_keep.append(curr_i_ind)
+        df[curr_i_ind] = np.where(df[curr_i] > var_mean, 1, 0)
+
+    cond = (df['cluster_life_car_trading_total_count_in_1m'] > 0)
+    print(df[cond].shape)
+    display(df[cond][col_keep][:3])
+
+    rows = df[col_keep]
+    print(rows.shape)
+
+    b = rows.to_dict('records')
+    first_three_items = b[:3]
+
+    data_path = FILE_NAME
+    print(first_three_items)
+    query = f'''
+        UNWIND $rows as row
+        CREATE (xxx:USER {{
+            num_hash: row.num_hash,
+            ind_type1: row.ind_cluster_life_car_trading_total_count_in_1m,
+            ind_type2: row.ind_cluster_life_car_trading_qc_count_in_1m 
+            }})
+        WITH xxx
+        MATCH (a:USER), (b:USER)
+        WHERE a.ind_type2 = 1
+        and b.ind_type2 = 1
+        and a <> b
+        CREATE (a)-[r:r_ind_type2]->(b) 
+        RETURN count(r) 
+    '''
+
+    # MATCH (a:USER), (b:USER)
+    # WHERE a.num_hash = row.num_hash
+    # CREATE (:USER {prop: row.ind_cluster_life_car_trading_total_count_in_1m})
+    # RETURN count(*) as cnt
+
+    #     MATCH (a:NUM_ID), (b:NUM_ID)
+    #     WHERE a.info_yp_categ = b.info_yp_categ
+    #     AND a <> b
+    #     CREATE (a)-[r:YP_CATEG]->(b)
+    #     RETURN count(r) as cnt
+
+    # query = '''
+    #     UNWIND $rows as row
+    #     MERGE (:Ind_v2 {
+    #         num:row.num_hash,
+    #         ind_ct_total:row.ind_cluster_life_car_trading_total_count_in_1m,
+    #         ind_ct_qc: row.ind_cluster_life_car_trading_qc_count_in_1m})
+    #     return count(*)
+    # '''
+    with Neo4jConnection(uri=PATH_BOLT, user=NEO4J_USER, pwd=NEO4J_PASSWORD) as driver:
+        print(driver.query(cypher_clean))
+        # print(driver.query(gen_cypher()))
+        print(driver.query(query, parameters={
+              'rows': rows.to_dict('records')}))
+
+    print("done")
+
+
 df = check_data(sample_size=1000, file_name=FILE_NAME)
-print(df.shape)
-display(df[:3])
-
-# def add_ind(df):
-for curr_i in col_var:
-    # col_check = 'cluster_life_car_trading_total_count_in_1m'
-    var_avg = df[curr_i].mean(axis=0)
-    curr_i_ind = f'ind_{curr_i}'
-    df[curr_i_ind] = np.where(df[curr_i] > var_mean, 1, 0)
-
-cond = (df[cluster_life_car_trading_total_count_in_1m] > 0)
-print(df[cond].shape)
-display(df[cond])
-print(a)
-
+df_for_relation(df)
 # print(df.describe())
 # main()
 
 # %%
+
 # if __name__=="__main__":
 #     print(f"{'-'*20}")
 #     gen_cypher()
 #     # main()
 #     # data_csv_process(sample_size=1000)
 #     print(f"{'-'*20}")
+
+# %%

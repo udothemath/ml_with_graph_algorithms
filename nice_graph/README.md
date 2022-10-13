@@ -18,8 +18,8 @@
 - 視覺化結果呈現在瀏覽器上
 - 當圖已經建好時，產生圖結構生成的特徵(graph feature enhancement)
 - 研究圖暫存檔格式(效能優化)
-- cipher 語法介紹
+- cypher 語法介紹
     - 參考網站:https://ithelp.ithome.com.tw/users/20130217/articles?page=2
 
 ## 附註
-請同步新增操作說明以及相關參考資料
+請新增操作說明以及相關參考資料

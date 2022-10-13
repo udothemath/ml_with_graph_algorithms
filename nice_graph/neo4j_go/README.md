@@ -70,5 +70,20 @@
 	> load csv with headers from 'file:///artists.csv' as row return count(row);
 - from preferred directory
 	> load csv with headers from 'file:////home/jovyan/ml_with_graph_algorithms/nice_graph/neo4j_go/artists_with_header.csv' as row return count(row);
+
+
+## Thoughts
+Q: 如何增加圖的資訊？  
+A: 有以下三種可能的方式。  
+1. 新增節點的屬性(property)
+2. 新增節點種類(異質圖)，並依照節點的屬性建立關係
+3. 具有相同屬性的節點，建立節點與節點間關係連線 
+
+備註：一點感想。盡量不要用第三種方法建立關係連線，因為可能會造成過多的連線
+
+
+
+## Reference
+- [Create a graph database in Neo4j using Python](https://towardsdatascience.com/create-a-graph-database-in-neo4j-using-python-4172d40f89c4)
  
  
