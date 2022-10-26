@@ -1,4 +1,5 @@
 # %%
+from neo4j import GraphDatabase, basic_auth
 import json
 import time
 from asyncore import read
@@ -110,29 +111,12 @@ def main():
         # print(driver.query(cypher_csv_create_rel))
         # # ## print(driver.query(cypher_html_csv))
 
-
-# gen_cypher()
-# gen_cypher_info()
-
-# df = check_data(file_name=FILE_NAME)
-
-the_g_query = 'MATCH (n) RETURN COUNT(n)'
-with Neo4jConnection(uri=PATH_BOLT, user=NEO4J_USER, pwd=NEO4J_PASSWORD) as driver:
-    print(driver.query(the_g_query))
-    # print(driver.query(query, parameters={
-    #         'rows': rows.to_dict('records')}))
-
-
-# main()
-
-
 # %%
 
 # if __name__=="__main__":
 #     print(f"{'-'*20}")
 #     gen_cypher()
 #     # main()
-#     # data_csv_process(sample_size=1000)
 #     print(f"{'-'*20}")
 
 # %%
