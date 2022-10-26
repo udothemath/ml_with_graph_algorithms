@@ -19,11 +19,11 @@ pd.set_option('display.max_columns', 9999)
 
 PATH_BOLT = "bolt://localhost:7687"
 DATA_SOURCE = '/Users/pro/Documents/ml_with_graph_algorithms/nice_graph/neo4j_go/data'
-FILE_NAME = f'{DATA_SOURCE}/6000set2_2022_04-05/2022-05-01/cluster_life.csv'
+FILE_NAME = f'{DATA_SOURCE}/6000set2_2022_04-05/2022-05-01/info.csv'
 
 
-def read_csv_as_chunk(fname, sample_size, chunk_size=1000):
-    reader = pd.read_csv(fname, header=0, nrows=sample_size,
+def read_csv_as_chunk(file_name: str, sample_size: int, chunk_size=1000):
+    reader = pd.read_csv(file_name, header=0, nrows=sample_size,
                          iterator=True, low_memory=False)
     chunks = []
     loop = True
@@ -48,24 +48,6 @@ def save_df_to_csv(input_df: pd.DataFrame(), to_filename: str, to_path=DATA_SOUR
     except Exception as e:
         print("Fail to save csv file")
         raise e
-
-
-def check_data(sample_size: int = 1000, file_name: str = FILE_NAME):
-
-    # df_all = pd.read_csv(file_name, header=0)
-    # print(df_all.shape)
-    # cluster_life: 5485, 1179
-
-    df = read_csv_as_chunk(file_name, sample_size=sample_size, chunk_size=1000)
-    col_list = [
-        'num_hash', 'search_dt', 'status_verify_yn',
-    ] + col_var
-
-    df = df[col_list]
-    return df
-    # display(df_keep)
-    # display(df_keep[['num_hash','search_dt','status_verify_yn']])
-    # save_df_to_csv(df_keep, to_filename='test_df_v2')
 
 
 def gen_cypher(file_name: str = FILE_NAME):
@@ -150,6 +132,8 @@ def df_for_relation(df):
     rows = df[col_keep]
 
     display(rows[:3])
+
+    print(df.sum())
     print(rows.shape)
     query = f'''
         UNWIND $rows as row
@@ -160,11 +144,9 @@ def df_for_relation(df):
             }})
         MERGE (yyy:REL_TYPE2 {{ind_type2: row.ind_cluster_life_car_trading_qc_count_in_1m}})
         WITH xxx, yyy
-        MATCH (a:USER), (b:USER)
+        MATCH (a:USER)
         WHERE a.ind_type2 = 1
-        and b.ind_type2 = 1
-        and a <> b
-        CREATE (a)-[r:r_ind_type2]->(b) 
+        CREATE (:USER)-[]->(:REL_TYPE2) 
         with r
         RETURN count(r) 
     '''
@@ -178,8 +160,14 @@ def df_for_relation(df):
     print("done")
 
 
-df = check_data(sample_size=1000, file_name=FILE_NAME)
-df_for_relation(df)
+df = read_csv_as_chunk(file_name=FILE_NAME, sample_size=1000, chunk_size=1000)
+display(df[:3])
+print(df.info())
+# df_v = df.select_dtypes(['object'])
+# display(df_v[:3])
+
+
+# df_for_relation(df)
 # main()
 
 # %%
