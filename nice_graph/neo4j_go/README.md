@@ -73,7 +73,17 @@
 
 
 ## Thoughts
-### 
+### 圖的應用
+- [Graph DB到底有哪些應用啊？＠webcomm](https://www.webcomm.com.tw/web/tw/neo4j/)
+    - ![](https://i.imgur.com/WlhKmdI.png)
+- [https://neo4j.com/developer/](https://neo4j.com/cloud/platform/aura-graph-database/?ref=nav-get-started-cta)
+- [Bite-Sized Neo4j for Data Scientists](https://github.com/cj2001/bite_sized_data_science)
+- [Announcing NODES 2022! Nov. 16-17](https://neo4j.com/blog/nodes-2022/)
+- [Videos from NODES 2021](https://neo4j.com/video/nodes-2021/)
+    - [9 – Building an ML Pipeline in Neo4j Link Prediction Deep Dive](https://www.youtube.com/watch?v=qdbhCG-Yn74&t=72s&ab_channel=Neo4j)
+        - ![](https://i.imgur.com/qvIH5DD.jpg)
+    - [8 – Data Warehouse to Graph with Apache Spark](https://www.youtube.com/watch?v=rNKLgqU_mu0&ab_channel=Neo4j)
+        - 使用Spark，將巢狀資料解構為可以輸入neo4j的格式 
 ### 如何增加圖的資訊？  
 Q: 如何增加User節點在圖資料庫上的資訊？  
 A: 有以下三種可能的方式。  
