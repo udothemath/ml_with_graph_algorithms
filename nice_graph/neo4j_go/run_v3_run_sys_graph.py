@@ -20,10 +20,42 @@ from src.neo4j_conn import Neo4jConnection
 pd.set_option('display.max_columns', 9999)
 
 PATH_BOLT = "bolt://localhost:7687"
-DATA_SOURCE = '/Users/pro/Documents/ml_with_graph_algorithms/nice_graph/neo4j_go/data'
-FILE_NAME = f'{DATA_SOURCE}/6000set2_2022_04-05/2022-05-01/cluster_life.csv'
 
-DATA_WHOS = '/home/jovyan/ml_with_graph_algorithms/nice_graph/neo4j_go/data/to_whoscall/data'
+ON_PRO = True
+
+if ON_PRO:
+    DATA_SOURCE = '/Users/pro/Documents/ml_with_graph_algorithms/nice_graph/neo4j_go/data'
+else:
+    DATA_SOURCE = 'Path_on_aicloud'
+
+print(DATA_SOURCE)
+
+file_comp = 'graph_node_analysis_v1_comp.xlsx'
+file_pm = 'graph_node_analysis_v1_pm.xlsx'
+
+df_comp = pd.read_excel(os.path.join(DATA_SOURCE, file_comp),
+                        index_col=None, header=0, engine='openpyxl')
+
+df_pm = pd.read_excel(os.path.join(DATA_SOURCE, file_pm),
+                      index_col=None, header=0, engine='openpyxl')
+
+
+def print_info(df: pd.DataFrame, info_string: str, verbose: bool = False):
+    print(f"{'-'*20} Info of {info_string} {'-'*20}")
+    display(df[:3])
+    print("Shape:", df.shape)
+    print("Unique in columns: ")
+    for i in df.columns:
+        print(f"    {i}", df[i].nunique())
+    if verbose:
+        print(df.value_counts())
+        for i in df.columns:
+            print(df[i].value_counts())
+
+
+print_info(df_comp, 'comp', False)
+print_info(df_pm, 'pm', False)
+# %%
 
 
 def check_whos_parquet(data_path=DATA_WHOS):
@@ -43,17 +75,17 @@ print(df_one.shape)
 display(df_one[:3])
 # %%
 
-print(df_one['employee'].value_counts())  ## 8,763
+print(df_one['employee'].value_counts())  # 8,763
 
 # %%
 # cond = (df_one.columns.str.contains('info'))
 
 col_info = [
     'info_yp_categ',
-    'info_yp_tag', 
-    'info_yp_source', 
-    'info_special_tag', 
-    'info_special_categ',	
+    'info_yp_tag',
+    'info_yp_source',
+    'info_special_tag',
+    'info_special_categ',
     'info_spam_categ']
 
 display(df_one[col_info].describe())
@@ -62,14 +94,16 @@ print(df_one.shape)
 # df_check = df_one[df_one.columns[cond]]
 # display(df_check[:3])
 
-## df[df.columns[df.columns.str.contains("spike|spke")]]
+# df[df.columns[df.columns.str.contains("spike|spke")]]
 
 print("Done")
 
 # check_whos_parquet()
- 
- # %%
+
 # %%
+# %%
+
+
 def read_csv_as_chunk(fname, sample_size, chunk_size=1000):
     reader = pd.read_csv(fname, header=0, nrows=sample_size,
                          iterator=True, low_memory=False)
@@ -104,7 +138,8 @@ def check_data(sample_size: int = 1000, file_name: str = FILE_NAME):
     # print(df_all.shape)
     # cluster_life: 5485, 1179
 
-    df = read_csv_as_chunk(file_name, sample_size=sample_size, chunk_size=1000)
+    df = read_csv_as_chunk(
+        file_name, sample_size=sample_size, chunk_size=1000)
     col_list = [
         'num_hash', 'search_dt', 'status_verify_yn',
     ] + col_var
