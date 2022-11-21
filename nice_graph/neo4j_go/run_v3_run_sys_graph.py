@@ -30,8 +30,27 @@ else:
 
 print(DATA_SOURCE)
 
-file_comp = 'graph_node_analysis_v1_comp.xlsx'
-file_pm = 'graph_node_analysis_v1_pm.xlsx'
+file_comp = 'graph_node_analysis_v1_comp'
+file_pm = 'graph_node_analysis_v1_pm'
+
+
+def excel_to_csv(filename: str):
+    xlsx_with_path = os.path.join(
+        DATA_SOURCE, f"{filename}.xlsx")
+
+    filename_as_csv = os.path.join(DATA_SOURCE, f"csv_{filename}.csv")
+    df = pd.read_excel(xlsx_with_path, index_col=None,
+                       header=0, engine='openpyxl')
+    df.to_csv(filename_as_csv, index=None, header=True)
+    print(f"U have saved {filename_as_csv}")
+
+
+excel_to_csv(filename=file_comp)
+excel_to_csv(filename=file_pm)
+
+# %%
+# %%
+
 
 df_comp = pd.read_excel(os.path.join(DATA_SOURCE, file_comp),
                         index_col=None, header=0, engine='openpyxl')
@@ -44,7 +63,7 @@ def print_info(df: pd.DataFrame, info_string: str, verbose: bool = False):
     print(f"{'-'*20} Info of {info_string} {'-'*20}")
     display(df[:3])
     print("Shape:", df.shape)
-    print("Unique in columns: ")
+    print("Number of unique type in columns: ")
     for i in df.columns:
         print(f"    {i}", df[i].nunique())
     if verbose:
@@ -56,26 +75,6 @@ def print_info(df: pd.DataFrame, info_string: str, verbose: bool = False):
 print_info(df_comp, 'comp', False)
 print_info(df_pm, 'pm', False)
 # %%
-
-
-def check_whos_parquet(data_path=DATA_WHOS):
-    file_list = os.listdir(data_path)
-    print(file_list)
-    # for file in file_list:
-    #     print(file)
-    #     df_whoscall = pd.read_parquet(data_path + file)
-    #     # print(file, df_whoscall.shape)
-    # print('Done!')
-
-
-file = '2021-07-01.parquet'
-read_this = os.path.join(DATA_WHOS, file)
-df_one = pd.read_parquet(read_this, engine='pyarrow')
-print(df_one.shape)
-display(df_one[:3])
-# %%
-
-print(df_one['employee'].value_counts())  # 8,763
 
 # %%
 # cond = (df_one.columns.str.contains('info'))
@@ -130,25 +129,6 @@ def save_df_to_csv(input_df: pd.DataFrame(), to_filename: str, to_path=DATA_SOUR
     except Exception as e:
         print("Fail to save csv file")
         raise e
-
-
-def check_data(sample_size: int = 1000, file_name: str = FILE_NAME):
-
-    # df_all = pd.read_csv(file_name, header=0)
-    # print(df_all.shape)
-    # cluster_life: 5485, 1179
-
-    df = read_csv_as_chunk(
-        file_name, sample_size=sample_size, chunk_size=1000)
-    col_list = [
-        'num_hash', 'search_dt', 'status_verify_yn',
-    ] + col_var
-
-    df = df[col_list]
-    return df
-    # display(df_keep)
-    # display(df_keep[['num_hash','search_dt','status_verify_yn']])
-    # save_df_to_csv(df_keep, to_filename='test_df_v2')
 
 
 def gen_cypher(file_name: str = FILE_NAME):

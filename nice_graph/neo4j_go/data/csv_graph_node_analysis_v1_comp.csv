@@ -1,0 +1,40 @@
+環境,元件,元件負責人,專案
+staging,kafka,17957,wm_robo_advisor
+staging,kafka,17957,if_oa_gateway
+staging,kafka,17957,if_api_hub
+staging,kafka,17957,hr_resume_selector
+staging,kafka,17957,rm_eaml
+staging,kafka,17957,if_polaris
+staging,kafka,17957,if_messenger
+staging,kafka,17957,if_devops
+staging,kafka,17957,df_smart_channel
+staging,kafka,17957,if_cv_api_controller
+staging,kafka,17957,if_qaplatform
+staging,kafka,17957,cc_iivr
+staging,minIO,22220,cc_fraud_detection_advance
+staging,minIO,22220,if-captcha-ocr
+staging,minIO,22220,if-gp-ocr
+staging,minIO,22220,pl-automated-valuation
+staging,minIO,22220,rm_gaml_alert_reduction
+staging,minIO,22220,wm-aiget
+staging,kafka,17957, upload_api_and_offline_stt
+staging,kafka,17957, if_qaplatform
+staging,kafka,17957, if_oa_gateway
+staging,kafka,17957, if_mlaas2_plus
+staging,kafka,17957, br_remittance_digitization
+staging,airflow,17957, es_cv_api_controller
+staging,airflow,17957, if_imf
+staging,airflow,17957, eb_ln_extreme_speed_phase2
+staging,airflow,17957, df_smart_channel
+staging,airflow,17957, br_check_digitization
+staging,airflow,17957, if_cai
+staging,airflow,17957, pl_automated_valuation
+staging,airflow,17957, eb_voice_platform
+staging,airflow,17957, rm_eaml
+staging,airflow,17957, if_cv_api_controller
+staging,airflow,17957, cs_call_stsfctn_survey
+staging,airflow,17957, if_airflow
+staging,airflow,17957, cc_ln_pre_approval
+staging,airflow,17957, wm_insur_call_qa
+staging,airflow,17957, wm_robo_advisor
+staging,airflow,17957, if_polaris
