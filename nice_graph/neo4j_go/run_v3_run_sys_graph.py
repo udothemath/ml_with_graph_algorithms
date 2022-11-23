@@ -11,7 +11,7 @@ from tqdm import tqdm
 import os
 import pyarrow
 
-# from setting import NEO4J_PASSWORD, NEO4J_USER
+from setting import NEO4J_PASSWORD, NEO4J_USER
 from src.cypher_code import (cypher_clean, cypher_conf,
                              cypher_csv_cnt_from_pro, cypher_csv_cnt_import,
                              cypher_csv_create_from_pro, cypher_html_csv,
@@ -38,9 +38,13 @@ def excel_to_csv(filename: str):
     xlsx_with_path = os.path.join(
         DATA_SOURCE, f"{filename}.xlsx")
 
-    filename_as_csv = os.path.join(DATA_SOURCE, f"csv_{filename}.csv")
+    filename_as_csv = os.path.join(DATA_SOURCE, f"csv2_{filename}.csv")
     df = pd.read_excel(xlsx_with_path, index_col=None,
                        header=0, engine='openpyxl')
+
+    for i in df.columns[df.dtypes == object].tolist():
+        df[i] = df[i].str.strip()
+
     df.to_csv(filename_as_csv, index=None, header=True)
     print(f"U have saved {filename_as_csv}")
 
@@ -49,10 +53,10 @@ excel_to_csv(filename=file_comp)
 excel_to_csv(filename=file_pm)
 
 # %%
-df_comp = pd.read_excel(os.path.join(DATA_SOURCE, file_comp),
+df_comp = pd.read_excel(os.path.join(DATA_SOURCE, f"{file_comp}.xlsx"),
                         index_col=None, header=0, engine='openpyxl')
 
-df_pm = pd.read_excel(os.path.join(DATA_SOURCE, file_pm),
+df_pm = pd.read_excel(os.path.join(DATA_SOURCE, f"{file_pm}.xlsx"),
                       index_col=None, header=0, engine='openpyxl')
 
 
@@ -72,69 +76,37 @@ def print_info(df: pd.DataFrame, info_string: str, verbose: bool = False):
 print_info(df_comp, 'comp', False)
 print_info(df_pm, 'pm', False)
 # %%
+csv_comp = os.path.join(DATA_SOURCE, f"csv2_{file_comp}.csv")
+csv_pm = os.path.join(DATA_SOURCE, f"csv2_{file_pm}.csv")
 
+load_csv_comp_conn = \
+    f'''
+    LOAD CSV WITH HEADERS FROM 'file:///{csv_comp}' AS row 
+    MERGE (n:Sys_comp {{sys_comp: row.元件}})    
+    MERGE (m:Sys_lead {{sys_lead: row.元件負責人}}) 
+    MERGE (o:Proj {{proj: row.專案}})  
+    MERGE (n)-[rel_comp_lead:Comp_Lead]->(m)
+    MERGE (n)-[:Comp_Proj]->(o)
+    return count(rel_comp_lead)
+    '''
 
-col_info = [
-    'info_yp_categ',
-    'info_yp_tag',
-    'info_yp_source',
-    'info_special_tag',
-    'info_special_categ',
-    'info_spam_categ']
+load_csv_pm_conn = \
+    f'''
+    LOAD CSV WITH HEADERS FROM 'file:///{csv_pm}' AS row
+    MERGE (o:Proj {{proj: row.專案}})  
+    MERGE (r:PM {{pm: row.PM}})
+    MERGE (o)-[rel_proj_pm:Proj_PM]->(r)
+    return count(rel_proj_pm)
+    '''
 
-display(df_one[col_info].describe())
-print(df_one.shape)
-
-# df_check = df_one[df_one.columns[cond]]
-# display(df_check[:3])
-
-# df[df.columns[df.columns.str.contains("spike|spke")]]
-
-print("Done")
+with Neo4jConnection(uri=PATH_BOLT, user=NEO4J_USER, pwd=NEO4J_PASSWORD) as driver:
+    print(driver.query(cypher_clean))
+    print(driver.query(cypher_conf))
+    print(driver.query(load_csv_comp_conn))
+    print(driver.query(load_csv_pm_conn))
 
 # %%
-
-
-def gen_cypher(file_name: str = FILE_NAME):
-
-    data_path = f"{file_name}"
-    cypher_csv_create_from_pro = f'''
-        LOAD CSV FROM 'file:///{data_path}' AS row
-        CREATE (:USER {{num_hash: row[0], search_dt: row[1]}})
-    '''
-    print(cypher_csv_create_from_pro)
-    return cypher_csv_create_from_pro
-
-
-def gen_cypher_info():
-
-    file_name = f'{DATA_SOURCE}/6000set2_2022_04-05/2022-05-01/info.csv'
-
-    df_all = pd.read_csv(file_name, header=0)
-    print(df_all.shape)
-    print(df_all.columns)
-    # info size: 5485, 9
-
-    # df = read_csv_as_chunk(file_name, sample_size=1000, chunk_size=1000)
-
-    col_list = ['num_hash', 'search_dt', 'status_verify_yn', 'info_yp_categ',
-                'info_yp_tag', 'info_yp_source', 'info_special_tag',
-                'info_special_categ', 'info_spam_categ']
-
-    # df_keep = df[col_list][:3]
-    # display(df_keep)
-    # display(df_keep[['num_hash','search_dt','status_verify_yn']])
-
-    # save_df_to_csv(df_keep, to_filename='test_df_v2')
-
-    data_path = f"{file_name}"
-    cypher_task = f'''
-        LOAD CSV FROM 'file:///{data_path}' AS row_life
-        CREATE (:NUM_ID {{num_hash: row_life[0], info_yp_categ: row_life[3]}})
-        CREATE (:SPECIAL_ID {{info_special_tag: row_life[6], info_special_categ: row_life[7]}})
-    '''
-    print(cypher_task)
-    return cypher_task
+# %%
 
 
 def main():
@@ -217,8 +189,5 @@ def df_for_relation(df):
 #     # main()
 #     # data_csv_process(sample_size=1000)
 #     print(f"{'-'*20}")
-
-# %%
-
 
 # %%
