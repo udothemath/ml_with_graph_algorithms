@@ -48,9 +48,10 @@
 		$ python main.py
 		```
 	- through browser with port forward 
-		```bash
-		localhost:7474
-		```
+		- please ensure that you have following two port forwarding
+			- localhost:7474 (step1: for neo4j connection)
+			- localhost:7687 (step2: for graph db connection)
+
 ### Check the neo4j config setting
 - default import path
 	> Call dbms.listConfig() YIELD name, value

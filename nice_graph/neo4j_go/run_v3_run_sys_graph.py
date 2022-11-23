@@ -21,14 +21,17 @@ pd.set_option('display.max_columns', 9999)
 
 PATH_BOLT = "bolt://localhost:7687"
 
-ON_PRO = True
+ON_PRO = False
 
 if ON_PRO:
     DATA_SOURCE = '/Users/pro/Documents/ml_with_graph_algorithms/nice_graph/neo4j_go/data'
 else:
-    DATA_SOURCE = 'Path_on_aicloud'
+    DATA_SOURCE = '/home/jovyan/ml_with_graph_algorithms/nice_graph/neo4j_go/data'
 
 print(DATA_SOURCE)
+
+print(f"NEO4J user:{NEO4J_USER}. password: {NEO4J_PASSWORD}")
+# %%
 
 file_comp = 'graph_node_analysis_v1_comp'
 file_pm = 'graph_node_analysis_v1_pm'
@@ -49,8 +52,8 @@ def excel_to_csv(filename: str):
     print(f"U have saved {filename_as_csv}")
 
 
-excel_to_csv(filename=file_comp)
-excel_to_csv(filename=file_pm)
+# excel_to_csv(filename=file_comp)
+# excel_to_csv(filename=file_pm)
 
 # %%
 df_comp = pd.read_excel(os.path.join(DATA_SOURCE, f"{file_comp}.xlsx"),
@@ -76,63 +79,41 @@ def print_info(df: pd.DataFrame, info_string: str, verbose: bool = False):
 print_info(df_comp, 'comp', False)
 print_info(df_pm, 'pm', False)
 # %%
-csv_comp = os.path.join(DATA_SOURCE, f"csv2_{file_comp}.csv")
-csv_pm = os.path.join(DATA_SOURCE, f"csv2_{file_pm}.csv")
-
-load_csv_comp_conn = \
-    f'''
-    LOAD CSV WITH HEADERS FROM 'file:///{csv_comp}' AS row 
-    MERGE (n:Sys_comp {{sys_comp: row.元件}})    
-    MERGE (m:Sys_lead {{sys_lead: row.元件負責人}}) 
-    MERGE (o:Proj {{proj: row.專案}})  
-    MERGE (n)-[rel_comp_lead:Comp_Lead]->(m)
-    MERGE (n)-[:Comp_Proj]->(o)
-    return count(rel_comp_lead)
-    '''
-
-load_csv_pm_conn = \
-    f'''
-    LOAD CSV WITH HEADERS FROM 'file:///{csv_pm}' AS row
-    MERGE (o:Proj {{proj: row.專案}})  
-    MERGE (r:PM {{pm: row.PM}})
-    MERGE (o)-[rel_proj_pm:Proj_PM]->(r)
-    return count(rel_proj_pm)
-    '''
-
-with Neo4jConnection(uri=PATH_BOLT, user=NEO4J_USER, pwd=NEO4J_PASSWORD) as driver:
-    print(driver.query(cypher_clean))
-    print(driver.query(cypher_conf))
-    print(driver.query(load_csv_comp_conn))
-    print(driver.query(load_csv_pm_conn))
-
-# %%
-# %%
-
 
 def main():
+    csv_comp = os.path.join(DATA_SOURCE, f"csv2_{file_comp}.csv")
+    csv_pm = os.path.join(DATA_SOURCE, f"csv2_{file_pm}.csv")
+
+    load_csv_comp_conn = \
+        f'''
+        LOAD CSV WITH HEADERS FROM 'file:///{csv_comp}' AS row 
+        MERGE (n:Sys_comp {{sys_comp: row.元件}})    
+        MERGE (m:Sys_lead {{sys_lead: row.元件負責人}}) 
+        MERGE (o:Proj {{proj: row.專案}})  
+        MERGE (n)-[rel_comp_lead:Comp_Lead]->(m)
+        MERGE (n)-[:Comp_Proj]->(o)
+        return count(rel_comp_lead)
+        '''
+
+    load_csv_pm_conn = \
+        f'''
+        LOAD CSV WITH HEADERS FROM 'file:///{csv_pm}' AS row
+        MERGE (o:Proj {{proj: row.專案}})  
+        MERGE (r:PM {{pm: row.PM}})
+        MERGE (o)-[rel_proj_pm:Proj_PM]->(r)
+        return count(rel_proj_pm)
+        '''
+
     with Neo4jConnection(uri=PATH_BOLT, user=NEO4J_USER, pwd=NEO4J_PASSWORD) as driver:
         print(driver.query(cypher_clean))
         print(driver.query(cypher_conf))
-        # ## print(driver.query(cypher_csv_cnt_from_pro))
-        print(driver.query(gen_cypher()))
-        # print(driver.query(gen_cypher_info()))
+        print(driver.query(cypher_info)) 
+        print(driver.query(load_csv_comp_conn))
+        print(driver.query(load_csv_pm_conn))
 
-        # cypher_csv_create_rel = f'''
-        #     MATCH (a:NUM_ID), (b:NUM_ID)
-        #     WHERE a.info_yp_categ = b.info_yp_categ
-        #     AND a <> b
-        #     CREATE (a)-[r:YP_CATEG]->(b)
-        #     RETURN count(r) as cnt
-        # '''
-        # print(driver.query(cypher_csv_create_rel))
-        # # ## print(driver.query(cypher_html_csv))
-
-
-# gen_cypher()
-# gen_cypher_info()
-
-# df = check_data(file_name=FILE_NAME)
-
+main()
+# %%
+# %%
 
 def df_for_relation(df):
     print(df.shape)
@@ -176,10 +157,6 @@ def df_for_relation(df):
 
     print("done")
 
-
-# df = check_data(sample_size=1000, file_name=FILE_NAME)
-# df_for_relation(df)
-# main()
 
 # %%
 
