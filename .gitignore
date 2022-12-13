@@ -1,5 +1,6 @@
 *.log
 kaggle2022_otto/data/*
+nice_graph/neo4j_go/data/archive/*
 nice_graph/neo4j_go/data/data_sub*
 nice_graph/neo4j_go/.vs_graph_neo4j.code-workspace
 nice_graph/neo4j_go/venv/*
