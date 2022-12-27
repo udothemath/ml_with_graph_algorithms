@@ -1,5 +1,8 @@
 *.log
 kaggle2022_otto/data/*
+kaggle2022_otto/udo/*.csv
+kaggle2022_otto/udo/sandbox/*
+nice_graph/neo4j_go/data/archive/*
 nice_graph/neo4j_go/data/archive/*
 nice_graph/neo4j_go/data/data_sub*
 nice_graph/neo4j_go/.vs_graph_neo4j.code-workspace
