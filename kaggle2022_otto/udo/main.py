@@ -10,23 +10,27 @@ import pprint
 from zipfile import ZipFile
 import zipfile
 from IPython.display import display
+from src_eda import EDA
 
 OTTO_PATH = '/Users/pro/Documents/ml_with_graph_algorithms/kaggle2022_otto/'
 DATA_PATH = '/Users/pro/Documents/ml_with_graph_algorithms/kaggle2022_otto/data'
 
-data = os.path.join(DATA_PATH, 'demo_test.jsonl')
+data_train = os.path.join(DATA_PATH, 'train.jsonl')
+data_test = os.path.join(DATA_PATH, 'demo_test.jsonl')
+data_test10 = os.path.join(DATA_PATH, 'demo_test_10.jsonl')
+
 data_sub = os.path.join(OTTO_PATH, 'udo', 'sample_submission.csv')
 data_sub_test = os.path.join(OTTO_PATH, 'udo', 'sample_submission_short2.csv')
 
-print("hello", data)
+print("training data file with path: ", data_train)
 
 # %%
 
 
-def get_df_format():
-    train_sessions = pd.DataFrame()
+def get_df_format(data_path: str):
+    data_sessions = pd.DataFrame()
     chunks = pd.read_json(
-        data, lines=True, chunksize=1_000_000, nrows=10_000_000)
+        data_path, lines=True, chunksize=1_000_000, nrows=10_000_000)
 
     for e, chunk in enumerate(chunks):
         print(e, chunk)
@@ -37,7 +41,6 @@ def get_df_format():
             'type': [],
         }
         if e < 2:
-            # train_sessions = pd.concat([train_sessions, chunk])
             for session, events in zip(chunk['session'].tolist(), chunk['events'].tolist()):
                 for event in events:
                     event_dict['session'].append(session)
@@ -45,61 +48,32 @@ def get_df_format():
                     event_dict['ts'].append(event['ts'])
                     event_dict['type'].append(event['type'])
             chunk_session = pd.DataFrame(event_dict)
-            train_sessions = pd.concat([train_sessions, chunk_session])
+            train_sessions = pd.concat([data_sessions, chunk_session])
         else:
             break
 
-    train_sessions = train_sessions.reset_index(drop=True)
-    return train_sessions
+    data_sessions = data_sessions.reset_index(drop=True)
+    return data_sessions
 
 
-train_sessions = get_df_format()
-print(len(train_sessions))
-display(train_sessions[:3])
+test10_sessions = get_df_format(data_test10)
+print(len(test10_sessions))
+display(test10_sessions[:3])
+
+# %%
+# train_sessions = get_df_format(data_train)
+# print(len(train_sessions))
+# display(train_sessions[:3])
 
 # %%
 
 
-class EDA:
-    def __init__(self, input_df: pd.DataFrame):
-        self.df = input_df
+def create_unix_to_dt(df: pd.DataFrame, col_dt: str) -> pd.DataFrame:
+    ''' create time related info '''
+    df['date'] = pd.to_datetime(df[col_dt], unit='ms')
+    return df
 
-    def quick_check(self):
-        display(self.df.shape)
-
-    def show_unique_size(self):
-        """ show unique size info of dataframe """
-        print(f"--- Info of DataFrame --- ")
-        print(f"Size of datafame: {self.df.shape}")
-        display(self.df[:3])
-        for _col in ['session', 'aid']:
-            cnt_uniq_items = len(self.df[_col].unique())
-            print(f"Unique size of {_col}: {cnt_uniq_items}")
-
-    def grp_sess_show_cnt_type(self):
-        _df = self.df.groupby(['session'])
-        display(_df['type'].value_counts()[:3])
-
-    def grp_aid_type_topN(self, freq_topN: int = 3):
-        """ Show aid and type count """
-        _df = self.df.groupby(['aid', 'type'])
-        display(_df['session'].count()
-                .nlargest(freq_topN).reset_index(name=f'cnt_aid_type'))
-
-    def get_hot_aid_type(self) -> dict:
-        """ Return hot items(aid) """
-        _df = self.df.groupby(['aid', 'type'])
-        df_hot = (_df['session'].count().reset_index(name='cnt_aid_type'))
-
-        dict_hot_items = {}
-        for cur_type in ['clicks', 'carts', 'orders']:
-            mask = (df_hot['type'] == cur_type)
-            cur_top = df_hot.loc[mask]\
-                .sort_values(['cnt_aid_type'], ascending=False)[:20]
-            cur_dict = {cur_type: (
-                cur_top['aid'].to_list(), cur_top['cnt_aid_type'].to_list())}
-            dict_hot_items.update(cur_dict)
-        return dict_hot_items
+# %%
 
 
 obj_train_sess = EDA(train_sessions)
