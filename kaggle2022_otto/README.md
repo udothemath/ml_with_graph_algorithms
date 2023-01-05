@@ -15,3 +15,6 @@
 - time related info
 - Promoted items 
 - [Remove the promoted product](https://www.kaggle.com/code/simonveitner/eda-find-promoted-products?scriptVersionId=113992794)
+
+## Ref
+- [count unique])(https://stackoverflow.com/questions/46126541/count-unique-values-in-objects-within-large-json-file-with-python)
