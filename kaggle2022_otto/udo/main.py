@@ -22,58 +22,96 @@ OTTO_PATH = '/Users/pro/Documents/ml_with_graph_algorithms/kaggle2022_otto/'
 DATA_PATH = '/Users/pro/Documents/ml_with_graph_algorithms/kaggle2022_otto/data'
 
 data_train = os.path.join(DATA_PATH, 'train.jsonl')
-data_test = os.path.join(DATA_PATH, 'demo_test.jsonl')
 data_test2 = os.path.join(DATA_PATH, 'demo_test_2.jsonl')
+data_test10 = os.path.join(DATA_PATH, 'demo_test_10.jsonl')
 
 data_sub = os.path.join(OTTO_PATH, 'udo', 'sample_submission.csv')
 data_sub_test = os.path.join(OTTO_PATH, 'udo', 'sample_submission_short2.csv')
-
-print("training data file with path: ", data_train)
-
-
 # %%
 
-def doSomethingWithObj(obj):
-    print("%s" % (obj['session']))
+# def doSomethingWithObj(obj):
+#     print("%s" % (obj['session']))
 
 
-def main():
+# def main():
+#     counter = 0
+
+#     # https://github.com/isagalaev/ijson/issues/62
+#     with open(data_test2, 'rb') as data:
+#         for obj in ijson.itms(data, 'events.item', multiple_values=True):
+#             # print(obj)
+#             print(obj['aid'], obj['type'])
+#             counter = counter + 1
+#         # doSomethingWithObj(obj)
+
+#     print("There are " + str(counter) + " items in the JSON data file.")
+
+def counter_counts(data: object):
     counter = 0
+    counts = {}
+    for obj in ijson.items(data, 'events.item', multiple_values=True):
+        the_key = obj['aid']
+        the_type = obj['type']
+        field = counts.get(the_key, {})
+        total = field.get(the_type, 0)
+        field[the_type] = total + 1
+        counts[the_key] = field
+        counter = counter + 1
+    print('done')
+    return counter, counts
 
-    # https://github.com/isagalaev/ijson/issues/62
-    with open(data_test2, 'rb') as data:
-        for obj in ijson.items(data, 'events.item', multiple_values=True):
-            # print(obj)
-            print(obj['aid'], obj['type'])
-            counter = counter + 1
-        # doSomethingWithObj(obj)
 
-    print("There are " + str(counter) + " items in the JSON data file.")
+def actions(data: object):
+    counter = 0
+    sess_time_action = []
+    for i in ijson.items(data, '',
+                         multiple_values=True
+                         ):
+        init_time = datetime.fromtimestamp(
+            i['events'][0]['ts']/1000).strftime('%Y-%m-%d %H:%M:%S')
+        flow = {'session': i['session'],
+                'time': init_time,
+                'action': [f"{go['aid']}_{go['type']}" for go in i['events']]
+                }
+        sess_time_action.append(flow)
+    print('done with actions')
+    return sess_time_action
 
 
 @elapsed_time
-def main2(input_json: str):
-    counter = 0
-    counts = {}
+def count_freq_words(input_json: str) -> dict:
+    """Example function with PEP 484 type annotations.
+    Args:
+        input_json: data path of json(jsonl) file 
+    Returns:
+        aid with type counts
+    """
     # https://github.com/isagalaev/ijson/issues/62
-    with open(input_json, 'rb') as data:
-        for obj in ijson.items(data, 'events.item', multiple_values=True):
-            the_key = obj['aid']
-            the_type = obj['type']
-            field = counts.get(the_key, {})
-            total = field.get(the_type, 0)
-            field[the_type] = total + 1
-            counts[the_key] = field
-            counter = counter + 1
-        #     doSomethingWithObj(obj)
+    with open(input_json, 'rb') as obj_data:
+        counter, counts = counter_counts(obj_data)
     print("There are " + str(counter) +
           " items in the JSON data file.")  # 1855603
     return counts
 
 
-dict_aid_type_cnt = main2(data_train)
+@elapsed_time
+def get_actions(input_json: str) -> dict:
+    """Example function with PEP 484 type annotations.
+    Args:
+        input_json: data path of json(jsonl) file 
+    Returns:
+        dictionary with session, time, and actions    
+    """
+    with open(input_json, 'rb') as obj_data:
+        sess_time_action = actions(obj_data)
+    return sess_time_action
 
 
+dict_aid_type_cnt_tmp = get_actions(data_test10)
+pprint.pprint(dict_aid_type_cnt_tmp)
+# dict_aid_type_cnt = main2(data_train)
+
+# %%
 # %%
 dict_aid_type_cnt_test = main2(data_test2)
 pprint.pprint(dict_aid_type_cnt_test)
@@ -233,23 +271,32 @@ display(df_go[:3])
 # %%
 
 
-def create_zip_sub(df: pd.DataFrame):
+def create_zip_and_sub(df: pd.DataFrame):
     """ Create submission with current datetime as filename """
     str_dt = datetime.today().strftime('%Y%m%d%H%M')
     filename = f'sub_{str_dt}'
+    filename_zip = f"{filename}.zip"
     df.to_csv(f"{filename}.csv", index=False,
               quoting=csv.QUOTE_NONE, escapechar="")
-    with ZipFile(f"{filename}.zip", mode='w', compression=zipfile.ZIP_DEFLATED) as myzip:
+    with ZipFile(filename_zip, mode='w', compression=zipfile.ZIP_DEFLATED) as myzip:
         myzip.write(f'{filename}.csv')
-
     os.remove(f'{filename}.csv')
+    !kaggle competitions submit - c otto-recommender-system - f "{filename_zip}" - m "test api"
 
 
-create_zip_sub(df_go)
-# def go_by_api():
+create_zip_and_sub(df_go)
+# def submit_by_api():
 #     kaggle competitions submit - c otto-recommender-system - f submission.csv - m "Message"
 
+
 # %%
+def show():
+    a = 123
+    !pwd
+    !echo hello "{a}"
+
+
+show()
 
 # %%
 
