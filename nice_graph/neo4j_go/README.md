@@ -33,11 +33,11 @@
 			```bash
 			dbms.security.auth_enabled=false
 			```
-2. Connect neo4j
+2. Connect neo4j (Run at background)
 	- run neo4j console at background
 	```bash
 	$ neo4j console &
-	```
+	```	
 3. There are three ways to communicate with neo4j
 	- shell: 
 		```bash 
@@ -48,9 +48,13 @@
 		$ python main.py
 		```
 	- through browser with port forward 
-		```bash
-		localhost:7474
-		```
+		1. Type ```bash localhost:7474``` on browser
+	        2. Username/Password (default setting): neo4j/neo4j
+			![image](https://user-images.githubusercontent.com/10674490/226319017-339f3623-d3b2-4b15-b51e-6571c838d320.png)
+		3. Port forward on vscode
+		    - ![image](https://user-images.githubusercontent.com/10674490/226319418-44d8fed4-504c-4ebc-81be-862ace0c4adb.png)
+		    - ![image](https://user-images.githubusercontent.com/10674490/226319609-63b1b70c-293e-42cf-9844-eafab1ee9fce.png)
+
 ### Check the neo4j config setting
 - default import path
 	> Call dbms.listConfig() YIELD name, value
