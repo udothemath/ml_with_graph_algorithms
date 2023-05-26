@@ -1,0 +1,52 @@
+# pipeline_version: v1.1.0
+trigger: none
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: if_devops/pipeline
+      ref: refs/heads/master
+    - repository: vars
+      type: git
+      name: if_devops/pipeline_vars
+      ref: refs/heads/master
+    - repository: self
+    
+variables:
+  - template: var-secret.yml@vars
+  - template: var-normal.yml@vars
+
+stages:
+  - stage: TagCheck
+    jobs:
+      - template: mlaas2_cicd_template/pr-tag-check.yml@templates
+  - stage: Checkmarx
+    condition: contains(variables['System.PullRequest.TargetBranch'],'master')
+    jobs:
+      - template: mlaas2_cicd_template/master-build.yml@templates
+  - stage: AUTH_CHECK
+    dependsOn: []
+    jobs:
+      - job: Prod
+        condition: contains(variables['System.PullRequest.TargetBranch'],'master')
+        pool: "IF-Mlaas2-Prod-Build"
+        steps:
+          - template: modules/tasks/init-pr.yml@templates
+          - template: modules/tasks/create_env.yml@templates
+          - template: modules/tasks/deployment_check/api-auth-check.yml@templates
+          - template: modules/tasks/deployment_check/config-check.yml@templates
+          - template: modules/tasks/db_permission/get-etl-info.yml@templates
+          - template: modules/tasks/db_permission/grant-superuser.yml@templates
+          - template: modules/tasks/db_permission/check-mlaas-rawdata.yml@templates
+          - template: modules/tasks/db_permission/check-mlaas-limit.yml@templates
+          - template: modules/tasks/db_permission/check-feature.yml@templates
+          - template: modules/tasks/destroy_env.yml@templates
+      - job: UAT
+        condition: contains(variables['System.PullRequest.TargetBranch'],'uat')
+        pool: "IF-Mlaas2-Uat-Build"
+        steps:
+          - template: modules/tasks/init-pr.yml@templates
+          - template: modules/tasks/create_env.yml@templates
+          - template: modules/tasks/deployment_check/api-auth-check.yml@templates
+          - template: modules/tasks/deployment_check/config-check.yml@templates
+          - template: modules/tasks/destroy_env.yml@templates

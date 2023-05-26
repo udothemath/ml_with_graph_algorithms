@@ -1,0 +1,44 @@
+# pipeline_version: v1.1.0
+trigger: none
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: if_devops/pipeline
+      ref: refs/heads/master
+    - repository: vars
+      type: git
+      name: if_devops/pipeline_vars
+      ref: refs/heads/master
+    - repository: self
+
+variables:
+  - name: tag_dev
+    value: $(echo $(git tag --points-at HEAD |grep -E 'v[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}-alpha'))
+  - name: tag_uat
+    value: $(echo $(git tag --points-at HEAD |grep -E 'v[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}-beta'))
+  - name: tag_mas
+    value: $(echo $(git tag --points-at HEAD |grep -E 'v[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}'))
+  - template: var-secret.yml@vars
+  - template: var-normal.yml@vars
+
+stages:
+  - template: mlaas2_cicd_template/callback.yml@templates
+  - stage: Deploy_Message
+    condition: and(succeededOrFailed(), in(variables['Build.SourceBranchName'], 'develop', 'master'))
+    jobs:
+      - job: Send_Deploy_Message
+        ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+          pool: 'IF-Mlaas2-Prod-Build'
+        ${{ if eq(variables['Build.SourceBranchName'], 'develop') }}:
+          pool: 'IF-MLaas2-Staging-Build'
+        steps:
+          - template: modules/tasks/send_deploy_msg.yml@templates
+            parameters:
+              kafka_url: $(kafka_url)
+              index_url: $(index_url)
+              trusted_host: $(trusted_host)
+              deploy_msg_source: 'cicd_dag_watcher'
+              deploy_msg_content: $(deploy_msg)
+          - template: modules/tasks/destroy_env.yml@templates

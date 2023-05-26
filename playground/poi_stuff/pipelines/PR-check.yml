@@ -1,0 +1,41 @@
+# pipeline_version: v1.2.0
+trigger: none
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: if_devops/pipeline
+      ref: refs/heads/master
+    - repository: vars
+      type: git
+      name: if_devops/pipeline_vars
+      ref: refs/heads/master
+    - repository: self
+variables:
+  - name: python_version
+    value: "3.6.6" # 預設版本: 3.6.6 & 可支援: 3.7.5、3.8.6
+  - template: var-secret.yml@vars
+  - template: var-normal.yml@vars
+
+stages:
+  - stage: Code_Scan
+    jobs:
+      - template: modules/jobs/check-pipeline-version.yml@templates
+      - template: mlaas2_cicd_template/PR-check.yml@templates
+  - stage: AUTH_CHECK
+    dependsOn: []
+    jobs:
+      - job: Staging
+        pool: "IF-Mlaas2-Staging-Build"
+        dependsOn: []
+        steps:
+          - template: modules/tasks/init-pr.yml@templates
+          - template: modules/tasks/create_env.yml@templates
+          - template: modules/tasks/deployment_check/api-auth-check.yml@templates
+          - template: modules/tasks/deployment_check/config-check.yml@templates
+          - template: modules/tasks/db_permission/get-etl-info.yml@templates
+          - template: modules/tasks/db_permission/grant-superuser.yml@templates
+          - template: modules/tasks/db_permission/check-mlaas-rawdata.yml@templates
+          - template: modules/tasks/db_permission/check-mlaas-limit.yml@templates
+          - template: modules/tasks/db_permission/check-feature.yml@templates
+          - template: modules/tasks/destroy_env.yml@templates

@@ -1,0 +1,94 @@
+# pipeline_version: v1.3.0
+# docker
+# Build and push an image to Azure Container Registry
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+  branches:
+    include:
+      - refs/tags/aicloud_v*
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: if_devops/pipeline
+      ref: refs/heads/master
+    - repository: vars
+      type: git
+      name: if_devops/pipeline_vars
+      ref: refs/heads/master
+    - repository: self
+
+variables:
+  - name: ComponentType
+    value: 'etl'
+  - name: imageRepository
+    value: 'up0125/$(System.TeamProject)_$(Build.Repository.Name)_etl'  # 注意 config.py 的 imageRepository 要和這裡一致
+  - name: airflow_env
+    value: 'airflow'  # 若要上新的 airflow 這裡請填 'airflow-itc'
+  - template: var-secret.yml@vars
+  - template: var-normal.yml@vars
+
+jobs:
+  - template: modules/jobs/init.yml@templates
+      
+  - job: AIRFLOW_DAG_VALIDATOR
+    ${{ if or(in(variables['Build.SourceBranchName'], 'develop', 'hotfix'), startsWith(variables['Build.SourceBranchName'],'aicloud_v')) }}:
+      pool: "IF-Mlaas2-Staging-Build"
+    ${{ if eq(variables['Build.SourceBranchName'], 'uat') }}:
+      pool: "IF-Mlaas2-Uat-Build"
+    ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+      pool: "IF-Mlaas2-Prod-Build"
+    dependsOn:
+      - INIT
+    steps:
+      - template: modules/tasks/init.yml@templates
+      - template: modules/tasks/airflow_tasks/init-airflow-host.yml@templates
+      - template: modules/tasks/airflow_tasks/get-build-info.yml@templates
+      - template: modules/tasks/airflow_tasks/push-to-centralized-repo.yml@templates
+      - template: modules/tasks/airflow_tasks/check-conn-id.yml@templates
+      - template: modules/tasks/airflow_tasks/set-airflow-vars.yml@templates
+      - template: modules/tasks/airflow_tasks/trigger-dag-validator.yml@templates
+
+  - template: modules/jobs/image-build.yml@templates
+  
+  - job: AIRFLOW_DAG_TRIGGER
+    ${{ if or(in(variables['Build.SourceBranchName'], 'develop', 'hotfix'), startsWith(variables['Build.SourceBranchName'],'aicloud_v')) }}:
+      pool: "IF-Mlaas2-Staging-Build"
+    ${{ if eq(variables['Build.SourceBranchName'], 'uat') }}:
+      pool: "IF-Mlaas2-Uat-Build"
+    ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+      pool: "IF-Mlaas2-Prod-Build"
+    dependsOn:
+      - AIRFLOW_DAG_VALIDATOR
+      - IMAGE_BUILD_PUSH
+    variables:
+      pipe_callbackID: $[ dependencies.AIRFLOW_DAG_VALIDATOR.outputs['get_build_info.pipe_callbackID']]
+      previous_commit: $[ dependencies.AIRFLOW_DAG_VALIDATOR.outputs['push_DAG.previous_commit']]
+      pushed_status: $[ dependencies.AIRFLOW_DAG_VALIDATOR.outputs['push_DAG.pushed_status']]
+    steps:
+      - template: modules/tasks/init.yml@templates
+      - template: modules/tasks/airflow_tasks/init-airflow-host.yml@templates
+      - template: modules/tasks/airflow_tasks/check-dag-id.yml@templates
+      - template: modules/tasks/airflow_tasks/trigger-dag.yml@templates
+  
+  - job: AIRFLOW_ROLLBACK
+    ${{ if or(in(variables['Build.SourceBranchName'], 'develop', 'hotfix'), startsWith(variables['Build.SourceBranchName'],'aicloud_v')) }}:
+      pool: "IF-Mlaas2-Staging-Build"
+    ${{ if eq(variables['Build.SourceBranchName'], 'uat') }}:
+      pool: "IF-Mlaas2-Uat-Build"
+    ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+      pool: "IF-Mlaas2-Prod-Build"
+    dependsOn:
+      - AIRFLOW_DAG_VALIDATOR
+      - IMAGE_BUILD_PUSH
+    variables: 
+      previous_commit: $[ dependencies.AIRFLOW_DAG_VALIDATOR.outputs['push_DAG.previous_commit']]
+      pushed_status: $[ dependencies.AIRFLOW_DAG_VALIDATOR.outputs['push_DAG.pushed_status']]
+    condition: failed()
+    steps:
+      - template: modules/tasks/airflow_tasks/init-airflow-host.yml@templates
+      - template: modules/tasks/airflow_tasks/rollback-etl.yml@templates
+      
+  - template: modules/jobs/tag-push.yml@templates
