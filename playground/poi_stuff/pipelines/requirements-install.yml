@@ -1,0 +1,44 @@
+# pipeline_version: v2.0.0
+# docker
+# Build and push an image to Azure Container Registry
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+parameters:
+  - name: folders
+    type: object
+    default: 
+    - api
+    - etl
+    - consumer
+  - name: envs
+    type: object
+    default: 
+    - Staging
+    - Uat
+    - Prod
+
+variables:
+  - name: python_version
+    value: '3.6.6'  # 預設版本: 3.6.6 & 可支援: 3.7.5、3.8.6
+  - name: pip_version
+    value: '21.2.1'
+
+trigger: none
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: if_devops/pipeline
+      ref: refs/heads/master # 專案請換成 refs/heads/master
+    - repository: self
+
+stages:
+  - ${{ each env in parameters.envs }}:
+    - stage: ${{ env }}
+      condition: always()
+      dependsOn: []
+      jobs:
+        - template: modules/jobs/requirements/install.yml@templates
+          parameters:
+              folders: ${{ parameters.folders }}
+              env: ${{ env }}

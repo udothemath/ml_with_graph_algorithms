@@ -1,0 +1,42 @@
+# pipeline_version: v1.0.0
+trigger: none
+
+resources:
+  repositories:
+    - repository: self
+    - repository: templates
+      type: git
+      name: if_devops/pipeline
+      ref: refs/heads/master
+    - repository: vars
+      type: git
+      name: if_devops/pipeline_vars
+      ref: refs/heads/master
+
+variables:
+  - template: var-secret.yml@vars
+  - template: var-normal.yml@vars
+  - name: proj_name
+    value: $(System.TeamProject)
+  - name: repo_name
+    value: $(Build.Repository.Name)
+  - name: mlaas_api_repo_name
+    value: if_crux
+  - name: mlaas_api_proj_name
+    value: if_polaris
+  - name: azure_url
+    value: https://hellodevops.esunbank.com.tw/
+  - name: collection_name
+    value: IF
+  - name: mlaas_api_framework_repo_url
+    value: $(azure_url)/$(collection_name)/$(mlaas_api_proj_name)/_git/$(mlaas_api_repo_name)
+  - name: default_messenger_msg
+    value: $(Build.Repository.Name) 文件已更新
+  - name: mlaas_without_api_framework_repo_url # 不從 crux 取 API 相關檔案，直接到該專案 repo 取檔
+    value: $(azure_url)/$(collection_name)/$(proj_name)/_git/$(repo_name)
+  - name: main_program_name
+    value: app # 可自定義 API 主程式名稱
+
+jobs:
+  - template: api_hub_template/api_hub_cd.yml@templates
+  # - template: api_hub_template/api_hub_cd_free_main.yml@templates

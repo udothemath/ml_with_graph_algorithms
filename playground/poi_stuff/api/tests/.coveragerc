@@ -1,0 +1,7 @@
+[run]
+# omit files not for testing
+# omit=
+[report]
+exclude_lines =
+    if __name__ == __main__:
+    pass

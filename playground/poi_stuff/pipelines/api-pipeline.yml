@@ -1,0 +1,50 @@
+# pipeline_version: v1.1.0
+# docker
+# Build and push an image to Azure Container Registry
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger: none
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: if_devops/pipeline
+      ref: refs/heads/master # 專案請換成 refs/heads/master
+    - repository: vars
+      type: git
+      name: if_devops/pipeline_vars
+      ref: refs/heads/master
+    - repository: self
+
+variables:
+  - template: var-secret.yml@vars
+  - template: var-normal.yml@vars
+  - name: ComponentType
+    value: 'api'
+  - name: imageRepository
+    value: 'up0125/$(System.TeamProject)_$(Build.Repository.Name)_api'
+  - name: URL
+    value: https://hellodevops.esunbank.com.tw/IF/$(proj_name)/_git/config
+  - name: msg
+    value: $(echo $(git tag -n1 --points-at HEAD | sed 's/$(tag)//'))
+  - name: event_commit_dev
+    value: $(echo $(git log --tags --decorate --simplify-by-decoration | awk '/commit/ && /tag/' | grep 'alpha' -m1 | cut -d ' ' -f2))
+  - name: tag_uat
+    value: $(echo $(git tag --points-at $(event_commit_dev) |grep -E 'v[0-9]{1,2}.[0-9]{1,2}.[0-9]{1,2}-alpha'))
+  
+
+stages:
+  - stage: nomodel
+    condition: always()
+    variables:
+      - name: model_type
+        value: 'nomodel' # nomodel, online, pretrain
+      - name: python_version
+        value: '3.6.6'  # 預設版本: 3.6.6 & 可支援: 3.7.5、3.8.6
+    jobs:
+      - template: modules/jobs/init.yml@templates
+      - template: modules/jobs/get-model.yml@templates
+      - template: modules/jobs/image-build.yml@templates
+      - template: modules/jobs/api-test.yml@templates
+      - template: modules/jobs/tag-push.yml@templates
+      - template: modules/jobs/config-setting-helm.yml@templates

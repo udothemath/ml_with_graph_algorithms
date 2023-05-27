@@ -1,1 +1,1 @@
-cp -r /home/jovyan/pl_automated_valuation_TFS .
+cp -r /home/jovyan/pl_poi_service_TFS .

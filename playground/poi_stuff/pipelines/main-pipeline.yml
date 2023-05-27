@@ -1,0 +1,81 @@
+# pipeline_version: v1.1.0
+# docker
+# # Build and push an image to Azure Container Registry
+# # https://docs.microsoft.com/azure/devops/pipelines/languages/docker
+
+trigger:
+  branches:
+    include:
+      - master
+      - develop
+      - uat
+      - hotfix
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: if_devops/pipeline
+      ref: refs/heads/master
+    - repository: vars
+      type: git
+      name: if_devops/pipeline_vars
+      ref: refs/heads/master
+    - repository: self
+
+
+variables:
+  - template: var-secret.yml@vars
+  - template: var-normal.yml@vars
+
+
+stages:
+  - stage: AlertManager
+    condition: always()
+    jobs:
+      - template: alert_manager_template/alert-manager-template.yml@templates
+      
+  - stage: Messenger
+    condition: always()
+    jobs:
+      - template: messenger_template/messenger.yml@templates
+
+  - stage: EFKServices
+    condition: always()
+    jobs:
+      - template: efk_template/esalert-pipeline.yml@templates
+      - template: efk_template/esalert-staging.yml@templates
+      - template: efk_template/esdump-pipeline.yml@templates
+
+  - stage: MainPipeline
+    condition: always()
+    jobs:
+      - job: MAIN
+        ${{ if in(variables['Build.SourceBranchName'], 'develop', 'hotfix') }}:
+          pool: 'IF-MLaas2-Staging-Build-Minio'
+        ${{ if eq(variables['Build.SourceBranchName'], 'uat') }}:
+          pool: 'IF-Mlaas2-Uat-Build'
+        ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+          pool: 'IF-Mlaas2-Prod-Build'
+        steps:
+        - checkout: self
+          persistCredentials: true
+        - template: modules/tasks/get-pr-info.yml@templates
+        - template: modules/tasks/get-build-info.yml@templates
+        - template: modules/tasks/tag-info.yml@templates
+        - template: modules/tasks/call-api.yml@templates
+          # Description: 
+          #  - Call Jabar to close event trigger, call Azure DevOps to queue components build
+          # Dependency:
+          #  - NA
+          # Used variables:
+          #  - Needed
+          #    proj_name, branch, domain, end_component, tag, commitID
+          #  - Optional
+          #    api, model, etl, batch, etl_callback, model_callback, batch_callback        
+        - template: modules/tasks/release-note.yml@templates
+          # Description: 
+          #  - Check and create Release Note page
+          # Dependency:
+          #  - NA
+          # Used variables:
+          #  - proj_name, branch, tag, commitID, date
