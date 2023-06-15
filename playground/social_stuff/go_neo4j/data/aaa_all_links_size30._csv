@@ -1,0 +1,11 @@
+,from,to,from_type,to_type,link_type
+0,a1,a10,cust,cust,rel_1
+1,a2,x2,cust,company,rel_2
+2,a3,a11,cust,cust,rel_1
+3,a4,a12,cust,cust,rel_3
+4,a5,a13,cust,cust,rel_3
+5,a6,a14,cust,cust,rel_1
+6,x1,x3,company,company,rel_4
+7,a7,a15,cust,cust,rel_1
+8,a8,x4,cust,company,rel_2
+9,a9,a16,cust,cust,rel_1
