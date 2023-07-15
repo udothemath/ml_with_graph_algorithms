@@ -10,5 +10,3 @@ load_dotenv(dotenv_path=env_path)
 NEO4J_USER = os.environ.get('NEO4J_USER')
 NEO4J_PASSWORD = os.environ.get('PASSWORD')
 print(f"NEO4J user:{NEO4J_USER}. password: {NEO4J_PASSWORD}")
-
-
