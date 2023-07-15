@@ -1,7 +1,24 @@
 import math
 import random
 import csv
+import time
+import functools
+import logging
 
+def logger_decorator(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        execution_time = end_time - start_time
+
+        logger = logging.getLogger(__name__)
+        logger.info(f"Function '{func.__qualname__}' executed in {execution_time:.4f} seconds.")
+
+        return result
+
+    return wrapper
 
 def create_csv_file(file_info):
     file_prefix = file_info.file_prefix 
