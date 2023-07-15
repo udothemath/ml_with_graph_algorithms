@@ -1,14 +1,13 @@
-import os
 import math
 import random
 import csv
 
 
-def create_csv_file(file_prefix: str, 
-                    num_rows: int, 
-                    type_size: int,
-                    file_path: str
-                    ):
+def create_csv_file(file_info):
+    file_prefix = file_info.file_prefix 
+    num_rows = file_info.num_rows 
+    type_size = file_info.type_size
+    file_path = file_info.file_path
     # Define column names
     fieldnames = ['from', 'to', 'from_type', 'to_type', 'relation']
     rand_size = int(num_rows/3)
@@ -36,9 +35,7 @@ def create_csv_file(file_prefix: str,
                      'relation': relation})
     
     # Write data to CSV file
-    file_name = os.path.join(file_path, f'{file_prefix}_size{num_rows}.csv')
-
-    with open(file_name, mode='w', newline='') as csv_file:
+    with open(file_info.filename_path, mode='w', newline='') as csv_file:
         writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)
