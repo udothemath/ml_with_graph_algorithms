@@ -1,11 +1,16 @@
 {
   "folders": [
-	{
-		"path": "../.."
-	},
-	{
-		"path": "../../../a_sandbox"
-	}
-],
-  "settings": {}
+    {
+      "path": "../.."
+    },
+    {
+      "path": "../../../a_sandbox"
+    }
+  ],
+  "settings": {
+    "[python]": {
+      "editor.defaultFormatter": "ms-python.autopep8"
+    },
+    "python.formatting.provider": "none"
+  }
 }
