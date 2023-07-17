@@ -1,17 +1,19 @@
 # %%
 import os
 from dataclasses import dataclass
-from src.utils import create_csv_file, logger_decorator
+from src.utils import create_csv_file, logger_decorator, create_logger, log_info
 from src.neo4j_conn import Neo4jConnection
 from setting import NEO4J_PASSWORD, NEO4J_USER
 from src.cypher_code import (cypher_clean, cypher_conf)
+from datetime import datetime
 
 PATH_BOLT = "bolt://localhost:7687"
-MAIN_PATH = "/Users/pro/Documents/ml_with_graph_algorithms/nice_graph/neo4j_go"
+MAIN_PATH = "/Users/pro/Documents/ml_with_graph_algorithms/nice_graph/neo4j_go/"
 DATA_PATH = os.path.join(MAIN_PATH, 'data')
-import logging
+# dir_path = os.path.abspath(os.getcwd()) + "/"
+LOG_FILENAME = f"log_{datetime.now():%Y%m%d}.log"
+the_logger = create_logger(LOG_FILENAME, 'logs', MAIN_PATH, turn_on_console=True)
 
-logging.basicConfig(level=logging.INFO)
 
 @dataclass
 class FileInfo:
@@ -24,38 +26,65 @@ class FileInfo:
     def filename_path(self):
         return os.path.join(self.file_path, f'{self.file_prefix}_size{self.num_rows}.csv')
 
-def check_file(file_info:FileInfo) -> None:
-    filename_path  =  file_info.filename_path
-    print(f"file: {filename_path}")
-    if os.path.isfile(filename_path):
-        print("u already have csv file. Do nothing...")
-    else:
-        print("u don't have csv file. Create in progress...")
-        create_csv_file(a_csv)
+class RunNeo4j:
+    def __init__(self,  file_info:FileInfo, logger):
+        self.file_info = file_info
+        self.logger = logger
+        self.filename_path = self._check_file()
 
-@logger_decorator
-def main(the_file):
+    @logger_decorator(the_logger)
+    def _check_file(self)  -> None:
+        filename_path  =  self.file_info.filename_path
+        self.logger.info(f"file: {filename_path}")
+        self.logger.info(self.file_info)
+        if os.path.isfile(filename_path):
+            print("u already have csv file. Do nothing...")
+        else:
+            print("u don't have csv file. Create in progress...")
+            create_csv_file(self.file_info)   
+        return filename_path
 
-    the_cypher = f'''
-        LOAD CSV WITH HEADERS FROM 'file:///{the_file}' AS row
-        RETURN count(row);
-    '''
+    @logger_decorator(the_logger)
+    def main(self):
+        the_file = self.filename_path
 
-    with Neo4jConnection(uri=PATH_BOLT, user=NEO4J_USER, pwd=NEO4J_PASSWORD) as driver:
-        print(driver.query(cypher_conf))
-        print(driver.query(the_cypher))
-        # print(driver.query(cypher_html_csv))
+        cypher_constraint_from = f'''
+            CREATE CONSTRAINT IF NOT EXISTS ON (m:FROM_ID) ASSERT m.from IS UNIQUE
+        '''
 
+        cypher_constraint_to = f'''
+            CREATE CONSTRAINT IF NOT EXISTS ON (m:TO_ID) ASSERT m.to IS UNIQUE
+        '''
+
+        cypher_count = f'''
+            LOAD CSV WITH HEADERS FROM 'file:///{the_file}' AS row
+            RETURN count(row);
+        '''
+
+        cypher_from_rel_to = f'''
+            USING PERIODIC COMMIT 5000
+            LOAD CSV WITH HEADERS FROM 'file:///{the_file}' AS row
+            MERGE (from_id:ID:FROM_ID {{name: row.from, type: row.from_type}})
+            MERGE (to_id:ID:TO_ID {{name: row.to, type: row.to_type}})
+            MERGE (from_id) - [rel:relation {{type: row.relation}}] -> (to_id)       
+            RETURN count(from_id), count(to_id), count(rel);
+        '''
+
+        with Neo4jConnection(uri=PATH_BOLT, user=NEO4J_USER, pwd=NEO4J_PASSWORD) as driver:
+            print(driver.query(cypher_clean))
+            print(driver.query(cypher_constraint_from))
+            print(driver.query(cypher_constraint_to))
+            print(driver.query(cypher_conf))
+            print(driver.query(cypher_count))
+            print(driver.query(cypher_from_rel_to))
 
 if __name__ == "__main__":
-    print("run main")
+    print("---run main---")
     # step 1:
-    a_csv = FileInfo('sample', 12, 5, DATA_PATH)
-    a_path = a_csv.filename_path
-    check_file(a_csv)
-    main(a_path)
-
-
-    print("done in main")
+    for i in [10, 100, 1_000, 10_000, 100_000, 1_000_000, 10_000_000]:
+        a_csv = FileInfo('sample', i, 5, DATA_PATH)
+        go = RunNeo4j(a_csv, the_logger)
+        go.main()
+    print("---done in main---")
 # %%
 
